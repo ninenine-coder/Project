@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PBLS VR教學平台 - 演示版本</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Microsoft JhengHei', Arial, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+        }
+
+        .demo-container {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .demo-notice {
+            background: linear-gradient(45deg, #ff6b6b, #ee5a24);
+            color: white;
+            padding: 15px;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .marquee-section {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .marquee-content {
+            display: flex;
+            gap: 30px;
+            align-items: center;
+        }
+
+        .marquee-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+        }
+
+        .pbls-logo {
+            font-size: 24px;
+            font-weight: bold;
+            letter-spacing: 2px;
+        }
+
+        .main-content {
+            flex: 1;
+            display: flex;
+            padding: 30px;
+            gap: 30px;
+        }
+
+        .sidebar {
+            width: 200px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .menu-icons {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .menu-icon {
+            width: 60px;
+            height: 60px;
+            background: white;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+
+        .menu-icon:hover {
+            transform: translateX(10px);
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .menu-icon i {
+            font-size: 24px;
+        }
+
+        .menu-description {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            font-size: 12px;
+            line-height: 1.6;
+            color: #666;
+        }
+
+        .video-section {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .video-container {
+            width: 100%;
+            max-width: 600px;
+            aspect-ratio: 16/9;
+            background: #000;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .video-placeholder {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, #1a1a1a, #2d2d2d);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            text-align: center;
+            padding: 40px;
+        }
+
+        .video-placeholder i {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            color: #667eea;
+        }
+
+        .user-section {
+            width: 200px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .user-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 2rem;
+            margin-bottom: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .user-avatar:hover {
+            transform: scale(1.05);
+        }
+
+        .help-section {
+            background: white;
+            padding: 20px 30px;
+            border-top: 1px solid #e9ecef;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .help-icon {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.5rem;
+        }
+
+        .help-text h4 {
+            margin: 0 0 5px 0;
+            color: #333;
+        }
+
+        .help-text p {
+            margin: 0;
+            color: #666;
+            font-size: 14px;
+        }
+
+        .sport-options {
+            display: flex;
+            gap: 15px;
+        }
+
+        .sport-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .sport-item:hover {
+            background: #e9ecef;
+            transform: translateY(-2px);
+        }
+
+        .sport-item i {
+            font-size: 1.5rem;
+            color: #667eea;
+        }
+
+        .sport-item span {
+            font-size: 12px;
+            color: #666;
+        }
+
+        .arrow-indicator {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #667eea;
+            font-weight: 500;
+        }
+
+        @media (max-width: 1024px) {
+            .main-content {
+                flex-direction: column;
+            }
+            
+            .sidebar {
+                width: 100%;
+                flex-direction: row;
+                justify-content: space-between;
+            }
+            
+            .menu-icons {
+                flex-direction: row;
+            }
+            
+            .user-section {
+                width: 100%;
+                flex-direction: row;
+                justify-content: space-between;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="demo-container">
+        <!-- 演示通知 -->
+        <div class="demo-notice">
+            <i class="fas fa-info-circle"></i>
+            這是演示版本，實際功能需要設定Firebase後才能使用
+        </div>
+
+        <!-- 頂部跑馬燈區域 -->
+        <div class="marquee-section">
+            <div class="marquee-content">
+                <div class="marquee-item">
+                    <i class="fas fa-info-circle"></i>
+                    <span>網站新資訊</span>
+                </div>
+                <div class="marquee-item">
+                    <i class="fas fa-book"></i>
+                    <span>PBLS知識</span>
+                </div>
+                <div class="marquee-item">
+                    <i class="fas fa-arrow-right"></i>
+                    <span>下一頁</span>
+                </div>
+            </div>
+            <div class="pbls-logo">
+                <span>PBLS</span>
+            </div>
+        </div>
+
+        <!-- 主要內容區域 -->
+        <div class="main-content">
+            <!-- 左側選單區域 -->
+            <div class="sidebar">
+                <div class="menu-icons">
+                    <div class="menu-icon" title="對話練習">
+                        <i class="fas fa-comments"></i>
+                    </div>
+                    <div class="menu-icon" title="聽力訓練">
+                        <i class="fas fa-volume-up"></i>
+                    </div>
+                    <div class="menu-icon" title="閱讀練習">
+                        <i class="fas fa-book"></i>
+                    </div>
+                    <div class="menu-icon" title="數據分析">
+                        <i class="fas fa-chart-bar"></i>
+                    </div>
+                </div>
+                <div class="menu-description">
+                    <p>4個選單</p>
+                    <p>將滑鼠移到圖示上方 會向右彈開</p>
+                    <p>練習題 顯示中文字 點選後 會自動下移到該區段</p>
+                </div>
+            </div>
+
+            <!-- 中央影片區域 -->
+            <div class="video-section">
+                <div class="video-container">
+                    <div class="video-placeholder">
+                        <i class="fas fa-vr-cardboard"></i>
+                        <h3>360實境教學影片</h3>
+                        <p>請連接VR頭盔...</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 右側用戶區域 -->
+            <div class="user-section">
+                <div class="user-avatar">
+                    <i class="fas fa-user"></i>
+                </div>
+                <div class="user-info">
+                    <h4>演示用戶</h4>
+                    <p>點擊頭像跳出</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 底部幫助區域 -->
+        <div class="help-section">
+            <div class="help-icon">
+                <i class="fas fa-question-circle"></i>
+            </div>
+            <div class="help-text">
+                <h4>導入使用手冊</h4>
+                <p>虛擬人說明</p>
+            </div>
+            <div class="sport-options">
+                <div class="sport-item">
+                    <i class="fas fa-swimming-pool"></i>
+                    <span>游泳</span>
+                </div>
+                <div class="sport-item">
+                    <i class="fas fa-volleyball-ball"></i>
+                    <span>排球</span>
+                </div>
+            </div>
+            <div class="arrow-indicator">
+                <i class="fas fa-arrow-right"></i>
+                <span>做液晶玻璃</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 添加一些基本的互動效果
+        document.querySelectorAll('.menu-icon').forEach(icon => {
+            icon.addEventListener('click', function() {
+                const title = this.getAttribute('title');
+                alert(`您點擊了: ${title}\n\n這是演示版本，實際功能需要設定Firebase後才能使用。`);
+            });
+        });
+
+        document.querySelector('.user-avatar').addEventListener('click', function() {
+            alert('用戶選單\n\n這是演示版本，實際功能需要設定Firebase後才能使用。');
+        });
+
+        document.querySelectorAll('.sport-item').forEach(item => {
+            item.addEventListener('click', function() {
+                const sport = this.querySelector('span').textContent;
+                alert(`您選擇了: ${sport}\n\n這是演示版本，實際功能需要設定Firebase後才能使用。`);
+            });
+        });
+    </script>
+</body>
+</html>
