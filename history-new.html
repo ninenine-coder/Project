@@ -1,0 +1,2713 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>歷史紀錄 - PBLS VR教學平台</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Microsoft JhengHei', Arial, sans-serif;
+            background: white;
+            min-height: 100vh;
+            color: #333;
+        }
+
+        /* 左側導航欄 */
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 80px;
+            height: 100vh;
+            background: rgba(147, 112, 219, 0.85);
+            backdrop-filter: blur(20px);
+            display: flex;
+            flex-direction: column;
+            transition: width 0.3s ease;
+            box-shadow: 4px 0 20px rgba(0, 0, 0, 0.3), 
+                         0 0 40px rgba(0, 0, 0, 0.1);
+            border-right: 1px solid rgba(255, 255, 255, 0.1);
+            z-index: 1000;
+        }
+
+        .sidebar:hover {
+            width: 180px;
+        }
+
+        /* 當左側選單展開時，標題欄和跑馬燈跟著向右移動 */
+        .sidebar:hover ~ .header {
+            left: 180px;
+        }
+
+        .sidebar:hover ~ .marquee-section {
+            left: 180px;
+        }
+
+        .sidebar:hover ~ .main-content {
+            margin-left: 180px;
+        }
+
+        .sidebar-top {
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .sidebar-center {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            width: 100%;
+            align-items: center;
+        }
+
+        .sidebar-bottom {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .sidebar-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2),
+                        inset 0 1px 0 rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: white;
+            position: relative;
+        }
+
+        .sidebar:hover .sidebar-icon {
+            width: 160px;
+            justify-content: center;
+            padding: 0 15px;
+        }
+
+        .sidebar-icon:hover,
+        .sidebar-icon.active {
+            background: rgba(52, 152, 219, 0.8);
+            color: white;
+            transform: scale(1.05);
+            box-shadow: 0 6px 20px rgba(52, 152, 219, 0.4),
+                        inset 0 1px 0 rgba(255, 255, 255, 0.3);
+        }
+
+        .sidebar-icon.help-icon {
+            background: transparent;
+            color: #bdc3c7;
+            margin-top: auto;
+        }
+
+        /* Logo樣式 */
+        .sidebar-top {
+            padding: 20px 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .logo-container {
+            width: 60px;
+            height: 60px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+
+        .logo-image {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+            filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+            transition: all 0.3s ease;
+        }
+
+        .sidebar:hover .logo-container {
+            transform: scale(1.82);
+        }
+
+        .logo-container:hover .logo-image {
+            filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
+        }
+
+        .sidebar-icon-text {
+            font-size: 14px;
+            font-weight: 500;
+            white-space: nowrap;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            margin-left: 10px;
+        }
+
+        .sidebar:hover .sidebar-icon-text {
+            opacity: 1;
+        }
+
+        .sidebar-icon i {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+            font-size: 20px;
+        }
+
+        /* 頂部標題欄 */
+        .header {
+            position: fixed;
+            top: 0;
+            left: 80px; /* 與側邊欄對齊 */
+            right: 0;
+            height: 80px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 30px;
+            z-index: 999;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            transition: left 0.3s ease; /* 與側邊欄同步動畫 */
+        }
+
+        .sidebar:hover ~ .header {
+            left: 180px; /* 側邊欄展開時，header也一起移動 */
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .header-title {
+            color: white;
+            font-size: 24px;
+            font-weight: bold;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .user-info {
+            background: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 14px;
+            color: #333;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #3498db;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .user-avatar:hover {
+            transform: scale(1.1);
+        }
+
+        .logout-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #e74c3c;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .logout-btn:hover {
+            transform: scale(1.1);
+        }
+
+        /* 跑馬燈 */
+        .marquee {
+            position: fixed;
+            top: 80px;
+            left: 0;
+            right: 0;
+            height: 60px;
+            background: rgba(52, 152, 219, 0.9);
+            display: flex;
+            align-items: center;
+            overflow: hidden;
+            z-index: 998;
+        }
+
+        .marquee-content {
+            display: flex;
+            animation: marquee 30s linear infinite;
+            white-space: nowrap;
+        }
+
+        .marquee-item {
+            margin-right: 50px;
+            color: white;
+            font-size: 16px;
+            font-weight: 500;
+        }
+
+        @keyframes marquee {
+            0% { transform: translateX(100%); }
+            100% { transform: translateX(-100%); }
+        }
+
+        /* 主要內容區域 */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            margin-left: 80px;
+            margin-top: 140px; /* 為固定標題欄(80px)和跑馬燈(60px)留出空間 */
+            padding: 20px 30px 40px 30px;
+            min-height: calc(100vh - 180px);
+        }
+
+        .sidebar:hover ~ .main-content {
+            margin-left: 180px;
+        }
+
+        /* 練習專區首頁樣式 */
+        .practice-homepage {
+            padding: 20px 30px 40px 30px;
+            min-height: calc(100vh - 180px);
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        /* 360實境教學影片樣式 */
+        .vr-video-section {
+            max-width: 800px;
+            margin: 0 auto 40px auto;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            overflow: hidden;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .vr-video-section:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+        }
+
+        .vr-video-header {
+            padding: 30px 30px 20px 30px;
+            text-align: center;
+        }
+
+        .video-title {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 10px;
+        }
+
+        .video-title i {
+            font-size: 24px;
+            color: #3498db;
+        }
+
+        .video-title span {
+            font-size: 24px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .video-subtitle {
+            font-size: 14px;
+            color: #7f8c8d;
+            margin: 0;
+            line-height: 1.5;
+        }
+
+        .video-player-container {
+            padding: 0 30px 30px 30px;
+        }
+
+        .video-player {
+            position: relative;
+            width: 100%;
+            height: 400px;
+            background: linear-gradient(135deg, #9370db 0%, #3498db 100%);
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .video-player:hover {
+            transform: scale(1.02);
+            box-shadow: 0 10px 30px rgba(52, 152, 219, 0.3);
+        }
+
+        .play-button-center {
+            width: 80px;
+            height: 80px;
+            background: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .play-button-center:hover {
+            transform: scale(1.1);
+            box-shadow: 0 12px 25px rgba(0, 0, 0, 0.3);
+        }
+
+        .play-button-center i {
+            font-size: 28px;
+            color: #3498db;
+            margin-left: 4px;
+        }
+
+        .video-duration {
+            position: absolute;
+            bottom: 15px;
+            right: 15px;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        /* 虛擬人互動樣式 */
+        .virtual-human-section {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .section-header h2 {
+            font-size: 24px;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+
+        .section-header h2 i {
+            color: #3498db;
+            margin-right: 10px;
+        }
+
+        .section-header p {
+            color: #7f8c8d;
+            font-size: 14px;
+        }
+
+        .virtual-human-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .virtual-human-card {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+
+        .virtual-human-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .virtual-human-card h3 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+
+        .virtual-human-card p {
+            color: #7f8c8d;
+            font-size: 14px;
+            margin-bottom: 15px;
+        }
+
+        /* 響應式設計 */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 60px;
+            }
+
+            .sidebar:hover {
+                width: 160px;
+            }
+
+            .main-content {
+                margin-left: 60px;
+            }
+
+            .sidebar:hover ~ .main-content {
+                margin-left: 160px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 左側導航欄 -->
+    <div class="sidebar">
+        <!-- 頂部：Logo -->
+        <div class="sidebar-top">
+            <div class="logo-container">
+                <img src="assets/logo.png" alt="PBLS Logo" class="logo-image">
+            </div>
+        </div>
+        
+        <!-- 中間：5個功能按鈕 -->
+        <div class="sidebar-center">
+            <!-- 練習專區 -->
+            <div class="sidebar-icon" 
+                 title="練習專區"
+                 onclick="window.location.href='index.html'">
+                <i class="fas fa-dumbbell"></i>
+                <span class="sidebar-icon-text">練習專區</span>
+            </div>
+            
+            <!-- 考試專區 -->
+            <div class="sidebar-icon" 
+                 title="考試專區"
+                 onclick="window.location.href='exam.html'">
+                <i class="fas fa-clipboard-check"></i>
+                <span class="sidebar-icon-text">考試專區</span>
+            </div>
+            
+            <!-- 歷史成績 -->
+            <div class="sidebar-icon active" 
+                 title="歷史成績"
+                 onclick="window.location.href='history.html'">
+                <i class="fas fa-chart-line"></i>
+                <span class="sidebar-icon-text">歷史成績</span>
+            </div>
+            
+            <!-- 資訊 -->
+            <div class="sidebar-icon" 
+                 title="資訊"
+                 onclick="window.location.href='info.html'">
+                <i class="fas fa-info-circle"></i>
+                <span class="sidebar-icon-text">資訊</span>
+            </div>
+            
+            <!-- 團隊 -->
+            <div class="sidebar-icon" 
+                 title="團隊"
+                 onclick="window.location.href='team.html'">
+                <i class="fas fa-users"></i>
+                <span class="sidebar-icon-text">團隊</span>
+            </div>
+        </div>
+        
+        <!-- 底部：教學手冊 -->
+        <div class="sidebar-bottom">
+            <div class="sidebar-icon help-icon" 
+                 title="教學手冊"
+                 onclick="showHelpModal()">
+                <i class="fas fa-question-circle"></i>
+                <span class="sidebar-icon-text">教學手冊</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- 頂部標題欄 -->
+    <div class="header">
+        <div class="header-left">
+            <h1 class="header-title">歡迎使用PBLS教學平台</h1>
+        </div>
+        <div class="header-right">
+            <div class="user-info">CGU(長庚大學), Nursing</div>
+            <div class="user-avatar" onclick="showUserProfile()">
+                <i class="fas fa-user"></i>
+            </div>
+            <div class="logout-btn" onclick="logout()">
+                <i class="fas fa-sign-out-alt"></i>
+            </div>
+        </div>
+    </div>
+
+    <!-- 跑馬燈 -->
+    <div class="marquee">
+        <div class="marquee-content">
+            <div class="marquee-item">🎯 歡迎使用PBLS VR教學平台！</div>
+            <div class="marquee-item">📚 360°實境教學影片，身臨其境的學習體驗</div>
+            <div class="marquee-item">🤖 虛擬人互動，提升急救溝通技巧</div>
+            <div class="marquee-item">🎮 VR實際操作，模擬真實急救情境</div>
+            <div class="marquee-item">📊 即時成績追蹤，掌握學習進度</div>
+            <div class="marquee-item">💡 問題導向學習法，提升急救技能</div>
+        </div>
+    </div>
+
+    <!-- 主要內容區域 -->
+    <div class="main-content">
+        <!-- 練習專區首頁內容 -->
+        <div class="practice-homepage" id="practiceHomepage">
+            <h1>練習專區</h1>
+            <p>這裡提供 360° 實境教學影片與虛擬人互動學習。</p>
+            
+            <!-- 360實境教學影片區段 -->
+            <div class="vr-video-section">
+                <div class="vr-video-header">
+                    <div class="video-title">
+                        <i class="fas fa-play-circle"></i>
+                        <span>360實境教學影片</span>
+                    </div>
+                    <p class="video-subtitle">沉浸式VR學習體驗,讓您身臨其境地學習急救技能</p>
+                </div>
+                
+                <div class="video-player-container">
+                    <div class="video-player" onclick="playVRVideo()">
+                        <div class="play-button-center">
+                            <i class="fas fa-play"></i>
+                        </div>
+                        <div class="video-duration">15:30</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 虛擬人互動區段 -->
+            <div class="virtual-human-section">
+                <div class="section-header">
+                    <h2><i class="fas fa-comment-dots"></i> 虛擬人互動</h2>
+                    <p>與AI驅動的虛擬患者進行對話練習，提升溝通技巧</p>
+                </div>
+                <div class="virtual-human-grid">
+                    <div class="virtual-human-card">
+                        <h3>醫師對話練習</h3>
+                        <p>學習如何與患者進行專業的醫療對話，提升溝通技巧</p>
+                    </div>
+                    <div class="virtual-human-card">
+                        <h3>團隊協作場景</h3>
+                        <p>模擬急救團隊協作情境，學習團隊溝通與協調</p>
+                    </div>
+                    <div class="virtual-human-card">
+                        <h3>患者溝通訓練</h3>
+                        <p>練習如何安撫患者情緒，進行有效的醫療溝通</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 播放VR影片
+        function playVRVideo() {
+            console.log('播放360實境教學影片');
+            alert('即將播放360實境教學影片！\n\n這將開啟沉浸式VR學習體驗，讓您身臨其境地學習急救技能。');
+        }
+
+        // 用戶頭像功能
+        function showUserProfile() {
+            alert('用戶資料功能開發中，敬請期待！');
+        }
+
+        // 登出功能
+        function logout() {
+            if (confirm('確定要登出嗎？')) {
+                // 清除本地儲存
+                localStorage.removeItem('pbls_user');
+                localStorage.removeItem('pbls_user_profile');
+                
+                // 跳轉到登入頁面
+                window.location.href = 'login.html';
+            }
+        }
+
+        // 教學手冊功能
+        function showHelpModal() {
+            alert('教學手冊功能開發中，敬請期待！');
+        }
+    </script>
+</body>
+</html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>歷史紀錄 - PBLS VR教學平台</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Microsoft JhengHei', Arial, sans-serif;
+            background: white;
+            min-height: 100vh;
+            color: #333;
+        }
+
+        /* 左側導航欄 */
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 80px;
+            height: 100vh;
+            background: rgba(147, 112, 219, 0.85);
+            backdrop-filter: blur(20px);
+            display: flex;
+            flex-direction: column;
+            transition: width 0.3s ease;
+            box-shadow: 4px 0 20px rgba(0, 0, 0, 0.3), 
+                         0 0 40px rgba(0, 0, 0, 0.1);
+            border-right: 1px solid rgba(255, 255, 255, 0.1);
+            z-index: 1000;
+        }
+
+        .sidebar:hover {
+            width: 180px;
+        }
+
+        /* 當左側選單展開時，標題欄和跑馬燈跟著向右移動 */
+        .sidebar:hover ~ .header {
+            left: 180px;
+        }
+
+        .sidebar:hover ~ .marquee-section {
+            left: 180px;
+        }
+
+        .sidebar:hover ~ .main-content {
+            margin-left: 180px;
+        }
+
+        .sidebar-top {
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .sidebar-center {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            width: 100%;
+            align-items: center;
+        }
+
+        .sidebar-bottom {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .sidebar-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2),
+                        inset 0 1px 0 rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: white;
+            position: relative;
+        }
+
+        .sidebar:hover .sidebar-icon {
+            width: 160px;
+            justify-content: center;
+            padding: 0 15px;
+        }
+
+        .sidebar-icon:hover,
+        .sidebar-icon.active {
+            background: rgba(52, 152, 219, 0.8);
+            color: white;
+            transform: scale(1.05);
+            box-shadow: 0 6px 20px rgba(52, 152, 219, 0.4),
+                        inset 0 1px 0 rgba(255, 255, 255, 0.3);
+        }
+
+        .sidebar-icon.help-icon {
+            background: transparent;
+            color: #bdc3c7;
+            margin-top: auto;
+        }
+
+        /* Logo樣式 */
+        .sidebar-top {
+            padding: 20px 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .logo-container {
+            width: 60px;
+            height: 60px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+
+        .logo-image {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+            filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+            transition: all 0.3s ease;
+        }
+
+        .sidebar:hover .logo-container {
+            transform: scale(1.82);
+        }
+
+        .logo-container:hover .logo-image {
+            filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
+        }
+
+        .sidebar-icon-text {
+            font-size: 14px;
+            font-weight: 500;
+            white-space: nowrap;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            margin-left: 10px;
+        }
+
+        .sidebar:hover .sidebar-icon-text {
+            opacity: 1;
+        }
+
+        .sidebar-icon i {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+            font-size: 20px;
+        }
+
+        /* 頂部標題欄 */
+        .header {
+            position: fixed;
+            top: 0;
+            left: 80px; /* 與側邊欄對齊 */
+            right: 0;
+            height: 80px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 30px;
+            z-index: 999;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            transition: left 0.3s ease; /* 與側邊欄同步動畫 */
+        }
+
+        .sidebar:hover ~ .header {
+            left: 180px; /* 側邊欄展開時，header也一起移動 */
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .header-title {
+            color: white;
+            font-size: 24px;
+            font-weight: bold;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .user-info {
+            background: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 14px;
+            color: #333;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #3498db;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .user-avatar:hover {
+            transform: scale(1.1);
+        }
+
+        .logout-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #e74c3c;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .logout-btn:hover {
+            transform: scale(1.1);
+        }
+
+        /* 跑馬燈 */
+        .marquee {
+            position: fixed;
+            top: 80px;
+            left: 0;
+            right: 0;
+            height: 60px;
+            background: rgba(52, 152, 219, 0.9);
+            display: flex;
+            align-items: center;
+            overflow: hidden;
+            z-index: 998;
+        }
+
+        .marquee-content {
+            display: flex;
+            animation: marquee 30s linear infinite;
+            white-space: nowrap;
+        }
+
+        .marquee-item {
+            margin-right: 50px;
+            color: white;
+            font-size: 16px;
+            font-weight: 500;
+        }
+
+        @keyframes marquee {
+            0% { transform: translateX(100%); }
+            100% { transform: translateX(-100%); }
+        }
+
+        /* 主要內容區域 */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            margin-left: 80px;
+            margin-top: 140px; /* 為固定標題欄(80px)和跑馬燈(60px)留出空間 */
+            padding: 20px 30px 40px 30px;
+            min-height: calc(100vh - 180px);
+        }
+
+        .sidebar:hover ~ .main-content {
+            margin-left: 180px;
+        }
+
+        /* 練習專區首頁樣式 */
+        .practice-homepage {
+            padding: 20px 30px 40px 30px;
+            min-height: calc(100vh - 180px);
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        /* 360實境教學影片樣式 */
+        .vr-video-section {
+            max-width: 800px;
+            margin: 0 auto 40px auto;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            overflow: hidden;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .vr-video-section:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+        }
+
+        .vr-video-header {
+            padding: 30px 30px 20px 30px;
+            text-align: center;
+        }
+
+        .video-title {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 10px;
+        }
+
+        .video-title i {
+            font-size: 24px;
+            color: #3498db;
+        }
+
+        .video-title span {
+            font-size: 24px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .video-subtitle {
+            font-size: 14px;
+            color: #7f8c8d;
+            margin: 0;
+            line-height: 1.5;
+        }
+
+        .video-player-container {
+            padding: 0 30px 30px 30px;
+        }
+
+        .video-player {
+            position: relative;
+            width: 100%;
+            height: 400px;
+            background: linear-gradient(135deg, #9370db 0%, #3498db 100%);
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .video-player:hover {
+            transform: scale(1.02);
+            box-shadow: 0 10px 30px rgba(52, 152, 219, 0.3);
+        }
+
+        .play-button-center {
+            width: 80px;
+            height: 80px;
+            background: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .play-button-center:hover {
+            transform: scale(1.1);
+            box-shadow: 0 12px 25px rgba(0, 0, 0, 0.3);
+        }
+
+        .play-button-center i {
+            font-size: 28px;
+            color: #3498db;
+            margin-left: 4px;
+        }
+
+        .video-duration {
+            position: absolute;
+            bottom: 15px;
+            right: 15px;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        /* 虛擬人互動樣式 */
+        .virtual-human-section {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .section-header h2 {
+            font-size: 24px;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+
+        .section-header h2 i {
+            color: #3498db;
+            margin-right: 10px;
+        }
+
+        .section-header p {
+            color: #7f8c8d;
+            font-size: 14px;
+        }
+
+        .virtual-human-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .virtual-human-card {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+
+        .virtual-human-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .virtual-human-card h3 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+
+        .virtual-human-card p {
+            color: #7f8c8d;
+            font-size: 14px;
+            margin-bottom: 15px;
+        }
+
+        /* 響應式設計 */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 60px;
+            }
+
+            .sidebar:hover {
+                width: 160px;
+            }
+
+            .main-content {
+                margin-left: 60px;
+            }
+
+            .sidebar:hover ~ .main-content {
+                margin-left: 160px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 左側導航欄 -->
+    <div class="sidebar">
+        <!-- 頂部：Logo -->
+        <div class="sidebar-top">
+            <div class="logo-container">
+                <img src="assets/logo.png" alt="PBLS Logo" class="logo-image">
+            </div>
+        </div>
+        
+        <!-- 中間：5個功能按鈕 -->
+        <div class="sidebar-center">
+            <!-- 練習專區 -->
+            <div class="sidebar-icon" 
+                 title="練習專區"
+                 onclick="window.location.href='index.html'">
+                <i class="fas fa-dumbbell"></i>
+                <span class="sidebar-icon-text">練習專區</span>
+            </div>
+            
+            <!-- 考試專區 -->
+            <div class="sidebar-icon" 
+                 title="考試專區"
+                 onclick="window.location.href='exam.html'">
+                <i class="fas fa-clipboard-check"></i>
+                <span class="sidebar-icon-text">考試專區</span>
+            </div>
+            
+            <!-- 歷史成績 -->
+            <div class="sidebar-icon active" 
+                 title="歷史成績"
+                 onclick="window.location.href='history.html'">
+                <i class="fas fa-chart-line"></i>
+                <span class="sidebar-icon-text">歷史成績</span>
+            </div>
+            
+            <!-- 資訊 -->
+            <div class="sidebar-icon" 
+                 title="資訊"
+                 onclick="window.location.href='info.html'">
+                <i class="fas fa-info-circle"></i>
+                <span class="sidebar-icon-text">資訊</span>
+            </div>
+            
+            <!-- 團隊 -->
+            <div class="sidebar-icon" 
+                 title="團隊"
+                 onclick="window.location.href='team.html'">
+                <i class="fas fa-users"></i>
+                <span class="sidebar-icon-text">團隊</span>
+            </div>
+        </div>
+        
+        <!-- 底部：教學手冊 -->
+        <div class="sidebar-bottom">
+            <div class="sidebar-icon help-icon" 
+                 title="教學手冊"
+                 onclick="showHelpModal()">
+                <i class="fas fa-question-circle"></i>
+                <span class="sidebar-icon-text">教學手冊</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- 頂部標題欄 -->
+    <div class="header">
+        <div class="header-left">
+            <h1 class="header-title">歡迎使用PBLS教學平台</h1>
+        </div>
+        <div class="header-right">
+            <div class="user-info">CGU(長庚大學), Nursing</div>
+            <div class="user-avatar" onclick="showUserProfile()">
+                <i class="fas fa-user"></i>
+            </div>
+            <div class="logout-btn" onclick="logout()">
+                <i class="fas fa-sign-out-alt"></i>
+            </div>
+        </div>
+    </div>
+
+    <!-- 跑馬燈 -->
+    <div class="marquee">
+        <div class="marquee-content">
+            <div class="marquee-item">🎯 歡迎使用PBLS VR教學平台！</div>
+            <div class="marquee-item">📚 360°實境教學影片，身臨其境的學習體驗</div>
+            <div class="marquee-item">🤖 虛擬人互動，提升急救溝通技巧</div>
+            <div class="marquee-item">🎮 VR實際操作，模擬真實急救情境</div>
+            <div class="marquee-item">📊 即時成績追蹤，掌握學習進度</div>
+            <div class="marquee-item">💡 問題導向學習法，提升急救技能</div>
+        </div>
+    </div>
+
+    <!-- 主要內容區域 -->
+    <div class="main-content">
+        <!-- 練習專區首頁內容 -->
+        <div class="practice-homepage" id="practiceHomepage">
+            <h1>練習專區</h1>
+            <p>這裡提供 360° 實境教學影片與虛擬人互動學習。</p>
+            
+            <!-- 360實境教學影片區段 -->
+            <div class="vr-video-section">
+                <div class="vr-video-header">
+                    <div class="video-title">
+                        <i class="fas fa-play-circle"></i>
+                        <span>360實境教學影片</span>
+                    </div>
+                    <p class="video-subtitle">沉浸式VR學習體驗,讓您身臨其境地學習急救技能</p>
+                </div>
+                
+                <div class="video-player-container">
+                    <div class="video-player" onclick="playVRVideo()">
+                        <div class="play-button-center">
+                            <i class="fas fa-play"></i>
+                        </div>
+                        <div class="video-duration">15:30</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 虛擬人互動區段 -->
+            <div class="virtual-human-section">
+                <div class="section-header">
+                    <h2><i class="fas fa-comment-dots"></i> 虛擬人互動</h2>
+                    <p>與AI驅動的虛擬患者進行對話練習，提升溝通技巧</p>
+                </div>
+                <div class="virtual-human-grid">
+                    <div class="virtual-human-card">
+                        <h3>醫師對話練習</h3>
+                        <p>學習如何與患者進行專業的醫療對話，提升溝通技巧</p>
+                    </div>
+                    <div class="virtual-human-card">
+                        <h3>團隊協作場景</h3>
+                        <p>模擬急救團隊協作情境，學習團隊溝通與協調</p>
+                    </div>
+                    <div class="virtual-human-card">
+                        <h3>患者溝通訓練</h3>
+                        <p>練習如何安撫患者情緒，進行有效的醫療溝通</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 播放VR影片
+        function playVRVideo() {
+            console.log('播放360實境教學影片');
+            alert('即將播放360實境教學影片！\n\n這將開啟沉浸式VR學習體驗，讓您身臨其境地學習急救技能。');
+        }
+
+        // 用戶頭像功能
+        function showUserProfile() {
+            alert('用戶資料功能開發中，敬請期待！');
+        }
+
+        // 登出功能
+        function logout() {
+            if (confirm('確定要登出嗎？')) {
+                // 清除本地儲存
+                localStorage.removeItem('pbls_user');
+                localStorage.removeItem('pbls_user_profile');
+                
+                // 跳轉到登入頁面
+                window.location.href = 'login.html';
+            }
+        }
+
+        // 教學手冊功能
+        function showHelpModal() {
+            alert('教學手冊功能開發中，敬請期待！');
+        }
+    </script>
+</body>
+</html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>歷史紀錄 - PBLS VR教學平台</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Microsoft JhengHei', Arial, sans-serif;
+            background: white;
+            min-height: 100vh;
+            color: #333;
+        }
+
+        /* 左側導航欄 */
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 80px;
+            height: 100vh;
+            background: rgba(147, 112, 219, 0.85);
+            backdrop-filter: blur(20px);
+            display: flex;
+            flex-direction: column;
+            transition: width 0.3s ease;
+            box-shadow: 4px 0 20px rgba(0, 0, 0, 0.3), 
+                         0 0 40px rgba(0, 0, 0, 0.1);
+            border-right: 1px solid rgba(255, 255, 255, 0.1);
+            z-index: 1000;
+        }
+
+        .sidebar:hover {
+            width: 180px;
+        }
+
+        /* 當左側選單展開時，標題欄和跑馬燈跟著向右移動 */
+        .sidebar:hover ~ .header {
+            left: 180px;
+        }
+
+        .sidebar:hover ~ .marquee-section {
+            left: 180px;
+        }
+
+        .sidebar:hover ~ .main-content {
+            margin-left: 180px;
+        }
+
+        .sidebar-top {
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .sidebar-center {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            width: 100%;
+            align-items: center;
+        }
+
+        .sidebar-bottom {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .sidebar-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2),
+                        inset 0 1px 0 rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: white;
+            position: relative;
+        }
+
+        .sidebar:hover .sidebar-icon {
+            width: 160px;
+            justify-content: center;
+            padding: 0 15px;
+        }
+
+        .sidebar-icon:hover,
+        .sidebar-icon.active {
+            background: rgba(52, 152, 219, 0.8);
+            color: white;
+            transform: scale(1.05);
+            box-shadow: 0 6px 20px rgba(52, 152, 219, 0.4),
+                        inset 0 1px 0 rgba(255, 255, 255, 0.3);
+        }
+
+        .sidebar-icon.help-icon {
+            background: transparent;
+            color: #bdc3c7;
+            margin-top: auto;
+        }
+
+        /* Logo樣式 */
+        .sidebar-top {
+            padding: 20px 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .logo-container {
+            width: 60px;
+            height: 60px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+
+        .logo-image {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+            filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+            transition: all 0.3s ease;
+        }
+
+        .sidebar:hover .logo-container {
+            transform: scale(1.82);
+        }
+
+        .logo-container:hover .logo-image {
+            filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
+        }
+
+        .sidebar-icon-text {
+            font-size: 14px;
+            font-weight: 500;
+            white-space: nowrap;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            margin-left: 10px;
+        }
+
+        .sidebar:hover .sidebar-icon-text {
+            opacity: 1;
+        }
+
+        .sidebar-icon i {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+            font-size: 20px;
+        }
+
+        /* 頂部標題欄 */
+        .header {
+            position: fixed;
+            top: 0;
+            left: 80px; /* 與側邊欄對齊 */
+            right: 0;
+            height: 80px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 30px;
+            z-index: 999;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            transition: left 0.3s ease; /* 與側邊欄同步動畫 */
+        }
+
+        .sidebar:hover ~ .header {
+            left: 180px; /* 側邊欄展開時，header也一起移動 */
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .header-title {
+            color: white;
+            font-size: 24px;
+            font-weight: bold;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .user-info {
+            background: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 14px;
+            color: #333;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #3498db;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .user-avatar:hover {
+            transform: scale(1.1);
+        }
+
+        .logout-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #e74c3c;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .logout-btn:hover {
+            transform: scale(1.1);
+        }
+
+        /* 跑馬燈 */
+        .marquee {
+            position: fixed;
+            top: 80px;
+            left: 0;
+            right: 0;
+            height: 60px;
+            background: rgba(52, 152, 219, 0.9);
+            display: flex;
+            align-items: center;
+            overflow: hidden;
+            z-index: 998;
+        }
+
+        .marquee-content {
+            display: flex;
+            animation: marquee 30s linear infinite;
+            white-space: nowrap;
+        }
+
+        .marquee-item {
+            margin-right: 50px;
+            color: white;
+            font-size: 16px;
+            font-weight: 500;
+        }
+
+        @keyframes marquee {
+            0% { transform: translateX(100%); }
+            100% { transform: translateX(-100%); }
+        }
+
+        /* 主要內容區域 */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            margin-left: 80px;
+            margin-top: 140px; /* 為固定標題欄(80px)和跑馬燈(60px)留出空間 */
+            padding: 20px 30px 40px 30px;
+            min-height: calc(100vh - 180px);
+        }
+
+        .sidebar:hover ~ .main-content {
+            margin-left: 180px;
+        }
+
+        /* 練習專區首頁樣式 */
+        .practice-homepage {
+            padding: 20px 30px 40px 30px;
+            min-height: calc(100vh - 180px);
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        /* 360實境教學影片樣式 */
+        .vr-video-section {
+            max-width: 800px;
+            margin: 0 auto 40px auto;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            overflow: hidden;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .vr-video-section:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+        }
+
+        .vr-video-header {
+            padding: 30px 30px 20px 30px;
+            text-align: center;
+        }
+
+        .video-title {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 10px;
+        }
+
+        .video-title i {
+            font-size: 24px;
+            color: #3498db;
+        }
+
+        .video-title span {
+            font-size: 24px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .video-subtitle {
+            font-size: 14px;
+            color: #7f8c8d;
+            margin: 0;
+            line-height: 1.5;
+        }
+
+        .video-player-container {
+            padding: 0 30px 30px 30px;
+        }
+
+        .video-player {
+            position: relative;
+            width: 100%;
+            height: 400px;
+            background: linear-gradient(135deg, #9370db 0%, #3498db 100%);
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .video-player:hover {
+            transform: scale(1.02);
+            box-shadow: 0 10px 30px rgba(52, 152, 219, 0.3);
+        }
+
+        .play-button-center {
+            width: 80px;
+            height: 80px;
+            background: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .play-button-center:hover {
+            transform: scale(1.1);
+            box-shadow: 0 12px 25px rgba(0, 0, 0, 0.3);
+        }
+
+        .play-button-center i {
+            font-size: 28px;
+            color: #3498db;
+            margin-left: 4px;
+        }
+
+        .video-duration {
+            position: absolute;
+            bottom: 15px;
+            right: 15px;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        /* 虛擬人互動樣式 */
+        .virtual-human-section {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .section-header h2 {
+            font-size: 24px;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+
+        .section-header h2 i {
+            color: #3498db;
+            margin-right: 10px;
+        }
+
+        .section-header p {
+            color: #7f8c8d;
+            font-size: 14px;
+        }
+
+        .virtual-human-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .virtual-human-card {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+
+        .virtual-human-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .virtual-human-card h3 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+
+        .virtual-human-card p {
+            color: #7f8c8d;
+            font-size: 14px;
+            margin-bottom: 15px;
+        }
+
+        /* 響應式設計 */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 60px;
+            }
+
+            .sidebar:hover {
+                width: 160px;
+            }
+
+            .main-content {
+                margin-left: 60px;
+            }
+
+            .sidebar:hover ~ .main-content {
+                margin-left: 160px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 左側導航欄 -->
+    <div class="sidebar">
+        <!-- 頂部：Logo -->
+        <div class="sidebar-top">
+            <div class="logo-container">
+                <img src="assets/logo.png" alt="PBLS Logo" class="logo-image">
+            </div>
+        </div>
+        
+        <!-- 中間：5個功能按鈕 -->
+        <div class="sidebar-center">
+            <!-- 練習專區 -->
+            <div class="sidebar-icon" 
+                 title="練習專區"
+                 onclick="window.location.href='index.html'">
+                <i class="fas fa-dumbbell"></i>
+                <span class="sidebar-icon-text">練習專區</span>
+            </div>
+            
+            <!-- 考試專區 -->
+            <div class="sidebar-icon" 
+                 title="考試專區"
+                 onclick="window.location.href='exam.html'">
+                <i class="fas fa-clipboard-check"></i>
+                <span class="sidebar-icon-text">考試專區</span>
+            </div>
+            
+            <!-- 歷史成績 -->
+            <div class="sidebar-icon active" 
+                 title="歷史成績"
+                 onclick="window.location.href='history.html'">
+                <i class="fas fa-chart-line"></i>
+                <span class="sidebar-icon-text">歷史成績</span>
+            </div>
+            
+            <!-- 資訊 -->
+            <div class="sidebar-icon" 
+                 title="資訊"
+                 onclick="window.location.href='info.html'">
+                <i class="fas fa-info-circle"></i>
+                <span class="sidebar-icon-text">資訊</span>
+            </div>
+            
+            <!-- 團隊 -->
+            <div class="sidebar-icon" 
+                 title="團隊"
+                 onclick="window.location.href='team.html'">
+                <i class="fas fa-users"></i>
+                <span class="sidebar-icon-text">團隊</span>
+            </div>
+        </div>
+        
+        <!-- 底部：教學手冊 -->
+        <div class="sidebar-bottom">
+            <div class="sidebar-icon help-icon" 
+                 title="教學手冊"
+                 onclick="showHelpModal()">
+                <i class="fas fa-question-circle"></i>
+                <span class="sidebar-icon-text">教學手冊</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- 頂部標題欄 -->
+    <div class="header">
+        <div class="header-left">
+            <h1 class="header-title">歡迎使用PBLS教學平台</h1>
+        </div>
+        <div class="header-right">
+            <div class="user-info">CGU(長庚大學), Nursing</div>
+            <div class="user-avatar" onclick="showUserProfile()">
+                <i class="fas fa-user"></i>
+            </div>
+            <div class="logout-btn" onclick="logout()">
+                <i class="fas fa-sign-out-alt"></i>
+            </div>
+        </div>
+    </div>
+
+    <!-- 跑馬燈 -->
+    <div class="marquee">
+        <div class="marquee-content">
+            <div class="marquee-item">🎯 歡迎使用PBLS VR教學平台！</div>
+            <div class="marquee-item">📚 360°實境教學影片，身臨其境的學習體驗</div>
+            <div class="marquee-item">🤖 虛擬人互動，提升急救溝通技巧</div>
+            <div class="marquee-item">🎮 VR實際操作，模擬真實急救情境</div>
+            <div class="marquee-item">📊 即時成績追蹤，掌握學習進度</div>
+            <div class="marquee-item">💡 問題導向學習法，提升急救技能</div>
+        </div>
+    </div>
+
+    <!-- 主要內容區域 -->
+    <div class="main-content">
+        <!-- 練習專區首頁內容 -->
+        <div class="practice-homepage" id="practiceHomepage">
+            <h1>練習專區</h1>
+            <p>這裡提供 360° 實境教學影片與虛擬人互動學習。</p>
+            
+            <!-- 360實境教學影片區段 -->
+            <div class="vr-video-section">
+                <div class="vr-video-header">
+                    <div class="video-title">
+                        <i class="fas fa-play-circle"></i>
+                        <span>360實境教學影片</span>
+                    </div>
+                    <p class="video-subtitle">沉浸式VR學習體驗,讓您身臨其境地學習急救技能</p>
+                </div>
+                
+                <div class="video-player-container">
+                    <div class="video-player" onclick="playVRVideo()">
+                        <div class="play-button-center">
+                            <i class="fas fa-play"></i>
+                        </div>
+                        <div class="video-duration">15:30</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 虛擬人互動區段 -->
+            <div class="virtual-human-section">
+                <div class="section-header">
+                    <h2><i class="fas fa-comment-dots"></i> 虛擬人互動</h2>
+                    <p>與AI驅動的虛擬患者進行對話練習，提升溝通技巧</p>
+                </div>
+                <div class="virtual-human-grid">
+                    <div class="virtual-human-card">
+                        <h3>醫師對話練習</h3>
+                        <p>學習如何與患者進行專業的醫療對話，提升溝通技巧</p>
+                    </div>
+                    <div class="virtual-human-card">
+                        <h3>團隊協作場景</h3>
+                        <p>模擬急救團隊協作情境，學習團隊溝通與協調</p>
+                    </div>
+                    <div class="virtual-human-card">
+                        <h3>患者溝通訓練</h3>
+                        <p>練習如何安撫患者情緒，進行有效的醫療溝通</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 播放VR影片
+        function playVRVideo() {
+            console.log('播放360實境教學影片');
+            alert('即將播放360實境教學影片！\n\n這將開啟沉浸式VR學習體驗，讓您身臨其境地學習急救技能。');
+        }
+
+        // 用戶頭像功能
+        function showUserProfile() {
+            alert('用戶資料功能開發中，敬請期待！');
+        }
+
+        // 登出功能
+        function logout() {
+            if (confirm('確定要登出嗎？')) {
+                // 清除本地儲存
+                localStorage.removeItem('pbls_user');
+                localStorage.removeItem('pbls_user_profile');
+                
+                // 跳轉到登入頁面
+                window.location.href = 'login.html';
+            }
+        }
+
+        // 教學手冊功能
+        function showHelpModal() {
+            alert('教學手冊功能開發中，敬請期待！');
+        }
+    </script>
+</body>
+</html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>歷史紀錄 - PBLS VR教學平台</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Microsoft JhengHei', Arial, sans-serif;
+            background: white;
+            min-height: 100vh;
+            color: #333;
+        }
+
+        /* 左側導航欄 */
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 80px;
+            height: 100vh;
+            background: rgba(147, 112, 219, 0.85);
+            backdrop-filter: blur(20px);
+            display: flex;
+            flex-direction: column;
+            transition: width 0.3s ease;
+            box-shadow: 4px 0 20px rgba(0, 0, 0, 0.3), 
+                         0 0 40px rgba(0, 0, 0, 0.1);
+            border-right: 1px solid rgba(255, 255, 255, 0.1);
+            z-index: 1000;
+        }
+
+        .sidebar:hover {
+            width: 180px;
+        }
+
+        /* 當左側選單展開時，標題欄和跑馬燈跟著向右移動 */
+        .sidebar:hover ~ .header {
+            left: 180px;
+        }
+
+        .sidebar:hover ~ .marquee-section {
+            left: 180px;
+        }
+
+        .sidebar:hover ~ .main-content {
+            margin-left: 180px;
+        }
+
+        .sidebar-top {
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .sidebar-center {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            width: 100%;
+            align-items: center;
+        }
+
+        .sidebar-bottom {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .sidebar-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2),
+                        inset 0 1px 0 rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: white;
+            position: relative;
+        }
+
+        .sidebar:hover .sidebar-icon {
+            width: 160px;
+            justify-content: center;
+            padding: 0 15px;
+        }
+
+        .sidebar-icon:hover,
+        .sidebar-icon.active {
+            background: rgba(52, 152, 219, 0.8);
+            color: white;
+            transform: scale(1.05);
+            box-shadow: 0 6px 20px rgba(52, 152, 219, 0.4),
+                        inset 0 1px 0 rgba(255, 255, 255, 0.3);
+        }
+
+        .sidebar-icon.help-icon {
+            background: transparent;
+            color: #bdc3c7;
+            margin-top: auto;
+        }
+
+        /* Logo樣式 */
+        .sidebar-top {
+            padding: 20px 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .logo-container {
+            width: 60px;
+            height: 60px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+
+        .logo-image {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+            filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+            transition: all 0.3s ease;
+        }
+
+        .sidebar:hover .logo-container {
+            transform: scale(1.82);
+        }
+
+        .logo-container:hover .logo-image {
+            filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
+        }
+
+        .sidebar-icon-text {
+            font-size: 14px;
+            font-weight: 500;
+            white-space: nowrap;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            margin-left: 10px;
+        }
+
+        .sidebar:hover .sidebar-icon-text {
+            opacity: 1;
+        }
+
+        .sidebar-icon i {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+            font-size: 20px;
+        }
+
+        /* 頂部標題欄 */
+        .header {
+            position: fixed;
+            top: 0;
+            left: 80px; /* 與側邊欄對齊 */
+            right: 0;
+            height: 80px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 30px;
+            z-index: 999;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            transition: left 0.3s ease; /* 與側邊欄同步動畫 */
+        }
+
+        .sidebar:hover ~ .header {
+            left: 180px; /* 側邊欄展開時，header也一起移動 */
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .header-title {
+            color: white;
+            font-size: 24px;
+            font-weight: bold;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .user-info {
+            background: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 14px;
+            color: #333;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #3498db;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .user-avatar:hover {
+            transform: scale(1.1);
+        }
+
+        .logout-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #e74c3c;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .logout-btn:hover {
+            transform: scale(1.1);
+        }
+
+        /* 跑馬燈 */
+        .marquee {
+            position: fixed;
+            top: 80px;
+            left: 0;
+            right: 0;
+            height: 60px;
+            background: rgba(52, 152, 219, 0.9);
+            display: flex;
+            align-items: center;
+            overflow: hidden;
+            z-index: 998;
+        }
+
+        .marquee-content {
+            display: flex;
+            animation: marquee 30s linear infinite;
+            white-space: nowrap;
+        }
+
+        .marquee-item {
+            margin-right: 50px;
+            color: white;
+            font-size: 16px;
+            font-weight: 500;
+        }
+
+        @keyframes marquee {
+            0% { transform: translateX(100%); }
+            100% { transform: translateX(-100%); }
+        }
+
+        /* 主要內容區域 */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            margin-left: 80px;
+            margin-top: 140px; /* 為固定標題欄(80px)和跑馬燈(60px)留出空間 */
+            padding: 20px 30px 40px 30px;
+            min-height: calc(100vh - 180px);
+        }
+
+        .sidebar:hover ~ .main-content {
+            margin-left: 180px;
+        }
+
+        /* 練習專區首頁樣式 */
+        .practice-homepage {
+            padding: 20px 30px 40px 30px;
+            min-height: calc(100vh - 180px);
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        /* 360實境教學影片樣式 */
+        .vr-video-section {
+            max-width: 800px;
+            margin: 0 auto 40px auto;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            overflow: hidden;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .vr-video-section:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+        }
+
+        .vr-video-header {
+            padding: 30px 30px 20px 30px;
+            text-align: center;
+        }
+
+        .video-title {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 10px;
+        }
+
+        .video-title i {
+            font-size: 24px;
+            color: #3498db;
+        }
+
+        .video-title span {
+            font-size: 24px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .video-subtitle {
+            font-size: 14px;
+            color: #7f8c8d;
+            margin: 0;
+            line-height: 1.5;
+        }
+
+        .video-player-container {
+            padding: 0 30px 30px 30px;
+        }
+
+        .video-player {
+            position: relative;
+            width: 100%;
+            height: 400px;
+            background: linear-gradient(135deg, #9370db 0%, #3498db 100%);
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .video-player:hover {
+            transform: scale(1.02);
+            box-shadow: 0 10px 30px rgba(52, 152, 219, 0.3);
+        }
+
+        .play-button-center {
+            width: 80px;
+            height: 80px;
+            background: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .play-button-center:hover {
+            transform: scale(1.1);
+            box-shadow: 0 12px 25px rgba(0, 0, 0, 0.3);
+        }
+
+        .play-button-center i {
+            font-size: 28px;
+            color: #3498db;
+            margin-left: 4px;
+        }
+
+        .video-duration {
+            position: absolute;
+            bottom: 15px;
+            right: 15px;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        /* 虛擬人互動樣式 */
+        .virtual-human-section {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .section-header h2 {
+            font-size: 24px;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+
+        .section-header h2 i {
+            color: #3498db;
+            margin-right: 10px;
+        }
+
+        .section-header p {
+            color: #7f8c8d;
+            font-size: 14px;
+        }
+
+        .virtual-human-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .virtual-human-card {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+
+        .virtual-human-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .virtual-human-card h3 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+
+        .virtual-human-card p {
+            color: #7f8c8d;
+            font-size: 14px;
+            margin-bottom: 15px;
+        }
+
+        /* 響應式設計 */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 60px;
+            }
+
+            .sidebar:hover {
+                width: 160px;
+            }
+
+            .main-content {
+                margin-left: 60px;
+            }
+
+            .sidebar:hover ~ .main-content {
+                margin-left: 160px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 左側導航欄 -->
+    <div class="sidebar">
+        <!-- 頂部：Logo -->
+        <div class="sidebar-top">
+            <div class="logo-container">
+                <img src="assets/logo.png" alt="PBLS Logo" class="logo-image">
+            </div>
+        </div>
+        
+        <!-- 中間：5個功能按鈕 -->
+        <div class="sidebar-center">
+            <!-- 練習專區 -->
+            <div class="sidebar-icon" 
+                 title="練習專區"
+                 onclick="window.location.href='index.html'">
+                <i class="fas fa-dumbbell"></i>
+                <span class="sidebar-icon-text">練習專區</span>
+            </div>
+            
+            <!-- 考試專區 -->
+            <div class="sidebar-icon" 
+                 title="考試專區"
+                 onclick="window.location.href='exam.html'">
+                <i class="fas fa-clipboard-check"></i>
+                <span class="sidebar-icon-text">考試專區</span>
+            </div>
+            
+            <!-- 歷史成績 -->
+            <div class="sidebar-icon active" 
+                 title="歷史成績"
+                 onclick="window.location.href='history.html'">
+                <i class="fas fa-chart-line"></i>
+                <span class="sidebar-icon-text">歷史成績</span>
+            </div>
+            
+            <!-- 資訊 -->
+            <div class="sidebar-icon" 
+                 title="資訊"
+                 onclick="window.location.href='info.html'">
+                <i class="fas fa-info-circle"></i>
+                <span class="sidebar-icon-text">資訊</span>
+            </div>
+            
+            <!-- 團隊 -->
+            <div class="sidebar-icon" 
+                 title="團隊"
+                 onclick="window.location.href='team.html'">
+                <i class="fas fa-users"></i>
+                <span class="sidebar-icon-text">團隊</span>
+            </div>
+        </div>
+        
+        <!-- 底部：教學手冊 -->
+        <div class="sidebar-bottom">
+            <div class="sidebar-icon help-icon" 
+                 title="教學手冊"
+                 onclick="showHelpModal()">
+                <i class="fas fa-question-circle"></i>
+                <span class="sidebar-icon-text">教學手冊</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- 頂部標題欄 -->
+    <div class="header">
+        <div class="header-left">
+            <h1 class="header-title">歡迎使用PBLS教學平台</h1>
+        </div>
+        <div class="header-right">
+            <div class="user-info">CGU(長庚大學), Nursing</div>
+            <div class="user-avatar" onclick="showUserProfile()">
+                <i class="fas fa-user"></i>
+            </div>
+            <div class="logout-btn" onclick="logout()">
+                <i class="fas fa-sign-out-alt"></i>
+            </div>
+        </div>
+    </div>
+
+    <!-- 跑馬燈 -->
+    <div class="marquee">
+        <div class="marquee-content">
+            <div class="marquee-item">🎯 歡迎使用PBLS VR教學平台！</div>
+            <div class="marquee-item">📚 360°實境教學影片，身臨其境的學習體驗</div>
+            <div class="marquee-item">🤖 虛擬人互動，提升急救溝通技巧</div>
+            <div class="marquee-item">🎮 VR實際操作，模擬真實急救情境</div>
+            <div class="marquee-item">📊 即時成績追蹤，掌握學習進度</div>
+            <div class="marquee-item">💡 問題導向學習法，提升急救技能</div>
+        </div>
+    </div>
+
+    <!-- 主要內容區域 -->
+    <div class="main-content">
+        <!-- 練習專區首頁內容 -->
+        <div class="practice-homepage" id="practiceHomepage">
+            <h1>練習專區</h1>
+            <p>這裡提供 360° 實境教學影片與虛擬人互動學習。</p>
+            
+            <!-- 360實境教學影片區段 -->
+            <div class="vr-video-section">
+                <div class="vr-video-header">
+                    <div class="video-title">
+                        <i class="fas fa-play-circle"></i>
+                        <span>360實境教學影片</span>
+                    </div>
+                    <p class="video-subtitle">沉浸式VR學習體驗,讓您身臨其境地學習急救技能</p>
+                </div>
+                
+                <div class="video-player-container">
+                    <div class="video-player" onclick="playVRVideo()">
+                        <div class="play-button-center">
+                            <i class="fas fa-play"></i>
+                        </div>
+                        <div class="video-duration">15:30</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 虛擬人互動區段 -->
+            <div class="virtual-human-section">
+                <div class="section-header">
+                    <h2><i class="fas fa-comment-dots"></i> 虛擬人互動</h2>
+                    <p>與AI驅動的虛擬患者進行對話練習，提升溝通技巧</p>
+                </div>
+                <div class="virtual-human-grid">
+                    <div class="virtual-human-card">
+                        <h3>醫師對話練習</h3>
+                        <p>學習如何與患者進行專業的醫療對話，提升溝通技巧</p>
+                    </div>
+                    <div class="virtual-human-card">
+                        <h3>團隊協作場景</h3>
+                        <p>模擬急救團隊協作情境，學習團隊溝通與協調</p>
+                    </div>
+                    <div class="virtual-human-card">
+                        <h3>患者溝通訓練</h3>
+                        <p>練習如何安撫患者情緒，進行有效的醫療溝通</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 播放VR影片
+        function playVRVideo() {
+            console.log('播放360實境教學影片');
+            alert('即將播放360實境教學影片！\n\n這將開啟沉浸式VR學習體驗，讓您身臨其境地學習急救技能。');
+        }
+
+        // 用戶頭像功能
+        function showUserProfile() {
+            alert('用戶資料功能開發中，敬請期待！');
+        }
+
+        // 登出功能
+        function logout() {
+            if (confirm('確定要登出嗎？')) {
+                // 清除本地儲存
+                localStorage.removeItem('pbls_user');
+                localStorage.removeItem('pbls_user_profile');
+                
+                // 跳轉到登入頁面
+                window.location.href = 'login.html';
+            }
+        }
+
+        // 教學手冊功能
+        function showHelpModal() {
+            alert('教學手冊功能開發中，敬請期待！');
+        }
+    </script>
+</body>
+</html>

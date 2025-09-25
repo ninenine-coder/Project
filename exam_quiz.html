@@ -1,0 +1,1216 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>筆試測驗 - PBLS VR教學平台</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Microsoft JhengHei', sans-serif;
+            background: white;
+            min-height: 100vh;
+            color: #333;
+        }
+
+        /* 頂部標題欄 */
+        .header {
+            position: fixed;
+            top: 0;
+            left: 80px;
+            right: 0;
+            height: 80px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 30px;
+            z-index: 999;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            transition: left 0.3s ease;
+        }
+
+        .sidebar:hover ~ .header {
+            left: 180px;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .header-title {
+            color: white;
+            font-size: 24px;
+            font-weight: bold;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .user-info {
+            background: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 14px;
+            color: #333;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #3498db;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .user-avatar:hover {
+            transform: scale(1.1);
+        }
+
+        .logout-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #e74c3c;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .logout-btn:hover {
+            transform: scale(1.1);
+        }
+
+        /* 跑馬燈 */
+        .marquee {
+            position: fixed;
+            top: 80px;
+            left: 0;
+            right: 0;
+            height: 60px;
+            background: rgba(52, 152, 219, 0.9);
+            display: flex;
+            align-items: center;
+            overflow: hidden;
+            z-index: 998;
+        }
+
+        .marquee-content {
+            display: flex;
+            animation: marquee 30s linear infinite;
+            white-space: nowrap;
+        }
+
+        .marquee-item {
+            margin-right: 50px;
+            color: white;
+            font-size: 16px;
+            font-weight: 500;
+        }
+
+        @keyframes marquee {
+            0% { transform: translateX(100%); }
+            100% { transform: translateX(-100%); }
+        }
+
+        /* 側邊欄樣式 */
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 80px;
+            height: 100vh;
+            background: rgba(147, 112, 219, 0.85);
+            backdrop-filter: blur(20px);
+            transition: width 0.3s ease;
+            box-shadow: 4px 0 20px rgba(0, 0, 0, 0.3), 
+                         0 0 40px rgba(0, 0, 0, 0.1);
+            border-right: 1px solid rgba(255, 255, 255, 0.1);
+            z-index: 1000;
+        }
+
+        .sidebar:hover {
+            width: 180px;
+        }
+
+        .sidebar-top {
+            padding: 20px 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .logo-container {
+            width: 60px;
+            height: 60px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+
+        .logo-image {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+            filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+            transition: all 0.3s ease;
+        }
+
+        .sidebar:hover .logo-container {
+            transform: scale(1.82);
+        }
+
+        .logo-container:hover .logo-image {
+            filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
+        }
+
+        .sidebar-menu {
+            padding: 20px 0;
+        }
+
+        .sidebar-icon {
+            display: flex;
+            align-items: center;
+            padding: 15px 20px;
+            margin: 5px 10px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2),
+                        inset 0 1px 0 rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .sidebar-icon:hover,
+        .sidebar-icon.active {
+            background: rgba(52, 152, 219, 0.8);
+            box-shadow: 0 6px 20px rgba(52, 152, 219, 0.4),
+                        inset 0 1px 0 rgba(255, 255, 255, 0.3);
+        }
+
+        .sidebar-icon i {
+            font-size: 20px;
+            color: white;
+            min-width: 20px;
+            margin-right: 15px;
+        }
+
+        .sidebar-icon span {
+            color: white;
+            font-weight: 500;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            white-space: nowrap;
+        }
+
+        .sidebar:hover .sidebar-icon span {
+            opacity: 1;
+        }
+
+        /* 主要內容區域 */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            margin-left: 80px;
+            margin-top: 140px;
+            padding: 20px 30px 40px 30px;
+            min-height: calc(100vh - 180px);
+        }
+
+        .sidebar:hover ~ .main-content {
+            margin-left: 180px;
+        }
+
+        /* 測驗容器樣式 */
+        #quiz-container {
+            padding: 30px;
+            min-height: calc(100vh - 180px);
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        #question-text {
+            font-size: 24px;
+            color: #2c3e50;
+            margin-bottom: 30px;
+            line-height: 1.5;
+        }
+
+        #options {
+            margin-bottom: 30px;
+        }
+
+        .option {
+            display: block;
+            width: 100%;
+            padding: 15px 20px;
+            margin-bottom: 10px;
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 16px;
+            text-align: left;
+        }
+
+        .option:hover {
+            border-color: #3498db;
+            background: #f8f9fa;
+        }
+
+        .option.selected {
+            border-color: #3498db;
+            background: #e3f2fd;
+        }
+
+        .option.correct {
+            border-color: #27ae60;
+            background: #d5f4e6;
+            color: #27ae60;
+            font-weight: bold;
+        }
+
+        .option.incorrect {
+            border-color: #e74c3c;
+            background: #fadbd8;
+            color: #e74c3c;
+            font-weight: bold;
+        }
+
+        #next-btn {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background 0.3s ease;
+            margin-bottom: 20px;
+        }
+
+        #next-btn:hover {
+            background: #2980b9;
+        }
+
+        #next-btn:disabled {
+            background: #bdc3c7;
+            cursor: not-allowed;
+        }
+
+        #timer {
+            font-size: 18px;
+            color: #e74c3c;
+            font-weight: bold;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .timer-clock {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #8e44ad 0%, #9b59b6 50%, #a569bd 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 32px;
+            font-weight: bold;
+            box-shadow: 0 8px 25px rgba(142, 68, 173, 0.4), 
+                        0 0 0 4px rgba(255, 255, 255, 0.1),
+                        inset 0 2px 4px rgba(255, 255, 255, 0.2);
+            position: relative;
+            overflow: hidden;
+            animation: pulse 1s infinite;
+        }
+
+        .timer-clock::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: conic-gradient(from 0deg, #e74c3c 0deg, #e74c3c var(--progress, 0deg), transparent var(--progress, 0deg));
+            border-radius: 50%;
+            transition: all 0.1s ease;
+        }
+
+        .timer-clock .time-text {
+            position: relative;
+            z-index: 1;
+            text-shadow: 0 3px 6px rgba(0, 0, 0, 0.4);
+            animation: countdown 1s ease-in-out;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        @keyframes countdown {
+            0% { 
+                transform: scale(1.2);
+                opacity: 0.7;
+            }
+            50% { 
+                transform: scale(0.9);
+                opacity: 1;
+            }
+            100% { 
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        .timer-clock.danger {
+            animation: danger-pulse 0.5s infinite;
+            box-shadow: 0 8px 25px rgba(142, 68, 173, 0.8), 
+                        0 0 0 4px rgba(155, 89, 182, 0.5),
+                        inset 0 2px 4px rgba(255, 255, 255, 0.2);
+        }
+
+        @keyframes danger-pulse {
+            0% { 
+                transform: scale(1);
+                box-shadow: 0 8px 25px rgba(142, 68, 173, 0.8), 
+                            0 0 0 4px rgba(155, 89, 182, 0.5),
+                            inset 0 2px 4px rgba(255, 255, 255, 0.2);
+            }
+            50% { 
+                transform: scale(1.1);
+                box-shadow: 0 12px 35px rgba(142, 68, 173, 1.0), 
+                            0 0 0 6px rgba(155, 89, 182, 0.7),
+                            inset 0 2px 4px rgba(255, 255, 255, 0.2);
+            }
+            100% { 
+                transform: scale(1);
+                box-shadow: 0 8px 25px rgba(142, 68, 173, 0.8), 
+                            0 0 0 4px rgba(155, 89, 182, 0.5),
+                            inset 0 2px 4px rgba(255, 255, 255, 0.2);
+            }
+        }
+
+        .progress-bar {
+            width: 200px;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 10px;
+            overflow: hidden;
+            position: relative;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #8e44ad 0%, #9b59b6 50%, #a569bd 100%);
+            border-radius: 10px;
+            transition: width 0.1s ease;
+            position: relative;
+        }
+
+        .progress-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.3) 50%, transparent 100%);
+            animation: shimmer 2s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+
+
+        .quiz-summary {
+            background: white;
+            padding: 40px;
+            border-radius: 0;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15), 
+                        0 0 0 1px rgba(0, 0, 0, 0.1);
+            border: 2px solid #e0e0e0;
+            position: relative;
+            max-width: 800px;
+            margin: 0 auto;
+            font-family: 'Times New Roman', serif;
+        }
+
+        .quiz-summary::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #e74c3c 0%, #f39c12 50%, #27ae60 100%);
+        }
+
+        .total-score {
+            text-align: center;
+            margin-bottom: 40px;
+            position: relative;
+        }
+
+        .score-number {
+            font-size: 72px;
+            font-weight: bold;
+            color: #e74c3c;
+            transform: rotate(-3deg);
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+            margin: 0;
+            animation: scoreAppear 0.8s ease-out;
+            position: relative;
+        }
+
+        .score-number::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, transparent 30%, rgba(231, 76, 60, 0.1) 50%, transparent 70%);
+            animation: penStroke 1.2s ease-out;
+        }
+
+        @keyframes scoreAppear {
+            0% { 
+                transform: rotate(-3deg) scale(0.5);
+                opacity: 0;
+            }
+            50% { 
+                transform: rotate(-3deg) scale(1.1);
+                opacity: 0.8;
+            }
+            100% { 
+                transform: rotate(-3deg) scale(1);
+                opacity: 1;
+            }
+        }
+
+        @keyframes penStroke {
+            0% { 
+                background: linear-gradient(45deg, transparent 0%, rgba(231, 76, 60, 0.1) 0%, transparent 0%);
+            }
+            100% { 
+                background: linear-gradient(45deg, transparent 30%, rgba(231, 76, 60, 0.1) 50%, transparent 70%);
+            }
+        }
+
+        .score-label {
+            font-size: 18px;
+            color: #666;
+            margin-top: 10px;
+            font-style: italic;
+        }
+
+        .questions-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .question-item {
+            margin-bottom: 25px;
+            padding: 20px;
+            border-left: 4px solid #ddd;
+            background: #fafafa;
+            position: relative;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .question-item.correct {
+            border-left-color: #27ae60;
+            background: #f0f9f0;
+        }
+
+        .question-item.incorrect {
+            border-left-color: #e74c3c;
+            background: #fdf2f2;
+        }
+
+        .question-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .question-number {
+            font-weight: bold;
+            margin-right: 15px;
+            color: #333;
+            min-width: 30px;
+        }
+
+        .question-text {
+            flex: 1;
+            font-size: 16px;
+            line-height: 1.4;
+            color: #333;
+        }
+
+        .answer-status {
+            display: flex;
+            align-items: center;
+            margin: 10px 0;
+            font-size: 16px;
+        }
+
+        .status-icon {
+            font-size: 20px;
+            margin-right: 10px;
+        }
+
+        .correct-answer {
+            color: #27ae60;
+            font-weight: bold;
+        }
+
+        .incorrect-answer {
+            color: #e74c3c;
+            font-weight: bold;
+        }
+
+        .user-answer {
+            color: #666;
+            margin-left: 10px;
+        }
+
+        .explanation {
+            margin-top: 15px;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.7);
+            border-radius: 5px;
+            font-size: 14px;
+            color: #555;
+            border-left: 3px solid #3498db;
+            font-style: italic;
+        }
+
+        .summary-stats {
+            display: flex;
+            justify-content: space-around;
+            margin: 30px 0;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 24px;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+
+        .stat-label {
+            font-size: 14px;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        .summary-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        .summary-table th,
+        .summary-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .summary-table th {
+            background: #f8f9fa;
+            font-weight: bold;
+        }
+
+        .correct-answer {
+            color: #27ae60;
+            font-weight: bold;
+        }
+
+        .incorrect-answer {
+            color: #e74c3c;
+            font-weight: bold;
+        }
+
+        /* 響應式設計 */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 60px;
+            }
+
+            .sidebar:hover {
+                width: 160px;
+            }
+
+            .main-content {
+                margin-left: 60px;
+            }
+
+            .sidebar:hover ~ .main-content {
+                margin-left: 160px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 側邊欄 -->
+    <div class="sidebar">
+        <!-- 頂部：Logo -->
+        <div class="sidebar-top">
+            <div class="logo-container">
+                <img src="assets/logo.png" alt="PBLS Logo" class="logo-image">
+            </div>
+        </div>
+
+        <!-- 選單 -->
+        <div class="sidebar-menu">
+            <div class="sidebar-icon" onclick="window.location.href='index.html'">
+                <i class="fas fa-play-circle"></i>
+                <span>練習專區</span>
+            </div>
+            <div class="sidebar-icon active" onclick="window.location.href='exam.html'">
+                <i class="fas fa-clipboard-list"></i>
+                <span>考試專區</span>
+            </div>
+            <div class="sidebar-icon" onclick="window.location.href='history.html'">
+                <i class="fas fa-chart-line"></i>
+                <span>歷史成績</span>
+            </div>
+            <div class="sidebar-icon" onclick="window.location.href='info.html'">
+                <i class="fas fa-info-circle"></i>
+                <span>資訊</span>
+            </div>
+            <div class="sidebar-icon" onclick="window.location.href='team.html'">
+                <i class="fas fa-users"></i>
+                <span>團隊</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- 頂部標題欄 -->
+    <div class="header">
+        <div class="header-left">
+            <h1 class="header-title">歡迎使用PBLS教學平台</h1>
+        </div>
+        <div class="header-right">
+            <div class="user-info">CGU(長庚大學), Nursing</div>
+            <div class="user-avatar" onclick="showUserProfile()">
+                <i class="fas fa-user"></i>
+            </div>
+            <div class="logout-btn" onclick="logout()">
+                <i class="fas fa-sign-out-alt"></i>
+            </div>
+        </div>
+    </div>
+
+    <!-- 跑馬燈 -->
+    <div class="marquee">
+        <div class="marquee-content">
+            <div class="marquee-item">🎯 歡迎使用PBLS VR教學平台！</div>
+            <div class="marquee-item">📚 360°實境教學影片，身臨其境的學習體驗</div>
+            <div class="marquee-item">🤖 虛擬人互動，提升急救溝通技巧</div>
+            <div class="marquee-item">🎮 VR實際操作，模擬真實急救情境</div>
+            <div class="marquee-item">📊 即時成績追蹤，掌握學習進度</div>
+            <div class="marquee-item">💡 問題導向學習法，提升急救技能</div>
+        </div>
+    </div>
+
+    <!-- 主要內容區域 -->
+    <div class="main-content">
+        <!-- 測驗容器 -->
+        <div id="quiz-container">
+            <div id="timer">
+                <div class="timer-clock">
+                    <div class="time-text" id="time-text">5</div>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progress-fill"></div>
+                </div>
+            </div>
+            <h2 id="question-text"></h2>
+            <div id="options"></div>
+            <button id="next-btn">下一題</button>
+        </div>
+    </div>
+
+    <script>
+        // 測驗相關變數
+        let allQuestions = [];
+        let selectedQuestions = [];
+        let currentQuestionIndex = 0;
+        let userAnswers = [];
+        let quizStartTime;
+        let timerInterval;
+        let timeRemaining = 5; // 每題5秒
+        let isNextLocked = false; // 防止快速點擊的鎖定變數
+
+        // 頁面載入時初始化測驗
+        document.addEventListener('DOMContentLoaded', function() {
+            loadQuestions();
+        });
+
+        // 載入問題數據
+        async function loadQuestions() {
+            try {
+                const response = await fetch('data/questions.json');
+                allQuestions = await response.json();
+                startQuiz();
+            } catch (error) {
+                console.error('載入問題失敗:', error);
+                alert('載入測驗題目失敗，請重新整理頁面。');
+            }
+        }
+
+        // 開始測驗
+        function startQuiz() {
+            // 隨機選擇20題
+            selectedQuestions = getRandomQuestions(20);
+            currentQuestionIndex = 0;
+            userAnswers = [];
+            quizStartTime = new Date();
+            timeRemaining = 5; // 每題5秒
+            
+            // 開始計時器
+            startTimer();
+            
+            // 顯示第一題
+            displayQuestion();
+        }
+
+        // 隨機選擇問題
+        function getRandomQuestions(count) {
+            const shuffled = [...allQuestions].sort(() => 0.5 - Math.random());
+            return shuffled.slice(0, count);
+        }
+
+        // 開始計時器
+        function startTimer() {
+            timeRemaining = 5; // 每題5秒
+            timerInterval = setInterval(() => {
+                timeRemaining--;
+                updateTimer();
+                
+                if (timeRemaining <= 0) {
+                    clearInterval(timerInterval);
+                    // 時間到視為錯誤，記錄未作答
+                    handleTimeout();
+                }
+            }, 1000);
+        }
+
+        // 更新計時器顯示
+        function updateTimer() {
+            // 更新時鐘文字
+            document.getElementById('time-text').textContent = timeRemaining;
+            
+            // 更新進度條
+            const progressPercent = ((5 - timeRemaining) / 5) * 100;
+            document.getElementById('progress-fill').style.width = progressPercent + '%';
+            
+            // 更新時鐘的圓形進度
+            const clockProgress = (timeRemaining / 5) * 360;
+            document.querySelector('.timer-clock').style.setProperty('--progress', clockProgress + 'deg');
+            
+            // 根據剩餘時間改變顏色和動畫
+            const timerClock = document.querySelector('.timer-clock');
+            const timeText = document.getElementById('time-text');
+            
+            // 移除之前的動畫類
+            timerClock.classList.remove('danger');
+            
+            if (timeRemaining <= 2) {
+                // 危險時間：深紫色 + 快速脈衝
+                timerClock.style.background = 'linear-gradient(135deg, #6a1b9a 0%, #8e44ad 100%)';
+                timerClock.classList.add('danger');
+                timeText.style.animation = 'countdown 0.5s ease-in-out';
+            } else if (timeRemaining <= 3) {
+                // 警告時間：中紫色 + 正常脈衝
+                timerClock.style.background = 'linear-gradient(135deg, #8e44ad 0%, #9b59b6 100%)';
+                timeText.style.animation = 'countdown 0.8s ease-in-out';
+            } else {
+                // 安全時間：淺紫色 + 慢速脈衝
+                timerClock.style.background = 'linear-gradient(135deg, #9b59b6 0%, #a569bd 100%)';
+                timeText.style.animation = 'countdown 1s ease-in-out';
+            }
+            
+            // 添加跨年倒數效果
+            if (timeRemaining <= 3) {
+                // 添加閃爍效果
+                timeText.style.textShadow = '0 0 20px rgba(255, 255, 255, 0.8), 0 0 40px rgba(255, 255, 255, 0.6)';
+            } else {
+                timeText.style.textShadow = '0 3px 6px rgba(0, 0, 0, 0.4)';
+            }
+        }
+
+        // 處理超時
+        function handleTimeout() {
+            const question = selectedQuestions[currentQuestionIndex];
+            
+            // 記錄未作答的答案
+            userAnswers.push({
+                question: question.question,
+                userAnswer: -1, // -1 表示未作答
+                correctAnswer: question.correct,
+                isCorrect: false,
+                explanation: question.explanation,
+                userAnswerText: "未作答",
+                correctAnswerText: question.options[question.correct]
+            });
+            
+            // 顯示正確選項（綠色）
+            showTimeoutFeedback(question);
+        }
+
+        // 顯示超時反饋
+        function showTimeoutFeedback(question) {
+            // 標記正確選項為綠色
+            document.querySelectorAll('.option').forEach((option, index) => {
+                if (index === question.correct) {
+                    option.classList.add('correct');
+                }
+            });
+            
+            // 更新按鈕文字
+            if (currentQuestionIndex < selectedQuestions.length - 1) {
+                document.getElementById('next-btn').textContent = '下一題';
+            } else {
+                document.getElementById('next-btn').textContent = '完成測驗';
+            }
+            
+            // 2秒後跳到下一題
+            setTimeout(() => {
+                if (currentQuestionIndex < selectedQuestions.length - 1) {
+                    currentQuestionIndex++;
+                    displayQuestion();
+                } else {
+                    endQuiz();
+                }
+            }, 2000);
+        }
+
+
+        // 顯示當前問題
+        function displayQuestion() {
+            const question = selectedQuestions[currentQuestionIndex];
+            document.getElementById('question-text').textContent = 
+                `${currentQuestionIndex + 1}. ${question.question}`;
+            
+            // 清空選項
+            const optionsContainer = document.getElementById('options');
+            optionsContainer.innerHTML = '';
+            
+            // 創建選項按鈕
+            question.options.forEach((option, index) => {
+                const optionElement = document.createElement('button');
+                optionElement.className = 'option';
+                optionElement.textContent = option;
+                optionElement.onclick = () => selectOption(index);
+                optionsContainer.appendChild(optionElement);
+            });
+            
+            // 重置按鈕狀態
+            document.getElementById('next-btn').disabled = true;
+            document.getElementById('next-btn').textContent = '下一題';
+            
+            // 清除所有選項的顏色標記
+            document.querySelectorAll('.option').forEach(option => {
+                option.classList.remove('correct', 'incorrect', 'selected');
+            });
+            
+            // 重置計時器顯示
+            document.getElementById('time-text').textContent = '5';
+            document.getElementById('progress-fill').style.width = '0%';
+            document.querySelector('.timer-clock').style.setProperty('--progress', '0deg');
+            document.querySelector('.timer-clock').style.background = 'linear-gradient(135deg, #9b59b6 0%, #a569bd 100%)';
+            
+            // 重置動畫效果
+            const timerClock = document.querySelector('.timer-clock');
+            const timeText = document.getElementById('time-text');
+            timerClock.classList.remove('danger');
+            timeText.style.animation = 'countdown 1s ease-in-out';
+            timeText.style.textShadow = '0 3px 6px rgba(0, 0, 0, 0.4)';
+            
+            // 重新開始計時器
+            if (timerInterval) {
+                clearInterval(timerInterval);
+            }
+            startTimer();
+        }
+
+        // 選擇選項
+        function selectOption(optionIndex) {
+            // 停止計時器
+            if (timerInterval) {
+                clearInterval(timerInterval);
+            }
+            
+            // 移除所有選項的選中狀態
+            document.querySelectorAll('.option').forEach(option => {
+                option.classList.remove('selected');
+            });
+            
+            // 標記選中的選項
+            document.querySelectorAll('.option')[optionIndex].classList.add('selected');
+            
+            // 啟用下一題按鈕
+            document.getElementById('next-btn').disabled = false;
+        }
+
+        // 下一題按鈕點擊事件
+        document.getElementById('next-btn').addEventListener('click', function() {
+            if (this.disabled || isNextLocked) return;
+            
+            // 設置鎖定
+            isNextLocked = true;
+            
+            // 記錄用戶答案
+            const selectedOption = document.querySelector('.option.selected');
+            if (selectedOption) {
+                const optionIndex = Array.from(document.querySelectorAll('.option')).indexOf(selectedOption);
+                const question = selectedQuestions[currentQuestionIndex];
+                const isCorrect = optionIndex === question.correct;
+                
+                userAnswers.push({
+                    question: question.question,
+                    userAnswer: optionIndex,
+                    correctAnswer: question.correct,
+                    isCorrect: isCorrect,
+                    explanation: question.explanation,
+                    userAnswerText: question.options[optionIndex],
+                    correctAnswerText: question.options[question.correct]
+                });
+                
+                // 顯示解釋
+                showExplanation(question, optionIndex, isCorrect);
+            }
+        });
+
+        // 顯示解釋
+        function showExplanation(question, userAnswer, isCorrect) {
+            // 停止當前計時器
+            if (timerInterval) {
+                clearInterval(timerInterval);
+            }
+            
+            // 標記正確和錯誤的選項
+            document.querySelectorAll('.option').forEach((option, index) => {
+                if (index === question.correct) {
+                    option.classList.add('correct');
+                } else if (index === userAnswer && !isCorrect) {
+                    option.classList.add('incorrect');
+                }
+            });
+            
+            // 更新按鈕文字
+            if (currentQuestionIndex < selectedQuestions.length - 1) {
+                document.getElementById('next-btn').textContent = '下一題';
+            } else {
+                document.getElementById('next-btn').textContent = '完成測驗';
+            }
+            
+            // 移動到下一題或結束測驗
+            setTimeout(() => {
+                if (currentQuestionIndex < selectedQuestions.length - 1) {
+                    currentQuestionIndex++;
+                    displayQuestion();
+                    // 在顯示下一題時解鎖
+                    isNextLocked = false;
+                } else {
+                    endQuiz();
+                }
+            }, 2000);
+        }
+
+        // 結束測驗
+        function endQuiz() {
+            if (timerInterval) {
+                clearInterval(timerInterval);
+            }
+            
+            const endTime = new Date();
+            const totalTime = Math.floor((endTime - quizStartTime) / 1000);
+            const correctAnswers = userAnswers.filter(answer => answer.isCorrect).length;
+            const score = Math.round((correctAnswers / userAnswers.length) * 100);
+            
+            // 保存結果到LocalStorage
+            saveQuizResults(score, correctAnswers, userAnswers.length, totalTime);
+            
+            // 顯示測驗結果
+            showQuizResults(score, correctAnswers, userAnswers.length, totalTime);
+        }
+
+        // 保存測驗結果到LocalStorage
+        function saveQuizResults(score, correctAnswers, totalQuestions, totalTime) {
+            const quizResult = {
+                date: new Date().toISOString(),
+                score: score,
+                correctAnswers: correctAnswers,
+                totalQuestions: totalQuestions,
+                totalTime: totalTime,
+                answers: userAnswers
+            };
+            
+            // 獲取現有的測驗歷史
+            let examHistory = JSON.parse(localStorage.getItem('examHistory') || '[]');
+            
+            // 添加新的測驗結果
+            examHistory.push(quizResult);
+            
+            // 保存到LocalStorage
+            localStorage.setItem('examHistory', JSON.stringify(examHistory));
+        }
+
+        // 顯示測驗結果
+        function showQuizResults(score, correctAnswers, totalQuestions, totalTime) {
+            const minutes = Math.floor(totalTime / 60);
+            const seconds = totalTime % 60;
+            
+            document.getElementById('quiz-container').innerHTML = `
+                <div class="quiz-summary">
+                    <div class="total-score">
+                        <div class="score-number">${score}</div>
+                        <div class="score-label">分</div>
+                    </div>
+                    
+                    <div class="summary-stats">
+                        <div class="stat-item">
+                            <div class="stat-number">${correctAnswers}</div>
+                            <div class="stat-label">答對題數</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-number">${totalQuestions}</div>
+                            <div class="stat-label">總題數</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-number">${minutes}:${seconds.toString().padStart(2, '0')}</div>
+                            <div class="stat-label">用時</div>
+                        </div>
+                    </div>
+                    
+                    <h3 style="margin-bottom: 20px; color: #2c3e50; border-bottom: 2px solid #3498db; padding-bottom: 10px;">測驗詳情</h3>
+                    
+                    <ol class="questions-list">
+                        ${userAnswers.map((answer, index) => `
+                            <li class="question-item ${answer.isCorrect ? 'correct' : 'incorrect'}">
+                                <div class="question-header">
+                                    <span class="question-number">${index + 1}.</span>
+                                    <span class="question-text">${answer.question}</span>
+                                </div>
+                                
+                                <div class="answer-status">
+                                    <span class="status-icon">${answer.isCorrect ? '✅' : '❌'}</span>
+                                    <span class="${answer.isCorrect ? 'correct-answer' : 'incorrect-answer'}">
+                                        ${answer.isCorrect ? '正確' : '錯誤'}
+                                    </span>
+                                    <span class="user-answer">
+                                        ${answer.userAnswer === -1 ? '未作答' : `您的答案：${answer.userAnswerText}`}
+                                    </span>
+                                </div>
+                                
+                                <div class="explanation">
+                                    <strong>解釋：</strong>${answer.explanation}
+                                    ${!answer.isCorrect ? `<br><strong style="color: #27ae60;">正確答案：${answer.correctAnswerText}</strong>` : ''}
+                                </div>
+                            </li>
+                        `).join('')}
+                    </ol>
+                    
+                    <div style="text-align: center; margin-top: 40px; padding-top: 20px; border-top: 2px solid #e0e0e0;">
+                        <button onclick="window.location.href='exam.html'" style="
+                            background: #3498db;
+                            color: white;
+                            border: none;
+                            padding: 15px 30px;
+                            border-radius: 8px;
+                            cursor: pointer;
+                            font-size: 16px;
+                            margin-right: 15px;
+                            box-shadow: 0 4px 8px rgba(52, 152, 219, 0.3);
+                            transition: all 0.3s ease;
+                        " onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 12px rgba(52, 152, 219, 0.4)'" 
+                           onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 8px rgba(52, 152, 219, 0.3)'">返回考試專區</button>
+                        <button onclick="location.reload()" style="
+                            background: #27ae60;
+                            color: white;
+                            border: none;
+                            padding: 15px 30px;
+                            border-radius: 8px;
+                            cursor: pointer;
+                            font-size: 16px;
+                            box-shadow: 0 4px 8px rgba(39, 174, 96, 0.3);
+                            transition: all 0.3s ease;
+                        " onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 12px rgba(39, 174, 96, 0.4)'" 
+                           onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 8px rgba(39, 174, 96, 0.3)'">重新測驗</button>
+                    </div>
+                </div>
+            `;
+        }
+
+        // 用戶頭像功能
+        function showUserProfile() {
+            alert('用戶資料功能開發中，敬請期待！');
+        }
+
+        // 登出功能
+        function logout() {
+            if (confirm('確定要登出嗎？')) {
+                // 清除本地儲存
+                localStorage.removeItem('pbls_user');
+                localStorage.removeItem('pbls_user_profile');
+                
+                // 跳轉到登入頁面
+                window.location.href = 'login.html';
+            }
+        }
+    </script>
+</body>
+</html>

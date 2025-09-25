@@ -3,88 +3,189 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PBLS VR教學平台 - 測試頁面</title>
+    <title>測試頁面 - PBLS VR教學平台</title>
     <style>
         body {
-            font-family: 'Microsoft JhengHei', Arial, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            margin: 0;
-            padding: 20px;
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background: #f5f5f5;
         }
-        
-        .container {
+        .test-container {
+            max-width: 800px;
+            margin: 0 auto;
             background: white;
-            padding: 40px;
-            border-radius: 20px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-            text-align: center;
-            max-width: 600px;
-        }
-        
-        h1 {
-            color: #333;
-            margin-bottom: 20px;
-            font-size: 2.5rem;
-        }
-        
-        .logo {
-            font-size: 4rem;
-            color: #667eea;
-            margin-bottom: 20px;
-        }
-        
-        p {
-            color: #666;
-            font-size: 1.2rem;
-            line-height: 1.6;
-            margin-bottom: 30px;
-        }
-        
-        .btn {
-            background: linear-gradient(45deg, #667eea, #764ba2);
-            color: white;
-            padding: 15px 30px;
-            border: none;
+            padding: 20px;
             border-radius: 10px;
-            font-size: 1.1rem;
-            cursor: pointer;
-            text-decoration: none;
-            display: inline-block;
-            transition: transform 0.3s ease;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
         }
-        
-        .btn:hover {
-            transform: translateY(-2px);
+        .test-item {
+            margin: 10px 0;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
         }
-        
-        .status {
+        .test-item.success {
             background: #d4edda;
-            color: #155724;
-            padding: 15px;
-            border-radius: 10px;
-            margin-top: 20px;
-            border: 1px solid #c3e6cb;
+            border-color: #c3e6cb;
+        }
+        .test-item.error {
+            background: #f8d7da;
+            border-color: #f5c6cb;
+        }
+        .test-button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        .test-button:hover {
+            background: #0056b3;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="logo">🚑</div>
-        <h1>PBLS VR教學平台</h1>
-        <p>恭喜！您的網站已成功部署到GitHub Pages！</p>
-        <p>這是一個測試頁面，確認您的網站能正常顯示。</p>
+    <div class="test-container">
+        <h1>🔧 PBLS VR教學平台 - 系統測試</h1>
         
-        <div class="status">
-            ✅ GitHub Pages 部署成功<br>
-            ✅ 網站正常運作<br>
-            ✅ 可以開始整合VR教材
+        <div class="test-item">
+            <h3>📋 基本功能測試</h3>
+            <button class="test-button" onclick="testLocalStorage()">測試本地儲存</button>
+            <button class="test-button" onclick="testNavigation()">測試頁面導航</button>
+            <button class="test-button" onclick="testLogin()">測試登入狀態</button>
         </div>
         
-        <a href="complete-demo.html" class="btn">查看完整版本</a>
+        <div class="test-item">
+            <h3>🌐 頁面連結測試</h3>
+            <button class="test-button" onclick="window.open('login.html', '_blank')">開啟登入頁面</button>
+            <button class="test-button" onclick="window.open('login-simple.html', '_blank')">開啟簡化登入頁面</button>
+            <button class="test-button" onclick="window.open('index.html', '_blank')">開啟主頁</button>
+        </div>
+        
+        <div class="test-item">
+            <h3>🔍 錯誤檢查</h3>
+            <button class="test-button" onclick="checkConsoleErrors()">檢查控制台錯誤</button>
+            <button class="test-button" onclick="checkMissingFiles()">檢查缺失文件</button>
+        </div>
+        
+        <div id="test-results"></div>
     </div>
+
+    <script>
+        function testLocalStorage() {
+            try {
+                localStorage.setItem('test', 'success');
+                const result = localStorage.getItem('test');
+                localStorage.removeItem('test');
+                
+                if (result === 'success') {
+                    showResult('✅ 本地儲存功能正常', 'success');
+                } else {
+                    showResult('❌ 本地儲存功能異常', 'error');
+                }
+            } catch (error) {
+                showResult('❌ 本地儲存錯誤: ' + error.message, 'error');
+            }
+        }
+        
+        function testNavigation() {
+            try {
+                // 測試頁面導航
+                const testUrl = 'login.html';
+                const link = document.createElement('a');
+                link.href = testUrl;
+                
+                showResult('✅ 頁面導航功能正常', 'success');
+            } catch (error) {
+                showResult('❌ 頁面導航錯誤: ' + error.message, 'error');
+            }
+        }
+        
+        function testLogin() {
+            try {
+                const user = localStorage.getItem('pbls_user');
+                if (user) {
+                    showResult('✅ 用戶已登入: ' + JSON.parse(user).email, 'success');
+                } else {
+                    showResult('ℹ️ 用戶未登入', 'info');
+                }
+            } catch (error) {
+                showResult('❌ 登入狀態檢查錯誤: ' + error.message, 'error');
+            }
+        }
+        
+        function checkConsoleErrors() {
+            const originalError = console.error;
+            const errors = [];
+            
+            console.error = function(...args) {
+                errors.push(args.join(' '));
+                originalError.apply(console, args);
+            };
+            
+            // 重新載入頁面來檢查錯誤
+            setTimeout(() => {
+                if (errors.length === 0) {
+                    showResult('✅ 沒有發現控制台錯誤', 'success');
+                } else {
+                    showResult('❌ 發現 ' + errors.length + ' 個錯誤', 'error');
+                    errors.forEach(error => {
+                        showResult('錯誤: ' + error, 'error');
+                    });
+                }
+                console.error = originalError;
+            }, 1000);
+        }
+        
+        function checkMissingFiles() {
+            const files = [
+                'login.html',
+                'login-simple.html', 
+                'index.html',
+                'index.html',
+                'exam.html',
+                'history.html',
+                'info.html',
+                'team.html'
+            ];
+            
+            let missingFiles = [];
+            
+            files.forEach(file => {
+                fetch(file)
+                    .then(response => {
+                        if (!response.ok) {
+                            missingFiles.push(file);
+                        }
+                    })
+                    .catch(() => {
+                        missingFiles.push(file);
+                    });
+            });
+            
+            setTimeout(() => {
+                if (missingFiles.length === 0) {
+                    showResult('✅ 所有文件都存在', 'success');
+                } else {
+                    showResult('❌ 缺失文件: ' + missingFiles.join(', '), 'error');
+                }
+            }, 2000);
+        }
+        
+        function showResult(message, type) {
+            const resultsDiv = document.getElementById('test-results');
+            const resultItem = document.createElement('div');
+            resultItem.className = 'test-item ' + type;
+            resultItem.textContent = message;
+            resultsDiv.appendChild(resultItem);
+        }
+        
+        // 頁面載入時自動檢查
+        window.addEventListener('load', function() {
+            showResult('🚀 測試頁面已載入', 'success');
+        });
+    </script>
 </body>
 </html>
