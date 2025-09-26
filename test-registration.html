@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>註冊功能測試</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Microsoft JhengHei', sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .test-section {
+            background: white;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .status {
+            padding: 10px;
+            border-radius: 4px;
+            margin: 10px 0;
+        }
+        .success { background: #d4edda; color: #155724; }
+        .error { background: #f8d7da; color: #721c24; }
+        .info { background: #d1ecf1; color: #0c5460; }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover { background: #0056b3; }
+        pre {
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 4px;
+            overflow-x: auto;
+        }
+        .feature-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+        .feature-card {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #17a2b8;
+        }
+        .feature-card h3 {
+            margin: 0 0 10px 0;
+            color: #17a2b8;
+        }
+        .feature-card ul {
+            margin: 0;
+            padding-left: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔐 註冊功能測試</h1>
+    
+    <div class="test-section">
+        <h2>📋 註冊表單功能</h2>
+        <div class="feature-list">
+            <div class="feature-card">
+                <h3>📧 電子郵件驗證</h3>
+                <ul>
+                    <li>格式驗證 (xxx@xxx.xxx)</li>
+                    <li>必填欄位檢查</li>
+                    <li>錯誤訊息顯示</li>
+                </ul>
+            </div>
+            
+            <div class="feature-card">
+                <h3>🔒 密碼強度驗證</h3>
+                <ul>
+                    <li>大小寫英文 + 數字</li>
+                    <li>最少8個字符</li>
+                    <li>確認密碼一致性</li>
+                </ul>
+            </div>
+            
+            <div class="feature-card">
+                <h3>👤 個人資訊</h3>
+                <ul>
+                    <li>姓名 (最少2個字符)</li>
+                    <li>電話/分機號碼</li>
+                    <li>必填欄位驗證</li>
+                </ul>
+            </div>
+            
+            <div class="feature-card">
+                <h3>🏢 所屬單位選擇</h3>
+                <ul>
+                    <li>長庚大學 → 資管系、護理系、醫學系</li>
+                    <li>長庚科大 → 護理系</li>
+                    <li>長庚醫院 → 小兒科</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    
+    <div class="test-section">
+        <h2>🧪 測試步驟</h2>
+        <ol>
+            <li><strong>打開註冊頁面</strong>：<a href="public/index.html" target="_blank">public/index.html</a></li>
+            <li><strong>點擊「立即註冊」按鈕</strong></li>
+            <li><strong>填寫註冊表單</strong>：
+                <ul>
+                    <li>電子郵件：test@example.com</li>
+                    <li>密碼：Test123456</li>
+                    <li>確認密碼：Test123456</li>
+                    <li>姓名：測試用戶</li>
+                    <li>所屬單位：長庚大學</li>
+                    <li>部門：資管系</li>
+                    <li>電話：03-2118800#1234</li>
+                </ul>
+            </li>
+            <li><strong>提交表單</strong>並檢查驗證</li>
+            <li><strong>確認註冊成功</strong>並跳轉</li>
+        </ol>
+    </div>
+    
+    <div class="test-section">
+        <h2>✅ 驗證功能</h2>
+        <button onclick="testValidation()">測試表單驗證</button>
+        <button onclick="testDepartmentOptions()">測試部門選項</button>
+        <button onclick="testPasswordStrength()">測試密碼強度</button>
+        <div id="test-results"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>📱 響應式設計</h2>
+        <p>註冊表單支援各種螢幕尺寸：</p>
+        <ul>
+            <li>桌面電腦 (1200px+)</li>
+            <li>平板電腦 (768px - 1199px)</li>
+            <li>手機 (320px - 767px)</li>
+        </ul>
+        <p>表單會自動調整大小和佈局以適應不同設備。</p>
+    </div>
+    
+    <div class="test-section">
+        <h2>🔧 技術實現</h2>
+        <h3>JavaScript 功能：</h3>
+        <pre>
+// 部門選項配置
+const departmentOptions = {
+    '長庚大學': ['資管系', '護理系', '醫學系'],
+    '長庚科大': ['護理系'],
+    '長庚醫院': ['小兒科']
+};
+
+// 密碼強度驗證
+function validatePassword(password) {
+    const hasUpperCase = /[A-Z]/.test(password);
+    const hasLowerCase = /[a-z]/.test(password);
+    const hasNumbers = /\d/.test(password);
+    const minLength = password.length >= 8;
+    
+    return hasUpperCase && hasLowerCase && hasNumbers && minLength;
+}
+        </pre>
+    </div>
+
+    <script>
+        function testValidation() {
+            const results = document.getElementById('test-results');
+            results.innerHTML = '<div class="status info">正在測試表單驗證...</div>';
+            
+            // 測試電子郵件驗證
+            const emailTests = [
+                { email: 'test@example.com', valid: true },
+                { email: 'invalid-email', valid: false },
+                { email: 'test@', valid: false },
+                { email: '@example.com', valid: false }
+            ];
+            
+            let emailResults = '電子郵件驗證測試：<br>';
+            emailTests.forEach(test => {
+                const isValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(test.email);
+                const status = isValid === test.valid ? '✅' : '❌';
+                emailResults += `${status} ${test.email} - ${isValid ? '有效' : '無效'}<br>`;
+            });
+            
+            // 測試密碼強度
+            const passwordTests = [
+                { password: 'Test123456', valid: true },
+                { password: 'test123456', valid: false },
+                { password: 'TEST123456', valid: false },
+                { password: 'Test123', valid: false },
+                { password: 'TestPassword', valid: false }
+            ];
+            
+            let passwordResults = '<br>密碼強度測試：<br>';
+            passwordTests.forEach(test => {
+                const hasUpperCase = /[A-Z]/.test(test.password);
+                const hasLowerCase = /[a-z]/.test(test.password);
+                const hasNumbers = /\d/.test(test.password);
+                const minLength = test.password.length >= 8;
+                const isValid = hasUpperCase && hasLowerCase && hasNumbers && minLength;
+                const status = isValid === test.valid ? '✅' : '❌';
+                passwordResults += `${status} ${test.password} - ${isValid ? '有效' : '無效'}<br>`;
+            });
+            
+            results.innerHTML = emailResults + passwordResults;
+        }
+        
+        function testDepartmentOptions() {
+            const results = document.getElementById('test-results');
+            const departmentOptions = {
+                '長庚大學': ['資管系', '護理系', '醫學系'],
+                '長庚科大': ['護理系'],
+                '長庚醫院': ['小兒科']
+            };
+            
+            let deptResults = '部門選項測試：<br>';
+            Object.keys(departmentOptions).forEach(where => {
+                deptResults += `<strong>${where}:</strong><br>`;
+                departmentOptions[where].forEach(dept => {
+                    deptResults += `&nbsp;&nbsp;• ${dept}<br>`;
+                });
+            });
+            
+            results.innerHTML = deptResults;
+        }
+        
+        function testPasswordStrength() {
+            const results = document.getElementById('test-results');
+            const testPasswords = [
+                'Test123456',
+                'test123456',
+                'TEST123456',
+                'TestPassword',
+                '12345678',
+                'Test123'
+            ];
+            
+            let strengthResults = '密碼強度分析：<br>';
+            testPasswords.forEach(password => {
+                const hasUpperCase = /[A-Z]/.test(password);
+                const hasLowerCase = /[a-z]/.test(password);
+                const hasNumbers = /\d/.test(password);
+                const minLength = password.length >= 8;
+                
+                const checks = [
+                    hasUpperCase ? '✅' : '❌',
+                    hasLowerCase ? '✅' : '❌',
+                    hasNumbers ? '✅' : '❌',
+                    minLength ? '✅' : '❌'
+                ];
+                
+                const isValid = hasUpperCase && hasLowerCase && hasNumbers && minLength;
+                const status = isValid ? '✅ 有效' : '❌ 無效';
+                
+                strengthResults += `${status} ${password} - [${checks.join(' ')}]<br>`;
+            });
+            
+            results.innerHTML = strengthResults;
+        }
+    </script>
+</body>
+</html>

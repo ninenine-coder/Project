@@ -8,30 +8,49 @@
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js"></script>
     <script>
-        // Firebase配置
+        // Firebase配置 - 請從Firebase Console獲取正確的配置
         const firebaseConfig = {
-            apiKey: "your-api-key-here",
-            authDomain: "your-project.firebaseapp.com",
-            projectId: "your-project-id",
-            storageBucket: "your-project.appspot.com",
-            messagingSenderId: "your-sender-id",
-            appId: "your-app-id"
+            apiKey: "AIzaSyBuWO8hFVjjTUe2tqJDrqdbeGTrp4PoT5Q",
+            authDomain: "progect-115a5.firebaseapp.com",
+            projectId: "progect-115a5",
+            storageBucket: "progect-115a5.appspot.com",
+            messagingSenderId: "109099222287",
+            appId: "1:109099222287:web:4f7b56a1eebe5abbfaaa7a" // 需要從Firebase Console獲取真實的App ID
         };
 
         // 初始化Firebase
-        let app, auth;
+        let app, auth, db;
+        let isFirebaseReady = false;
+        
         try {
+            // 檢查Firebase SDK是否載入
+            if (typeof firebase === 'undefined') {
+                throw new Error('Firebase SDK未載入');
+            }
+            
+            // 初始化Firebase
             app = firebase.initializeApp(firebaseConfig);
             auth = firebase.auth();
+            db = firebase.firestore();
+            isFirebaseReady = true;
             console.log('Firebase初始化成功');
+            console.log('Firebase App:', app);
+            console.log('Firebase Auth:', auth);
+            console.log('Firebase Firestore:', db);
         } catch (error) {
             console.error('Firebase初始化失敗:', error);
-            // 創建模擬的auth對象用於測試
-            auth = {
-                signInWithPopup: () => Promise.reject(new Error('Firebase未正確配置')),
-                onAuthStateChanged: () => {}
-            };
+            isFirebaseReady = false;
+            
+            // 顯示詳細的錯誤信息
+            if (error.message.includes('Firebase SDK未載入')) {
+                console.error('請檢查Firebase SDK是否正確載入');
+            } else if (error.message.includes('Invalid app ID')) {
+                console.error('App ID無效，請從Firebase Console獲取正確的App ID');
+            } else if (error.message.includes('Invalid API key')) {
+                console.error('API Key無效，請檢查Firebase配置');
+            }
         }
     </script>
     <style>
@@ -153,6 +172,57 @@
             outline: none;
             border-color: #667eea;
             box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        /* 記住帳號樣式 */
+        .remember-group {
+            margin-bottom: 20px;
+        }
+
+        .remember-label {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            font-size: 14px;
+            color: #666;
+            user-select: none;
+        }
+
+        .remember-checkbox {
+            display: none;
+        }
+
+        .checkmark {
+            position: relative;
+            display: inline-block;
+            width: 18px;
+            height: 18px;
+            background-color: #fff;
+            border: 2px solid #ddd;
+            border-radius: 3px;
+            margin-right: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .remember-checkbox:checked + .checkmark {
+            background-color: #667eea;
+            border-color: #667eea;
+        }
+
+        .remember-checkbox:checked + .checkmark:after {
+            content: "";
+            position: absolute;
+            left: 5px;
+            top: 2px;
+            width: 4px;
+            height: 8px;
+            border: solid white;
+            border-width: 0 2px 2px 0;
+            transform: rotate(45deg);
+        }
+
+        .remember-label:hover .checkmark {
+            border-color: #667eea;
         }
 
         .btn {
@@ -346,6 +416,14 @@
                 />
             </div>
 
+            <div class="form-group remember-group">
+                <label class="remember-label">
+                    <input type="checkbox" id="rememberMe" class="remember-checkbox">
+                    <span class="checkmark"></span>
+                    記住帳號
+                </label>
+            </div>
+
             <button type="submit" class="btn btn-primary">
                 登入
             </button>
@@ -361,15 +439,191 @@
         </button>
 
         <div class="login-footer">
-            <a href="#" id="showSignUp">立即註冊</a>
+            <a href="register.html" id="showSignUp">立即註冊</a>
             <a href="#" id="forgotPassword">忘記密碼</a>
         </div>
     </div>
 
     <script>
+        // 處理登入表單提交
+        async function handleLogin(event) {
+            event.preventDefault();
+            
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const rememberMe = document.getElementById('rememberMe').checked;
+            
+            // 顯示載入狀態
+            const submitBtn = event.target.querySelector('button[type="submit"]');
+            const originalText = submitBtn.textContent;
+            submitBtn.textContent = '登入中...';
+            submitBtn.disabled = true;
+            
+            try {
+                if (isFirebaseReady && db) {
+                    // 使用Firebase驗證
+                    await loginWithFirebase(email, password, rememberMe);
+                } else {
+                    // 使用本地驗證（備用方案）
+                    await loginWithLocal(email, password, rememberMe);
+                }
+            } catch (error) {
+                console.error('登入失敗:', error);
+                alert('登入失敗：' + error.message);
+            } finally {
+                // 恢復按鈕狀態
+                submitBtn.textContent = originalText;
+                submitBtn.disabled = false;
+            }
+        }
+
+        // Firebase登入驗證
+        async function loginWithFirebase(email, password, rememberMe) {
+            try {
+                // 從Firestore查詢用戶
+                const userQuery = await db.collection('users').where('email', '==', email).get();
+                
+                if (userQuery.empty) {
+                    throw new Error('此電子郵件尚未註冊，請先註冊帳號！');
+                }
+                
+                const userDoc = userQuery.docs[0];
+                const userData = userDoc.data();
+                
+                // 驗證密碼
+                if (userData.password !== password) {
+                    throw new Error('密碼錯誤，請重新輸入！');
+                }
+                
+                // 登入成功
+                const loginUserData = {
+                    uid: userDoc.id,
+                    email: userData.email,
+                    name: userData.name,
+                    displayName: userData.name,
+                    photoURL: 'https://via.placeholder.com/40/17a2b8/ffffff?text=' + userData.name.charAt(0),
+                    loginTime: new Date().toISOString(),
+                    loginMethod: 'firebase',
+                    where: userData.where,
+                    department: userData.department,
+                    phone: userData.phone
+                };
+                
+                // 保存登入狀態
+                localStorage.setItem('pbls_user', JSON.stringify(loginUserData));
+                
+                // 處理「記住帳號」功能
+                if (rememberMe) {
+                    const rememberData = {
+                        email: email,
+                        password: password,
+                        rememberTime: new Date().toISOString()
+                    };
+                    localStorage.setItem('pbls_remember_me', JSON.stringify(rememberData));
+                    console.log('帳號信息已保存，下次自動填入');
+                } else {
+                    localStorage.removeItem('pbls_remember_me');
+                    console.log('記住帳號功能已關閉');
+                }
+                
+                // 更新最後登入時間
+                await db.collection('users').doc(userDoc.id).update({
+                    lastLogin: new Date().toISOString()
+                });
+                
+                alert('登入成功！歡迎回來！');
+                
+                // 跳轉到首頁
+                setTimeout(() => {
+                    window.location.href = 'index.html';
+                }, 1000);
+                
+            } catch (error) {
+                throw error;
+            }
+        }
+
+        // 本地登入驗證（備用方案）
+        async function loginWithLocal(email, password, rememberMe) {
+            const registeredUser = localStorage.getItem('registered_user_' + email);
+            
+            if (!registeredUser) {
+                throw new Error('此電子郵件尚未註冊，請先註冊帳號！');
+            }
+            
+            const userData = JSON.parse(registeredUser);
+            
+            if (userData.password !== password) {
+                throw new Error('密碼錯誤，請重新輸入！');
+            }
+            
+            // 登入成功
+            const loginUserData = {
+                uid: 'user-' + Date.now(),
+                email: userData.email,
+                name: userData.name,
+                displayName: userData.name,
+                photoURL: 'https://via.placeholder.com/40/17a2b8/ffffff?text=' + userData.name.charAt(0),
+                loginTime: new Date().toISOString(),
+                loginMethod: 'local',
+                where: userData.where,
+                department: userData.department,
+                phone: userData.phone
+            };
+            
+            // 保存登入狀態
+            localStorage.setItem('pbls_user', JSON.stringify(loginUserData));
+            
+            // 處理「記住帳號」功能
+            if (rememberMe) {
+                const rememberData = {
+                    email: email,
+                    password: password,
+                    rememberTime: new Date().toISOString()
+                };
+                localStorage.setItem('pbls_remember_me', JSON.stringify(rememberData));
+                console.log('帳號信息已保存，下次自動填入');
+            } else {
+                localStorage.removeItem('pbls_remember_me');
+                console.log('記住帳號功能已關閉');
+            }
+            
+            alert('登入成功！歡迎回來！');
+            
+            // 跳轉到首頁
+            setTimeout(() => {
+                window.location.href = 'index.html';
+            }, 1000);
+        }
+
+        // 載入已保存的帳號信息
+        function loadRememberedAccount() {
+            const rememberedData = localStorage.getItem('pbls_remember_me');
+            if (rememberedData) {
+                try {
+                    const data = JSON.parse(rememberedData);
+                    document.getElementById('email').value = data.email;
+                    document.getElementById('password').value = data.password;
+                    document.getElementById('rememberMe').checked = true;
+                    console.log('已載入保存的帳號信息');
+                } catch (error) {
+                    console.error('載入保存的帳號信息失敗:', error);
+                }
+            }
+        }
+
         // 等待DOM加載完成
         document.addEventListener('DOMContentLoaded', function() {
             console.log('DOM已加載完成');
+            
+            // 載入已保存的帳號信息
+            loadRememberedAccount();
+            
+            // 綁定登入表單事件
+            const loginForm = document.getElementById('loginForm');
+            if (loginForm) {
+                loginForm.addEventListener('submit', handleLogin);
+            }
             
             // DOM元素
             const googleBtn = document.getElementById("google-login-btn");
@@ -399,10 +653,14 @@
                 e.preventDefault();
                 console.log('Google登入按鈕被點擊');
                 
+                // 顯示載入狀態
+                googleBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 登入中...';
+                googleBtn.disabled = true;
+                
                 try {
                     // 檢查Firebase是否可用
-                    if (!firebase || !firebase.auth) {
-                        throw new Error('Firebase未正確載入');
+                    if (!isFirebaseReady || !firebase || !firebase.auth) {
+                        throw new Error('Firebase未正確配置，使用模擬登入');
                     }
                     
                     console.log('Firebase可用，開始Google登入流程');
@@ -440,16 +698,20 @@
                 } catch (error) {
                     console.error('Google登入失敗:', error);
                     
-                    // 如果是Firebase配置問題，提供模擬登入
-                    if (error.message.includes('Firebase未正確配置') || error.message.includes('Firebase未正確載入')) {
+                    // 如果Firebase配置有問題，使用模擬登入
+                    if (error.message.includes('Firebase未正確配置') || 
+                        error.message.includes('Firebase未正確載入') ||
+                        error.code === 'auth/invalid-api-key' ||
+                        error.code === 'auth/project-not-found') {
+                        
                         console.log('使用模擬Google登入');
                         
                         // 模擬Google登入成功
                         const mockUser = {
                             uid: 'mock-user-' + Date.now(),
-                            email: 'test@gmail.com',
-                            displayName: '測試用戶',
-                            photoURL: 'https://via.placeholder.com/40/667eea/ffffff?text=G'
+                            email: 'demo@gmail.com',
+                            displayName: 'Demo用戶',
+                            photoURL: 'https://via.placeholder.com/40/667eea/ffffff?text=D'
                         };
                         
                         userName.textContent = mockUser.displayName;
@@ -468,6 +730,9 @@
                         
                         console.log('模擬用戶信息已保存');
                         
+                        // 顯示成功訊息
+                        alert('模擬登入成功！\n\n注意：這是模擬登入，請配置真實的Firebase App ID以使用完整的Google登入功能。');
+                        
                         // 模擬登入成功後也跳轉到首頁
                         setTimeout(() => {
                             window.location.href = 'index.html';
@@ -480,16 +745,22 @@
                     if (error.code) {
                         switch (error.code) {
                             case 'auth/popup-closed-by-user':
-                                errorMessage = '登入視窗被關閉';
+                                errorMessage = '登入視窗被關閉，請重試';
                                 break;
                             case 'auth/popup-blocked':
-                                errorMessage = '彈出視窗被阻擋，請允許彈出視窗';
+                                errorMessage = '彈出視窗被阻擋，請允許彈出視窗後重試';
                                 break;
                             case 'auth/cancelled-popup-request':
                                 errorMessage = '登入請求被取消';
                                 break;
                             case 'auth/network-request-failed':
-                                errorMessage = '網路連線失敗';
+                                errorMessage = '網路連線失敗，請檢查網路連線';
+                                break;
+                            case 'auth/invalid-api-key':
+                                errorMessage = 'Firebase API Key 無效，請檢查配置';
+                                break;
+                            case 'auth/project-not-found':
+                                errorMessage = 'Firebase 專案未找到，請檢查配置';
                                 break;
                             default:
                                 errorMessage = `Google登入失敗: ${error.message}`;
@@ -497,41 +768,49 @@
                     }
                     
                     alert(errorMessage);
+                } finally {
+                    // 恢復按鈕狀態
+                    googleBtn.innerHTML = '<i class="fab fa-google"></i> 用 Google 登入';
+                    googleBtn.disabled = false;
                 }
             });
 
             console.log('Google登入按鈕事件已綁定');
 
             // 監聽登入狀態，自動顯示名字與頭像
-            auth.onAuthStateChanged((user) => {
-                if (user) {
-                    console.log('用戶已登入', user);
-                    userName.textContent = user.displayName;
-                    userPhoto.src = user.photoURL;
-                    document.getElementById('user-info').style.display = 'flex';
-                    
-                    // 保存用戶信息到localStorage
-                    const userData = {
-                        uid: user.uid,
-                        email: user.email,
-                        name: user.displayName,
-                        photoURL: user.photoURL,
-                        loginTime: new Date().toISOString()
-                    };
-                    localStorage.setItem('pbls_user', JSON.stringify(userData));
-                    
-                    // 自動跳轉到首頁
-                    setTimeout(() => {
-                        window.location.href = 'index.html';
-                    }, 1000);
-                    
-                } else {
-                    console.log('用戶未登入');
-                    userName.textContent = "";
-                    userPhoto.src = "";
-                    document.getElementById('user-info').style.display = 'none';
-                }
-            });
+            if (isFirebaseReady && auth) {
+                auth.onAuthStateChanged((user) => {
+                    if (user) {
+                        console.log('用戶已登入', user);
+                        userName.textContent = user.displayName;
+                        userPhoto.src = user.photoURL;
+                        document.getElementById('user-info').style.display = 'flex';
+                        
+                        // 保存用戶信息到localStorage
+                        const userData = {
+                            uid: user.uid,
+                            email: user.email,
+                            name: user.displayName,
+                            photoURL: user.photoURL,
+                            loginTime: new Date().toISOString()
+                        };
+                        localStorage.setItem('pbls_user', JSON.stringify(userData));
+                        
+                        // 自動跳轉到首頁
+                        setTimeout(() => {
+                            window.location.href = 'index.html';
+                        }, 1000);
+                        
+                    } else {
+                        console.log('用戶未登入');
+                        userName.textContent = "";
+                        userPhoto.src = "";
+                        document.getElementById('user-info').style.display = 'none';
+                    }
+                });
+            } else {
+                console.log('Firebase未就緒，跳過認證狀態監聽');
+            }
 
             console.log('認證狀態監聽器已設置');
         });

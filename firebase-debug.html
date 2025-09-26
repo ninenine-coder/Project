@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Firebase 除錯工具</title>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .debug-section {
+            background: white;
+            padding: 20px;
+            margin: 10px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .status {
+            padding: 10px;
+            border-radius: 4px;
+            margin: 10px 0;
+        }
+        .success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .warning { background: #fff3cd; color: #856404; border: 1px solid #ffeaa7; }
+        .info { background: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover { background: #0056b3; }
+        pre {
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 4px;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+    <h1>Firebase 除錯工具</h1>
+    
+    <div class="debug-section">
+        <h2>1. Firebase SDK 載入檢查</h2>
+        <div id="sdk-status"></div>
+    </div>
+    
+    <div class="debug-section">
+        <h2>2. Firebase 配置檢查</h2>
+        <div id="config-status"></div>
+        <pre id="config-display"></pre>
+    </div>
+    
+    <div class="debug-section">
+        <h2>3. Firebase 初始化測試</h2>
+        <div id="init-status"></div>
+        <button onclick="testFirebaseInit()">測試 Firebase 初始化</button>
+    </div>
+    
+    <div class="debug-section">
+        <h2>4. Google 登入測試</h2>
+        <div id="auth-status"></div>
+        <button onclick="testGoogleLogin()">測試 Google 登入</button>
+    </div>
+    
+    <div class="debug-section">
+        <h2>5. 網路連線檢查</h2>
+        <div id="network-status"></div>
+        <button onclick="testNetwork()">測試網路連線</button>
+    </div>
+    
+    <div class="debug-section">
+        <h2>6. 除錯建議</h2>
+        <div id="suggestions"></div>
+    </div>
+
+    <script>
+        // Firebase配置
+        const firebaseConfig = {
+            apiKey: "AIzaSyBuWO8hFVjjTUe2tqJDrqdbeGTrp4PoT5Q",
+            authDomain: "progect-115a5.firebaseapp.com",
+            projectId: "progect-115a5",
+            storageBucket: "progect-115a5.appspot.com",
+            messagingSenderId: "109099222287",
+            appId: "1:109099222287:web:your-app-id" // 這裡需要更新
+        };
+
+        let app, auth;
+
+        // 頁面載入時執行檢查
+        document.addEventListener('DOMContentLoaded', function() {
+            checkSDK();
+            checkConfig();
+            checkNetwork();
+            showSuggestions();
+        });
+
+        // 1. 檢查 Firebase SDK 載入
+        function checkSDK() {
+            const sdkStatus = document.getElementById('sdk-status');
+            
+            if (typeof firebase !== 'undefined') {
+                sdkStatus.innerHTML = '<div class="status success">✅ Firebase SDK 已載入</div>';
+            } else {
+                sdkStatus.innerHTML = '<div class="status error">❌ Firebase SDK 未載入</div>';
+            }
+        }
+
+        // 2. 檢查 Firebase 配置
+        function checkConfig() {
+            const configStatus = document.getElementById('config-status');
+            const configDisplay = document.getElementById('config-display');
+            
+            let hasError = false;
+            let errorMessages = [];
+
+            // 檢查各個配置項
+            if (!firebaseConfig.apiKey || firebaseConfig.apiKey.includes('your-')) {
+                hasError = true;
+                errorMessages.push('API Key 未正確配置');
+            }
+            
+            if (!firebaseConfig.authDomain || firebaseConfig.authDomain.includes('your-')) {
+                hasError = true;
+                errorMessages.push('Auth Domain 未正確配置');
+            }
+            
+            if (!firebaseConfig.projectId || firebaseConfig.projectId.includes('your-')) {
+                hasError = true;
+                errorMessages.push('Project ID 未正確配置');
+            }
+            
+            if (!firebaseConfig.appId || firebaseConfig.appId.includes('your-app-id')) {
+                hasError = true;
+                errorMessages.push('App ID 未正確配置 - 需要從 Firebase Console 獲取完整 App ID');
+            }
+
+            if (hasError) {
+                configStatus.innerHTML = '<div class="status error">❌ Firebase 配置有問題</div>';
+                configStatus.innerHTML += '<ul><li>' + errorMessages.join('</li><li>') + '</li></ul>';
+            } else {
+                configStatus.innerHTML = '<div class="status success">✅ Firebase 配置正確</div>';
+            }
+
+            configDisplay.textContent = JSON.stringify(firebaseConfig, null, 2);
+        }
+
+        // 3. 測試 Firebase 初始化
+        function testFirebaseInit() {
+            const initStatus = document.getElementById('init-status');
+            
+            try {
+                app = firebase.initializeApp(firebaseConfig);
+                auth = firebase.auth();
+                initStatus.innerHTML = '<div class="status success">✅ Firebase 初始化成功</div>';
+            } catch (error) {
+                initStatus.innerHTML = '<div class="status error">❌ Firebase 初始化失敗: ' + error.message + '</div>';
+            }
+        }
+
+        // 4. 測試 Google 登入
+        function testGoogleLogin() {
+            const authStatus = document.getElementById('auth-status');
+            
+            if (!auth) {
+                authStatus.innerHTML = '<div class="status error">❌ 請先初始化 Firebase</div>';
+                return;
+            }
+
+            try {
+                const provider = new firebase.auth.GoogleAuthProvider();
+                provider.setCustomParameters({ prompt: 'select_account' });
+                
+                auth.signInWithPopup(provider)
+                    .then(result => {
+                        authStatus.innerHTML = '<div class="status success">✅ Google 登入成功</div>';
+                        console.log('登入成功:', result.user);
+                    })
+                    .catch(error => {
+                        authStatus.innerHTML = '<div class="status error">❌ Google 登入失敗: ' + error.message + '</div>';
+                        console.error('登入失敗:', error);
+                    });
+            } catch (error) {
+                authStatus.innerHTML = '<div class="status error">❌ Google 登入測試失敗: ' + error.message + '</div>';
+            }
+        }
+
+        // 5. 測試網路連線
+        function testNetwork() {
+            const networkStatus = document.getElementById('network-status');
+            
+            // 測試 Firebase 服務連線
+            fetch('https://firebase.googleapis.com/v0/projects/progect-115a5')
+                .then(response => {
+                    if (response.ok) {
+                        networkStatus.innerHTML = '<div class="status success">✅ 網路連線正常</div>';
+                    } else {
+                        networkStatus.innerHTML = '<div class="status warning">⚠️ 網路連線有問題</div>';
+                    }
+                })
+                .catch(error => {
+                    networkStatus.innerHTML = '<div class="status error">❌ 網路連線失敗: ' + error.message + '</div>';
+                });
+        }
+
+        // 6. 顯示除錯建議
+        function showSuggestions() {
+            const suggestions = document.getElementById('suggestions');
+            
+            let suggestionsList = [
+                '<h3>🔧 除錯步驟：</h3>',
+                '<ol>',
+                '<li><strong>獲取完整 App ID：</strong>',
+                '<ul>',
+                '<li>前往 <a href="https://console.firebase.google.com/" target="_blank">Firebase Console</a></li>',
+                '<li>選擇專案 "Progect"</li>',
+                '<li>點擊 ⚙️ 設定 > 專案設定</li>',
+                '<li>在 "您的應用程式" 區段找到 Web 應用程式</li>',
+                '<li>複製完整的 App ID (格式: 1:109099222287:web:xxxxxxxxxxxxxxxx)</li>',
+                '</ul>',
+                '</li>',
+                '<li><strong>更新 App ID：</strong>',
+                '<ul>',
+                '<li>將 login.html 中的 "your-app-id" 替換為完整的 App ID</li>',
+                '<li>將 firebase-config.js 中的 "your-app-id" 替換為完整的 App ID</li>',
+                '<li>將 src/firebase/config.js 中的 "your-app-id" 替換為完整的 App ID</li>',
+                '</ul>',
+                '</li>',
+                '<li><strong>啟用 Google 登入：</strong>',
+                '<ul>',
+                '<li>在 Firebase Console 中前往 Authentication > Sign-in method</li>',
+                '<li>啟用 Google 登入提供者</li>',
+                '<li>設定 OAuth 同意畫面</li>',
+                '</ul>',
+                '</li>',
+                '<li><strong>設置授權網域：</strong>',
+                '<ul>',
+                '<li>在 Firebase Console 中前往 Authentication > Settings</li>',
+                '<li>在 "授權網域" 區段添加 localhost</li>',
+                '</ul>',
+                '</li>',
+                '</ol>'
+            ];
+            
+            suggestions.innerHTML = suggestionsList.join('');
+        }
+    </script>
+</body>
+</html>

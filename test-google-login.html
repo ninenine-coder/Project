@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Google 登入測試</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .test-section {
+            background: white;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .status {
+            padding: 10px;
+            border-radius: 4px;
+            margin: 10px 0;
+        }
+        .success { background: #d4edda; color: #155724; }
+        .error { background: #f8d7da; color: #721c24; }
+        .warning { background: #fff3cd; color: #856404; }
+        .info { background: #d1ecf1; color: #0c5460; }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover { background: #0056b3; }
+        button:disabled { background: #6c757d; cursor: not-allowed; }
+        pre {
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 4px;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔧 Google 登入測試</h1>
+    
+    <div class="test-section">
+        <h2>1. Firebase 配置檢查</h2>
+        <div id="config-status"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>2. Firebase 初始化測試</h2>
+        <button onclick="testFirebaseInit()">測試 Firebase 初始化</button>
+        <div id="init-status"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>3. Google 登入測試</h2>
+        <button onclick="testGoogleLogin()" id="google-test-btn">
+            <i class="fab fa-google"></i> 測試 Google 登入
+        </button>
+        <div id="login-status"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>4. 用戶信息顯示</h2>
+        <div id="user-info" style="display: none;">
+            <img id="user-photo" src="" alt="user photo" style="width:40px;height:40px;border-radius:50%;margin-right:10px;" />
+            <span id="user-name"></span>
+        </div>
+        <div id="user-data"></div>
+    </div>
+
+    <script>
+        // Firebase配置
+        const firebaseConfig = {
+            apiKey: "AIzaSyBuWO8hFVjjTUe2tqJDrqdbeGTrp4PoT5Q",
+            authDomain: "progect-115a5.firebaseapp.com",
+            projectId: "progect-115a5",
+            storageBucket: "progect-115a5.appspot.com",
+            messagingSenderId: "109099222287",
+            appId: "1:109099222287:web:4f7b56a1eebe5abbfaaa7a"
+        };
+
+        let app, auth;
+        let isFirebaseReady = false;
+
+        // 頁面載入時檢查配置
+        document.addEventListener('DOMContentLoaded', function() {
+            checkConfig();
+            testFirebaseInit();
+        });
+
+        // 檢查配置
+        function checkConfig() {
+            const configStatus = document.getElementById('config-status');
+            
+            let issues = [];
+            
+            if (!firebaseConfig.apiKey || firebaseConfig.apiKey.includes('your-')) {
+                issues.push('API Key 未正確配置');
+            }
+            
+            if (!firebaseConfig.authDomain || firebaseConfig.authDomain.includes('your-')) {
+                issues.push('Auth Domain 未正確配置');
+            }
+            
+            if (!firebaseConfig.projectId || firebaseConfig.projectId.includes('your-')) {
+                issues.push('Project ID 未正確配置');
+            }
+            
+            if (!firebaseConfig.appId || firebaseConfig.appId.includes('YOUR_ACTUAL_APP_ID')) {
+                issues.push('App ID 未正確配置');
+            }
+
+            if (issues.length > 0) {
+                configStatus.innerHTML = '<div class="status error">❌ Firebase 配置有問題</div>';
+                configStatus.innerHTML += '<ul><li>' + issues.join('</li><li>') + '</li></ul>';
+            } else {
+                configStatus.innerHTML = '<div class="status success">✅ Firebase 配置正確</div>';
+                configStatus.innerHTML += '<pre>' + JSON.stringify(firebaseConfig, null, 2) + '</pre>';
+            }
+        }
+
+        // 測試 Firebase 初始化
+        function testFirebaseInit() {
+            const initStatus = document.getElementById('init-status');
+            
+            try {
+                // 檢查Firebase SDK是否載入
+                if (typeof firebase === 'undefined') {
+                    throw new Error('Firebase SDK未載入');
+                }
+                
+                // 初始化Firebase
+                app = firebase.initializeApp(firebaseConfig);
+                auth = firebase.auth();
+                isFirebaseReady = true;
+                
+                initStatus.innerHTML = '<div class="status success">✅ Firebase 初始化成功</div>';
+                initStatus.innerHTML += '<div class="status info">App: ' + app.name + '</div>';
+                initStatus.innerHTML += '<div class="status info">Auth: ' + (auth ? '已初始化' : '未初始化') + '</div>';
+                
+            } catch (error) {
+                isFirebaseReady = false;
+                initStatus.innerHTML = '<div class="status error">❌ Firebase 初始化失敗: ' + error.message + '</div>';
+                
+                if (error.message.includes('Invalid app ID')) {
+                    initStatus.innerHTML += '<div class="status warning">⚠️ App ID 無效，請檢查 Firebase Console</div>';
+                } else if (error.message.includes('Invalid API key')) {
+                    initStatus.innerHTML += '<div class="status warning">⚠️ API Key 無效，請檢查 Firebase 配置</div>';
+                }
+            }
+        }
+
+        // 測試 Google 登入
+        function testGoogleLogin() {
+            const loginStatus = document.getElementById('login-status');
+            const googleBtn = document.getElementById('google-test-btn');
+            
+            if (!isFirebaseReady || !auth) {
+                loginStatus.innerHTML = '<div class="status error">❌ Firebase 未初始化，無法測試 Google 登入</div>';
+                return;
+            }
+            
+            // 顯示載入狀態
+            googleBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 登入中...';
+            googleBtn.disabled = true;
+            loginStatus.innerHTML = '<div class="status info">正在測試 Google 登入...</div>';
+            
+            try {
+                const provider = new firebase.auth.GoogleAuthProvider();
+                provider.setCustomParameters({ prompt: 'select_account' });
+                
+                auth.signInWithPopup(provider)
+                    .then(result => {
+                        const user = result.user;
+                        
+                        // 顯示用戶信息
+                        document.getElementById('user-name').textContent = user.displayName;
+                        document.getElementById('user-photo').src = user.photoURL;
+                        document.getElementById('user-info').style.display = 'flex';
+                        
+                        // 顯示用戶數據
+                        const userData = {
+                            uid: user.uid,
+                            email: user.email,
+                            displayName: user.displayName,
+                            photoURL: user.photoURL,
+                            loginTime: new Date().toISOString()
+                        };
+                        
+                        document.getElementById('user-data').innerHTML = 
+                            '<div class="status success">✅ Google 登入成功！</div>' +
+                            '<pre>' + JSON.stringify(userData, null, 2) + '</pre>';
+                        
+                        // 保存到localStorage
+                        localStorage.setItem('pbls_user', JSON.stringify(userData));
+                        
+                        loginStatus.innerHTML = '<div class="status success">✅ Google 登入成功！用戶信息已保存</div>';
+                        
+                    })
+                    .catch(error => {
+                        console.error('Google 登入失敗:', error);
+                        
+                        let errorMessage = 'Google 登入失敗';
+                        if (error.code) {
+                            switch (error.code) {
+                                case 'auth/popup-closed-by-user':
+                                    errorMessage = '登入視窗被關閉';
+                                    break;
+                                case 'auth/popup-blocked':
+                                    errorMessage = '彈出視窗被阻擋，請允許彈出視窗';
+                                    break;
+                                case 'auth/cancelled-popup-request':
+                                    errorMessage = '登入請求被取消';
+                                    break;
+                                case 'auth/network-request-failed':
+                                    errorMessage = '網路連線失敗';
+                                    break;
+                                default:
+                                    errorMessage = `Google 登入失敗: ${error.message}`;
+                            }
+                        }
+                        
+                        loginStatus.innerHTML = '<div class="status error">❌ ' + errorMessage + '</div>';
+                    })
+                    .finally(() => {
+                        // 恢復按鈕狀態
+                        googleBtn.innerHTML = '<i class="fab fa-google"></i> 測試 Google 登入';
+                        googleBtn.disabled = false;
+                    });
+                    
+            } catch (error) {
+                loginStatus.innerHTML = '<div class="status error">❌ Google 登入測試失敗: ' + error.message + '</div>';
+                googleBtn.innerHTML = '<i class="fab fa-google"></i> 測試 Google 登入';
+                googleBtn.disabled = false;
+            }
+        }
+    </script>
+</body>
+</html>

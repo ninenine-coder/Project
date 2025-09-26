@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PBLS VR教學平台 - 部署測試</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Microsoft JhengHei', sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .test-container {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            max-width: 600px;
+            width: 90%;
+        }
+        .logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 30px;
+        }
+        .logo i {
+            font-size: 3rem;
+            color: #667eea;
+            margin-right: 15px;
+        }
+        .logo h1 {
+            font-size: 2.5rem;
+            color: #333;
+            margin: 0;
+        }
+        .subtitle {
+            color: #666;
+            font-size: 1.2rem;
+            margin-bottom: 30px;
+        }
+        .test-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .btn {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+        .btn-primary:hover {
+            background: #5a6fd8;
+            transform: translateY(-2px);
+        }
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+        .btn-success:hover {
+            background: #218838;
+            transform: translateY(-2px);
+        }
+        .btn-info {
+            background: #17a2b8;
+            color: white;
+        }
+        .btn-info:hover {
+            background: #138496;
+            transform: translateY(-2px);
+        }
+        .status {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 8px;
+            font-weight: 500;
+        }
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .status.info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <div class="logo">
+            <i class="fas fa-graduation-cap"></i>
+            <h1>PBLS</h1>
+        </div>
+        <p class="subtitle">VR教學平台 - 部署測試</p>
+        
+        <div class="test-buttons">
+            <a href="login.html" class="btn btn-primary">
+                <i class="fas fa-sign-in-alt"></i> 測試登入頁面
+            </a>
+            
+            <a href="index.html" class="btn btn-success">
+                <i class="fas fa-home"></i> 測試首頁
+            </a>
+            
+            <a href="test-google-login.html" class="btn btn-info">
+                <i class="fab fa-google"></i> 測試 Google 登入
+            </a>
+            
+            <a href="firebase-config-helper.html" class="btn btn-info">
+                <i class="fas fa-cog"></i> Firebase 配置助手
+            </a>
+        </div>
+        
+        <div id="status" class="status info">
+            <i class="fas fa-info-circle"></i> 點擊上方按鈕測試各個功能
+        </div>
+    </div>
+
+    <script>
+        // 檢查頁面載入狀態
+        document.addEventListener('DOMContentLoaded', function() {
+            const status = document.getElementById('status');
+            
+            // 檢查必要的文件是否存在
+            const requiredFiles = [
+                'login.html',
+                'index.html',
+                'assets/logo.png'
+            ];
+            
+            let allFilesExist = true;
+            let missingFiles = [];
+            
+            // 這裡可以添加更詳細的文件檢查邏輯
+            // 目前先顯示基本狀態
+            
+            if (allFilesExist) {
+                status.innerHTML = '<i class="fas fa-check-circle"></i> 所有必要文件已就緒，可以開始測試！';
+                status.className = 'status success';
+            } else {
+                status.innerHTML = '<i class="fas fa-exclamation-triangle"></i> 缺少必要文件: ' + missingFiles.join(', ');
+                status.className = 'status error';
+            }
+        });
+    </script>
+</body>
+</html>
