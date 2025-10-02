@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>語言切換測試 - PBLS 平台</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Microsoft JhengHei', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .test-container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            max-width: 600px;
+            width: 90%;
+        }
+
+        .test-title {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .test-description {
+            color: #666;
+            font-size: 1.1rem;
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+
+        .language-info {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .current-lang {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .lang-code {
+            font-family: 'Courier New', monospace;
+            background: #e9ecef;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 0.9rem;
+        }
+
+        .test-button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 25px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            margin: 10px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .test-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .feature-list {
+            text-align: left;
+            margin: 20px 0;
+            padding: 20px;
+            background: rgba(102, 126, 234, 0.1);
+            border-radius: 15px;
+        }
+
+        .feature-list h3 {
+            color: #667eea;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .feature-list ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .feature-list li {
+            padding: 8px 0;
+            color: #555;
+        }
+
+        .feature-list li:before {
+            content: '✅ ';
+            margin-right: 10px;
+        }
+
+        .status {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 10px;
+            font-weight: 600;
+        }
+
+        .status.success {
+            background: rgba(46, 204, 113, 0.1);
+            color: #27ae60;
+            border: 2px solid rgba(46, 204, 113, 0.3);
+        }
+
+        .status.info {
+            background: rgba(52, 152, 219, 0.1);
+            color: #3498db;
+            border: 2px solid rgba(52, 152, 219, 0.3);
+        }
+    </style>
+    
+    <!-- 語言切換功能 -->
+    <script src="src/js/language-switcher.js"></script>
+</head>
+<body>
+    <div class="test-container">
+        <h1 class="test-title">🌐 語言切換測試</h1>
+        <p class="test-description">
+            這個頁面用於測試 PBLS 平台的語言切換功能。<br>
+            點擊下方按鈕測試中英文切換效果。
+        </p>
+
+        <div class="language-info">
+            <div class="current-lang">目前語言: <span id="current-language">中文</span></div>
+            <div class="lang-code">語言代碼: <span id="language-code">zh</span></div>
+        </div>
+
+        <button class="test-button" onclick="testLanguageToggle()">
+            🔄 切換語言
+        </button>
+
+        <button class="test-button" onclick="goToInfoPage()">
+            📄 前往資訊頁面
+        </button>
+
+        <button class="test-button" onclick="goToPracticePage()">
+            🎯 前往練習專區
+        </button>
+
+        <button class="test-button" onclick="goToExamPage()">
+            📝 前往考試專區
+        </button>
+
+        <button class="test-button" onclick="goToHistoryPage()">
+            📊 前往歷史成績
+        </button>
+
+        <button class="test-button" onclick="goToTeamPage()">
+            👥 前往團隊頁面
+        </button>
+
+        <div class="feature-list">
+            <h3>🚀 功能特色</h3>
+            <ul>
+                <li>左側選單語言切換按鈕</li>
+                <li>所有頁面文字即時翻譯</li>
+                <li>圖片路徑根據語言動態切換</li>
+                <li>語言偏好自動保存到本地存儲</li>
+                <li>頁面刷新後保持語言設定</li>
+                <li>響應式設計適配各種螢幕</li>
+            </ul>
+        </div>
+
+        <div class="status info" id="status">
+            💡 點擊「切換語言」按鈕測試功能
+        </div>
+    </div>
+
+    <script>
+        // 測試語言切換功能
+        function testLanguageToggle() {
+            const status = document.getElementById('status');
+            const currentLang = document.getElementById('current-language');
+            const langCode = document.getElementById('language-code');
+            
+            try {
+                // 調用語言切換功能
+                window.toggleLanguage();
+                
+                // 更新顯示
+                const newLang = window.languageSwitcher.currentLang;
+                currentLang.textContent = newLang === 'zh' ? '中文' : 'English';
+                langCode.textContent = newLang;
+                
+                status.className = 'status success';
+                status.innerHTML = `✅ 語言切換成功！當前語言: ${newLang === 'zh' ? '中文' : 'English'}`;
+                
+            } catch (error) {
+                status.className = 'status error';
+                status.innerHTML = `❌ 語言切換失敗: ${error.message}`;
+                console.error('語言切換錯誤:', error);
+            }
+        }
+
+        // 前往各個頁面
+        function goToInfoPage() {
+            window.location.href = 'info.html';
+        }
+
+        function goToPracticePage() {
+            window.location.href = 'index.html';
+        }
+
+        function goToExamPage() {
+            window.location.href = 'exam.html';
+        }
+
+        function goToHistoryPage() {
+            window.location.href = 'history.html';
+        }
+
+        function goToTeamPage() {
+            window.location.href = 'team.html';
+        }
+
+        // 頁面載入時顯示當前語言
+        document.addEventListener('DOMContentLoaded', function() {
+            if (window.languageSwitcher) {
+                const currentLang = window.languageSwitcher.currentLang;
+                document.getElementById('current-language').textContent = currentLang === 'zh' ? '中文' : 'English';
+                document.getElementById('language-code').textContent = currentLang;
+                
+                const status = document.getElementById('status');
+                status.className = 'status success';
+                status.innerHTML = `🎉 語言切換系統已就緒！當前語言: ${currentLang === 'zh' ? '中文' : 'English'}`;
+            } else {
+                const status = document.getElementById('status');
+                status.className = 'status error';
+                status.innerHTML = '❌ 語言切換系統未載入';
+            }
+        });
+    </script>
+</body>
+</html>

@@ -148,6 +148,8 @@
                          0 0 40px rgba(0, 0, 0, 0.1);
             border-right: 1px solid rgba(255, 255, 255, 0.1);
             z-index: 1000;
+            display: flex;
+            flex-direction: column;
         }
 
         .sidebar:hover {
@@ -188,6 +190,9 @@
 
         .sidebar-menu {
             padding: 20px 0;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
         }
 
         .sidebar-icon {
@@ -227,6 +232,37 @@
             white-space: nowrap;
         }
 
+        /* 語言切換按鈕容器 - 固定在底部 */
+        .language-switcher-container {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 10px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* 語言切換按鈕特殊樣式 */
+        .language-switcher {
+            background: rgba(46, 204, 113, 0.8) !important;
+            border: 2px solid rgba(46, 204, 113, 0.6) !important;
+            margin: 0;
+        }
+
+        .language-switcher:hover {
+            background: rgba(39, 174, 96, 0.9) !important;
+            border-color: rgba(39, 174, 96, 0.8) !important;
+            transform: translateX(5px);
+        }
+
+        .language-switcher i {
+            color: white !important;
+        }
+
+        .language-switcher span {
+            color: white !important;
+        }
+
         .sidebar:hover .sidebar-icon span {
             opacity: 1;
         }
@@ -246,6 +282,416 @@
             margin-left: 180px;
         }
 
+        /* PBLS 知識庫樣式 */
+        .pbls-container {
+            min-height: calc(100vh - 180px);
+            background: linear-gradient(135deg, #f3e8ff 0%, #e0e7ff 100%);
+            color: #333;
+        }
+
+        .hero-section {
+            position: relative;
+            padding: 100px 40px;
+            text-align: center;
+            border-radius: 25px;
+            margin-bottom: 50px;
+            box-shadow: 0 12px 35px rgba(0, 0, 0, 0.15);
+            overflow: hidden;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            min-height: 500px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.8s ease-in-out;
+            animation: backgroundZoom 5s ease-in-out infinite;
+        }
+
+        @keyframes backgroundZoom {
+            0%, 100% {
+                background-size: 105% auto;
+                transform: scale(1);
+            }
+            50% {
+                background-size: 115% auto;
+                transform: scale(1.03);
+            }
+        }
+
+        .hero-section.changing {
+            animation: zoomTransition 1.5s ease-in-out;
+        }
+
+        @keyframes zoomTransition {
+            0% {
+                transform: scale(1);
+                filter: brightness(1);
+            }
+            50% {
+                transform: scale(1.15);
+                filter: brightness(1.3);
+            }
+            100% {
+                transform: scale(1);
+                filter: brightness(1);
+            }
+        }
+
+        .hero-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.3);
+            z-index: 1;
+            border-radius: 25px;
+            transition: background 0.3s ease;
+        }
+
+        .hero-section.changing::before {
+            background: rgba(0, 0, 0, 0.5);
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 2;
+        }
+
+        .hero-title {
+            font-size: 42px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            color: white;
+            text-shadow: 0 3px 6px rgba(0, 0, 0, 0.8);
+            transition: all 0.3s ease;
+        }
+
+        .hero-description {
+            font-size: 20px;
+            max-width: 900px;
+            margin: 0 auto 35px auto;
+            line-height: 1.7;
+            color: rgba(255, 255, 255, 0.95);
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.6);
+            transition: all 0.3s ease;
+        }
+
+        .hero-section.changing .hero-title {
+            transform: scale(1.05);
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .hero-section.changing .hero-description {
+            transform: scale(1.02);
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .learn-more-btn {
+            background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 25px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3);
+        }
+
+        .learn-more-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(139, 92, 246, 0.4);
+            background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);
+        }
+
+        .section {
+            padding: 40px 30px;
+            margin-bottom: 30px;
+            border-radius: 20px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        .section-white {
+            background: white;
+            text-align: center;
+        }
+
+        .section-purple {
+            background: linear-gradient(135deg, #faf5ff 0%, #f3e8ff 100%);
+        }
+
+        .section-title {
+            font-size: 28px;
+            font-weight: bold;
+            margin-bottom: 30px;
+            color: #4c1d95;
+            text-align: center;
+        }
+
+        .flowchart-container {
+            max-width: 100%;
+            margin: 0 auto;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .flowchart-image {
+            width: 100%;
+            height: auto;
+            display: block;
+            border-radius: 15px;
+        }
+
+        .scenarios-grid {
+            display: flex;
+            gap: 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+            overflow-x: auto;
+            padding: 10px;
+        }
+
+        .scenario-card {
+            background: white;
+            border-radius: 20px;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+            min-width: 250px;
+            flex-shrink: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .scenario-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+            border-color: #8b5cf6;
+        }
+
+        .scenario-image {
+            width: 100%;
+            height: 150px;
+            border-radius: 15px;
+            margin-bottom: 15px;
+            background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #9ca3af;
+            font-size: 48px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .scenario-image img {
+            width: 200px;
+            height: 120px;
+            object-fit: cover;
+            border-radius: 15px;
+            transition: transform 0.3s ease;
+        }
+
+        .scenario-card:hover .scenario-image img {
+            transform: scale(1.05);
+        }
+
+        .scenario-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #4c1d95;
+        }
+
+        .scenario-btn {
+            background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 15px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3);
+        }
+
+        .scenario-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(139, 92, 246, 0.4);
+            background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);
+        }
+
+        .simulation-btn-container {
+            text-align: center;
+            padding: 40px 30px;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 25px;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .practice-btn, .exam-btn {
+            border: none;
+            padding: 18px 35px;
+            border-radius: 25px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            min-width: 200px;
+        }
+
+        .practice-btn {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            box-shadow: 0 6px 20px rgba(16, 185, 129, 0.3);
+        }
+
+        .practice-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 30px rgba(16, 185, 129, 0.4);
+            background: linear-gradient(135deg, #059669 0%, #047857 100%);
+        }
+
+        .exam-btn {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            color: white;
+            box-shadow: 0 6px 20px rgba(245, 158, 11, 0.3);
+        }
+
+        .exam-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 30px rgba(245, 158, 11, 0.4);
+            background: linear-gradient(135deg, #d97706 0%, #b45309 100%);
+        }
+
+        /* 彈出視窗樣式 */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            transform: scale(0.8) translateY(-50px);
+            transition: all 0.3s ease;
+        }
+
+        .modal-overlay.active .modal-content {
+            transform: scale(1) translateY(0);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #e5e7eb;
+        }
+
+        .modal-title {
+            font-size: 24px;
+            font-weight: bold;
+            color: #4c1d95;
+            margin: 0;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 24px;
+            color: #9ca3af;
+            cursor: pointer;
+            padding: 5px;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+        }
+
+        .modal-close:hover {
+            background: #f3f4f6;
+            color: #6b7280;
+        }
+
+        .modal-body {
+            font-size: 16px;
+            line-height: 1.6;
+            color: #374151;
+        }
+
+        .treatment-steps {
+            background: #f8fafc;
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px 0;
+            border-left: 4px solid #8b5cf6;
+        }
+
+        .treatment-step {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+
+        .treatment-step:last-child {
+            margin-bottom: 0;
+        }
+
+        .step-number {
+            background: #8b5cf6;
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-right: 15px;
+            flex-shrink: 0;
+        }
+
+        .step-text {
+            flex: 1;
+        }
+
         /* 響應式設計 */
         @media (max-width: 768px) {
             .sidebar {
@@ -263,8 +709,60 @@
             .sidebar:hover ~ .main-content {
                 margin-left: 160px;
             }
+
+            .hero-section {
+                padding: 80px 25px;
+                min-height: 450px;
+                margin-bottom: 30px;
+            }
+
+            .hero-title {
+                font-size: 32px;
+                margin-bottom: 15px;
+            }
+
+            .hero-description {
+                font-size: 18px;
+                padding: 0 15px;
+                margin-bottom: 25px;
+            }
+
+            .section {
+                padding: 30px 20px;
+            }
+
+            .scenarios-grid {
+                gap: 15px;
+                padding: 5px;
+            }
+
+            .scenario-card {
+                min-width: 200px;
+                padding: 15px;
+            }
+
+            .scenario-image {
+                height: 120px;
+            }
+
+            .scenario-image img {
+                width: 160px;
+                height: 100px;
+            }
+
+            .button-group {
+                flex-direction: column;
+                gap: 20px;
+            }
+
+            .practice-btn, .exam-btn {
+                min-width: 250px;
+            }
         }
     </style>
+    
+    <!-- 語言切換功能 -->
+    <script src="src/js/language-switcher.js"></script>
 </head>
 <body>
     <!-- 側邊欄 -->
@@ -278,6 +776,10 @@
 
         <!-- 選單 -->
         <div class="sidebar-menu">
+            <div class="sidebar-icon active" onclick="window.location.href='info.html'">
+                <i class="fas fa-info-circle"></i>
+                <span>資訊</span>
+            </div>
             <div class="sidebar-icon" onclick="window.location.href='index.html'">
                 <i class="fas fa-play-circle"></i>
                 <span>練習專區</span>
@@ -290,13 +792,17 @@
                 <i class="fas fa-chart-line"></i>
                 <span>歷史成績</span>
             </div>
-            <div class="sidebar-icon active" onclick="window.location.href='info.html'">
-                <i class="fas fa-info-circle"></i>
-                <span>資訊</span>
-            </div>
             <div class="sidebar-icon" onclick="window.location.href='team.html'">
                 <i class="fas fa-users"></i>
                 <span>團隊</span>
+            </div>
+        </div>
+
+        <!-- 語言切換按鈕 - 固定在底部 -->
+        <div class="language-switcher-container">
+            <div class="sidebar-icon language-switcher" onclick="toggleLanguage()">
+                <i class="fas fa-globe"></i>
+                <span id="language-text">中文</span>
             </div>
         </div>
     </div>
@@ -331,14 +837,336 @@
 
     <!-- 主要內容區域 -->
     <div class="main-content">
-        <!-- 資訊頁面內容 -->
-        <div class="info-page" id="infoPage">
-            <h1>資訊</h1>
-            <p>平台使用說明、公告與相關資源。</p>
+        <div class="pbls-container">
+            <!-- Hero Section -->
+            <div class="hero-section" id="heroSection">
+                <div class="hero-content">
+                    <h1 class="hero-title">Pediatric Basic Life Support</h1>
+                    <p class="hero-description">
+                        Pediatric Basic Life Support (PBLS) is the essential guideline for rescuing infants and children in cardiac or respiratory arrest. This platform provides systematic training combining theory, process flow, and scenario simulations.
+                    </p>
+                    <button class="learn-more-btn" onclick="scrollToFlowchart()">
+                        Learn More
+                    </button>
+                </div>
+            </div>
+
+            <!-- 流程圖區 -->
+            <section class="section section-white" id="flowchart-section">
+                <h2 class="section-title">PBLS 流程圖</h2>
+                <div class="flowchart-container">
+                    <img
+                        src="/PBLS流程圖.png"
+                        alt="PBLS流程圖"
+                        class="flowchart-image"
+                        onerror="this.style.display='none'; this.nextElementSibling.style.display='block';"
+                    />
+                    <div style="display: none; padding: 40px; text-align: center; color: #666;">
+                        <i class="fas fa-image" style="font-size: 48px; margin-bottom: 20px;"></i>
+                        <p>PBLS流程圖圖片載入中...</p>
+                        <p style="font-size: 14px; margin-top: 10px;">請確保圖片文件位於正確路徑</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 五大情境模擬區 -->
+            <section class="section section-purple">
+                <h2 class="section-title">模擬情境案例</h2>
+                <div class="scenarios-grid">
+                    <div class="scenario-card">
+                        <div class="scenario-image">
+                            <img src="assets/心臟驟停情境.png" alt="心臟驟停情境" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                            <div style="display: none; align-items: center; justify-content: center; width: 100%; height: 100%;">
+                                <i class="fas fa-heartbeat"></i>
+                            </div>
+                        </div>
+                        <h3 class="scenario-title">心臟驟停</h3>
+                        <button class="scenario-btn" onclick="showTreatmentModal('cardiac')">
+                            處理措施
+                        </button>
+                    </div>
+
+                    <div class="scenario-card">
+                        <div class="scenario-image">
+                            <img src="assets/食物中毒情境.png" alt="食物中毒情境" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                            <div style="display: none; align-items: center; justify-content: center; width: 100%; height: 100%;">
+                                <i class="fas fa-utensils"></i>
+                            </div>
+                        </div>
+                        <h3 class="scenario-title">食物中毒</h3>
+                        <button class="scenario-btn" onclick="showTreatmentModal('poisoning')">
+                            處理措施
+                        </button>
+                    </div>
+
+                    <div class="scenario-card">
+                        <div class="scenario-image">
+                            <img src="assets/溺水情境.png" alt="溺水情境" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                            <div style="display: none; align-items: center; justify-content: center; width: 100%; height: 100%;">
+                                <i class="fas fa-swimmer"></i>
+                            </div>
+                        </div>
+                        <h3 class="scenario-title">溺水</h3>
+                        <button class="scenario-btn" onclick="showTreatmentModal('drowning')">
+                            處理措施
+                        </button>
+                    </div>
+
+                    <div class="scenario-card">
+                        <div class="scenario-image">
+                            <img src="assets/火災嗆傷情境.png" alt="火災嗆傷情境" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                            <div style="display: none; align-items: center; justify-content: center; width: 100%; height: 100%;">
+                                <i class="fas fa-fire"></i>
+                            </div>
+                        </div>
+                        <h3 class="scenario-title">火災嗆傷</h3>
+                        <button class="scenario-btn" onclick="showTreatmentModal('fire')">
+                            處理措施
+                        </button>
+                    </div>
+
+                    <div class="scenario-card">
+                        <div class="scenario-image">
+                            <img src="assets/外傷情境.png" alt="外傷情境" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                            <div style="display: none; align-items: center; justify-content: center; width: 100%; height: 100%;">
+                                <i class="fas fa-band-aid"></i>
+                            </div>
+                        </div>
+                        <h3 class="scenario-title">外傷</h3>
+                        <button class="scenario-btn" onclick="showTreatmentModal('trauma')">
+                            處理措施
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 操作按鈕區 -->
+            <div class="simulation-btn-container">
+                <div class="button-group">
+                    <button class="practice-btn" onclick="goToPractice()">
+                        立即練習模擬
+                    </button>
+                    <button class="exam-btn" onclick="goToExam()">
+                        進入考試測驗
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 彈出視窗 -->
+    <div class="modal-overlay" id="treatmentModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title" id="modalTitle">處理措施</h2>
+                <button class="modal-close" onclick="closeTreatmentModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body" id="modalBody">
+                <!-- 處理措施內容將在這裡動態插入 -->
+            </div>
         </div>
     </div>
 
     <script>
+        // 滾動到流程圖區域
+        function scrollToFlowchart() {
+            const flowchartSection = document.getElementById('flowchart-section');
+            const offset = 100; // 向上偏移100px，避免滾動得太下面
+            
+            const elementPosition = flowchartSection.getBoundingClientRect().top;
+            const offsetPosition = elementPosition + window.pageYOffset - offset;
+            
+            window.scrollTo({
+                top: offsetPosition,
+                behavior: 'smooth'
+            });
+        }
+
+        // 跳轉到練習專區
+        function goToPractice() {
+            window.location.href = 'index.html';
+        }
+
+        // 跳轉到考試專區
+        function goToExam() {
+            window.location.href = 'exam.html';
+        }
+
+        // 處理措施資料
+        const treatmentData = {
+            cardiac: {
+                title: '心臟驟停處理措施',
+                steps: [
+                    '立即進行CPR（心肺復甦術）',
+                    '使用AED進行電擊除顫（50J）',
+                    '給予Epinephrine（腎上腺素）',
+                    '進行漸進式電擊治療',
+                    '轉送ICU重症監護室'
+                ]
+            },
+            poisoning: {
+                title: '食物中毒處理措施',
+                steps: [
+                    '清理呼吸道，確保氣道暢通',
+                    '使用Bag-Mask進行人工呼吸',
+                    '進行CPR心肺復甦術',
+                    '使用AED電擊除顫（80J）',
+                    '給予Amiodarone（胺碘酮）'
+                ]
+            },
+            drowning: {
+                title: '溺水處理措施',
+                steps: [
+                    '抽吸呼吸道中的水分',
+                    '使用Bag-Mask進行人工呼吸',
+                    '進行CPR心肺復甦術',
+                    '使用AED電擊除顫（60J）',
+                    '給予Amiodarone（胺碘酮）'
+                ]
+            },
+            fire: {
+                title: '火災嗆傷處理措施',
+                steps: [
+                    '進行氣管插管並給予氧氣',
+                    '進行CPR心肺復甦術',
+                    '使用AED電擊除顫（80-100J）',
+                    '給予Epinephrine（腎上腺素）'
+                ]
+            },
+            trauma: {
+                title: '外傷處理措施',
+                steps: [
+                    '進行止血並建立靜脈輸液',
+                    '進行CPR心肺復甦術',
+                    '使用AED電擊除顫（70J）',
+                    '給予Epinephrine（腎上腺素）'
+                ]
+            }
+        };
+
+        // 顯示處理措施彈出視窗
+        function showTreatmentModal(scenarioType) {
+            const modal = document.getElementById('treatmentModal');
+            const title = document.getElementById('modalTitle');
+            const body = document.getElementById('modalBody');
+            
+            // 使用全局翻譯數據或本地數據
+            const data = window.treatmentData ? window.treatmentData[scenarioType] : treatmentData[scenarioType];
+            if (!data) return;
+            
+            title.textContent = data.title;
+            
+            // 生成處理步驟HTML
+            const stepsHtml = data.steps.map((step, index) => `
+                <div class="treatment-step">
+                    <div class="step-number">${index + 1}</div>
+                    <div class="step-text">${step}</div>
+                </div>
+            `).join('');
+            
+            // 根據當前語言顯示不同的說明文字
+            const currentLang = localStorage.getItem('pbls_language') || 'zh';
+            const disclaimerText = currentLang === 'en' 
+                ? '※ The above are basic treatment procedures. Actual operations need to be adjusted according to the situation.'
+                : '※ 以上為基本處理流程，實際操作需依現場情況調整';
+            
+            body.innerHTML = `
+                <div class="treatment-steps">
+                    ${stepsHtml}
+                </div>
+                <p style="margin-top: 20px; font-size: 14px; color: #6b7280; text-align: center;">
+                    ${disclaimerText}
+                </p>
+            `;
+            
+            modal.classList.add('active');
+            document.body.style.overflow = 'hidden'; // 防止背景滾動
+        }
+
+        // 關閉處理措施彈出視窗
+        function closeTreatmentModal() {
+            const modal = document.getElementById('treatmentModal');
+            modal.classList.remove('active');
+            document.body.style.overflow = ''; // 恢復背景滾動
+        }
+
+        // 點擊背景關閉彈出視窗
+        document.addEventListener('DOMContentLoaded', function() {
+            const modal = document.getElementById('treatmentModal');
+            modal.addEventListener('click', function(e) {
+                if (e.target === modal) {
+                    closeTreatmentModal();
+                }
+            });
+            
+            // 初始化背景輪播
+            initHeroBackground();
+        });
+
+        // 初始化 Hero Section 背景輪播
+        function initHeroBackground() {
+            const heroSection = document.getElementById('heroSection');
+            const backgroundImages = [
+                'assets/場景1.png',
+                'assets/場景2.png',
+                'assets/場景3.png',
+                'assets/場景4.png'
+            ];
+            
+            let currentImageIndex = 0;
+            
+            // 設置初始背景
+            heroSection.style.backgroundImage = `url('${backgroundImages[currentImageIndex]}')`;
+            
+            // 每5秒切換背景
+            setInterval(() => {
+                // 添加切換動畫類
+                heroSection.classList.add('changing');
+                
+                // 延遲更換背景圖片，讓動畫效果更明顯
+                setTimeout(() => {
+                    currentImageIndex = (currentImageIndex + 1) % backgroundImages.length;
+                    heroSection.style.backgroundImage = `url('${backgroundImages[currentImageIndex]}')`;
+                }, 750);
+                
+                // 移除動畫類
+                setTimeout(() => {
+                    heroSection.classList.remove('changing');
+                }, 1500);
+                
+            }, 5000);
+        }
+
+        // 語言切換功能已移至 language-switcher.js
+
+        // 添加卡片懸停效果
+        document.addEventListener('DOMContentLoaded', function() {
+            const scenarioCards = document.querySelectorAll('.scenario-card');
+            
+            scenarioCards.forEach(card => {
+                card.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateY(-8px) scale(1.02)';
+                });
+                
+                card.addEventListener('mouseleave', function() {
+                    this.style.transform = 'translateY(0) scale(1)';
+                });
+            });
+
+            // 添加按鈕點擊動畫效果
+            const buttons = document.querySelectorAll('.learn-more-btn, .practice-btn, .exam-btn, .scenario-btn');
+            buttons.forEach(button => {
+                button.addEventListener('click', function() {
+                    this.style.transform = 'scale(0.95)';
+                    setTimeout(() => {
+                        this.style.transform = '';
+                    }, 150);
+                });
+            });
+        });
+
         // 用戶頭像功能
         function showUserProfile() {
             alert('用戶資料功能開發中，敬請期待！');
@@ -355,18 +1183,6 @@
                 window.location.href = 'login.html';
             }
         }
-    </script>
-</body>
-</html>
-
-    </script>
-</body>
-</html>
-
-    </script>
-</body>
-</html>
-
     </script>
 </body>
 </html>

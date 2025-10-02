@@ -148,6 +148,8 @@
                          0 0 40px rgba(0, 0, 0, 0.1);
             border-right: 1px solid rgba(255, 255, 255, 0.1);
             z-index: 1000;
+            display: flex;
+            flex-direction: column;
         }
 
         .sidebar:hover {
@@ -188,6 +190,9 @@
 
         .sidebar-menu {
             padding: 20px 0;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
         }
 
         .sidebar-icon {
@@ -225,6 +230,37 @@
             opacity: 0;
             transition: opacity 0.3s ease;
             white-space: nowrap;
+        }
+
+        /* 語言切換按鈕容器 - 固定在底部 */
+        .language-switcher-container {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 10px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* 語言切換按鈕特殊樣式 */
+        .language-switcher {
+            background: rgba(46, 204, 113, 0.8) !important;
+            border: 2px solid rgba(46, 204, 113, 0.6) !important;
+            margin: 0;
+        }
+
+        .language-switcher:hover {
+            background: rgba(39, 174, 96, 0.9) !important;
+            border-color: rgba(39, 174, 96, 0.8) !important;
+            transform: translateX(5px);
+        }
+
+        .language-switcher i {
+            color: white !important;
+        }
+
+        .language-switcher span {
+            color: white !important;
         }
 
         .sidebar:hover .sidebar-icon span {
@@ -444,6 +480,9 @@
             }
         }
     </style>
+    
+    <!-- 語言切換功能 -->
+    <script src="src/js/language-switcher.js"></script>
 </head>
 <body>
     <!-- 側邊欄 -->
@@ -457,27 +496,35 @@
                 
         <!-- 選單 -->
         <div class="sidebar-menu">
+            <div class="sidebar-icon" onclick="window.location.href='info.html'">
+                <i class="fas fa-info-circle"></i>
+                <span>資訊</span>
+            </div>
             <div class="sidebar-icon active" onclick="window.location.href='index.html'">
                 <i class="fas fa-play-circle"></i>
                 <span>練習專區</span>
-                    </div>
+            </div>
             <div class="sidebar-icon" onclick="window.location.href='exam.html'">
                 <i class="fas fa-clipboard-list"></i>
                 <span>考試專區</span>
-                    </div>
+            </div>
             <div class="sidebar-icon" onclick="window.location.href='history.html'">
-                        <i class="fas fa-chart-line"></i>
+                <i class="fas fa-chart-line"></i>
                 <span>歷史成績</span>
-                    </div>
-            <div class="sidebar-icon" onclick="window.location.href='info.html'">
-                        <i class="fas fa-info-circle"></i>
-                <span>資訊</span>
-                    </div>
+            </div>
             <div class="sidebar-icon" onclick="window.location.href='team.html'">
-                        <i class="fas fa-users"></i>
+                <i class="fas fa-users"></i>
                 <span>團隊</span>
-                    </div>
-                    </div>
+            </div>
+        </div>
+
+        <!-- 語言切換按鈕 - 固定在底部 -->
+        <div class="language-switcher-container">
+            <div class="sidebar-icon language-switcher" onclick="toggleLanguage()">
+                <i class="fas fa-globe"></i>
+                <span id="language-text">中文</span>
+            </div>
+        </div>
             </div>
 
             <!-- 頂部標題欄 -->
@@ -612,6 +659,8 @@
             console.log('跳轉到登入頁面');
             window.location.href = 'login.html';
         }
+
+        // 語言切換功能已移至 language-switcher.js
 
         // 播放VR影片
         function playVRVideo() {

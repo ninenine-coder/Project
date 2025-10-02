@@ -533,9 +533,9 @@
                 
                 alert('登入成功！歡迎回來！');
                 
-                // 跳轉到首頁
+                // 跳轉到資訊頁面
                 setTimeout(() => {
-                    window.location.href = 'index.html';
+                    window.location.href = 'info.html';
                 }, 1000);
                 
             } catch (error) {
@@ -590,9 +590,9 @@
             
             alert('登入成功！歡迎回來！');
             
-            // 跳轉到首頁
+            // 跳轉到資訊頁面
             setTimeout(() => {
-                window.location.href = 'index.html';
+                window.location.href = 'info.html';
             }, 1000);
         }
 
@@ -690,9 +690,9 @@
                     
                     console.log('用戶信息已保存');
                     
-                    // 登入成功後自動跳轉到首頁
+                    // 登入成功後自動跳轉到資訊頁面
                     setTimeout(() => {
-                        window.location.href = 'index.html';
+                        window.location.href = 'info.html';
                     }, 1000);
                     
                 } catch (error) {
@@ -733,9 +733,9 @@
                         // 顯示成功訊息
                         alert('模擬登入成功！\n\n注意：這是模擬登入，請配置真實的Firebase App ID以使用完整的Google登入功能。');
                         
-                        // 模擬登入成功後也跳轉到首頁
+                        // 模擬登入成功後也跳轉到資訊頁面
                         setTimeout(() => {
-                            window.location.href = 'index.html';
+                            window.location.href = 'info.html';
                         }, 1000);
                         
                         return;
@@ -796,9 +796,9 @@
                         };
                         localStorage.setItem('pbls_user', JSON.stringify(userData));
                         
-                        // 自動跳轉到首頁
+                        // 自動跳轉到資訊頁面
                         setTimeout(() => {
-                            window.location.href = 'index.html';
+                            window.location.href = 'info.html';
                         }, 1000);
                         
                     } else {

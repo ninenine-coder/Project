@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>音效診斷 - PBLS VR教學平台</title>
+    <style>
+        body {
+            font-family: 'Microsoft JhengHei', sans-serif;
+            background: #f5f5f5;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid #3498db;
+        }
+        .test-btn {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        .test-btn:hover {
+            background: #2980b9;
+        }
+        .log {
+            background: #2c3e50;
+            color: #ecf0f1;
+            padding: 15px;
+            border-radius: 5px;
+            font-family: monospace;
+            font-size: 12px;
+            max-height: 300px;
+            overflow-y: auto;
+            margin: 20px 0;
+        }
+        .status {
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+        .success {
+            background: #d5f4e6;
+            color: #27ae60;
+            border: 1px solid #27ae60;
+        }
+        .error {
+            background: #fadbd8;
+            color: #e74c3c;
+            border: 1px solid #e74c3c;
+        }
+        .info {
+            background: #e3f2fd;
+            color: #1976d2;
+            border: 1px solid #1976d2;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔍 音效診斷工具</h1>
+        
+        <div id="status" class="status info">
+            正在初始化診斷工具...
+        </div>
+        
+        <div class="test-section">
+            <h3>🎵 直接測試音效檔案</h3>
+            <p>直接測試各個音效檔案是否能正常播放</p>
+            <button class="test-btn" onclick="testDirectSound('quiz_sound/答題倒數.mp3')">測試倒數音效</button>
+            <button class="test-btn" onclick="testDirectSound('quiz_sound/答題音效.mp4')">測試答題音效</button>
+            <button class="test-btn" onclick="testDirectSound('quiz_sound/回答正確.mp3')">測試正確音效</button>
+            <button class="test-btn" onclick="testDirectSound('quiz_sound/回答錯誤.mp3')">測試錯誤音效</button>
+        </div>
+        
+        <div class="test-section">
+            <h3>🎛️ 音效管理器測試</h3>
+            <p>使用音效管理器測試各個功能</p>
+            <button class="test-btn" onclick="testSoundManager()">初始化音效管理器</button>
+            <button class="test-btn" onclick="testPlayQuestion()">播放答題音效</button>
+            <button class="test-btn" onclick="testStopSounds()">停止所有音效</button>
+        </div>
+        
+        <div class="test-section">
+            <h3>📁 檔案路徑檢查</h3>
+            <p>檢查音效檔案是否存在</p>
+            <button class="test-btn" onclick="checkFilePaths()">檢查檔案路徑</button>
+        </div>
+        
+        <div class="log" id="log">
+            <div>診斷日誌將顯示在這裡...</div>
+        </div>
+    </div>
+
+    <script>
+        function log(message) {
+            const logDiv = document.getElementById('log');
+            const timestamp = new Date().toLocaleTimeString();
+            logDiv.innerHTML += `<div>[${timestamp}] ${message}</div>`;
+            logDiv.scrollTop = logDiv.scrollHeight;
+            console.log(message);
+        }
+
+        function updateStatus(message, type) {
+            const status = document.getElementById('status');
+            status.textContent = message;
+            status.className = `status ${type}`;
+        }
+
+        // 直接測試音效檔案
+        function testDirectSound(filePath) {
+            log(`🎵 測試音效檔案: ${filePath}`);
+            
+            const audio = new Audio(filePath);
+            audio.volume = 0.7;
+            
+            audio.addEventListener('loadstart', () => {
+                log(`🔄 開始載入: ${filePath}`);
+            });
+            
+            audio.addEventListener('canplaythrough', () => {
+                log(`✅ 載入成功: ${filePath}`);
+            });
+            
+            audio.addEventListener('play', () => {
+                log(`▶️ 開始播放: ${filePath}`);
+            });
+            
+            audio.addEventListener('error', (e) => {
+                log(`❌ 載入失敗: ${filePath} - ${e.message}`);
+            });
+            
+            audio.play().then(() => {
+                log(`✅ 播放成功: ${filePath}`);
+            }).catch(error => {
+                log(`❌ 播放失敗: ${filePath} - ${error.message}`);
+            });
+        }
+
+        // 測試音效管理器
+        async function testSoundManager() {
+            log('🎵 初始化音效管理器...');
+            
+            try {
+                // 動態載入音效管理器
+                const script = document.createElement('script');
+                script.src = 'quiz_sound_manager.js';
+                script.onload = async () => {
+                    try {
+                        await window.quizSoundManager.init();
+                        log('✅ 音效管理器初始化成功');
+                        updateStatus('音效管理器初始化成功', 'success');
+                    } catch (error) {
+                        log(`❌ 音效管理器初始化失敗: ${error.message}`);
+                        updateStatus('音效管理器初始化失敗', 'error');
+                    }
+                };
+                script.onerror = () => {
+                    log('❌ 無法載入音效管理器腳本');
+                    updateStatus('無法載入音效管理器腳本', 'error');
+                };
+                document.head.appendChild(script);
+            } catch (error) {
+                log(`❌ 載入音效管理器失敗: ${error.message}`);
+                updateStatus('載入音效管理器失敗', 'error');
+            }
+        }
+
+        // 測試播放答題音效
+        function testPlayQuestion() {
+            if (window.quizSoundManager) {
+                log('🎵 使用音效管理器播放答題音效...');
+                window.quizSoundManager.playQuestion();
+            } else {
+                log('❌ 音效管理器未初始化');
+                updateStatus('音效管理器未初始化', 'error');
+            }
+        }
+
+        // 測試停止音效
+        function testStopSounds() {
+            if (window.quizSoundManager) {
+                log('🔇 停止所有音效...');
+                window.quizSoundManager.stopAllSounds();
+            } else {
+                log('❌ 音效管理器未初始化');
+            }
+        }
+
+        // 檢查檔案路徑
+        function checkFilePaths() {
+            const files = [
+                'quiz_sound/答題倒數.mp3',
+                'quiz_sound/答題音效.mp4',
+                'quiz_sound/回答正確.mp3',
+                'quiz_sound/回答錯誤.mp3'
+            ];
+            
+            log('📁 檢查音效檔案路徑...');
+            files.forEach(file => {
+                const audio = new Audio(file);
+                audio.addEventListener('loadstart', () => {
+                    log(`✅ 檔案存在: ${file}`);
+                });
+                audio.addEventListener('error', () => {
+                    log(`❌ 檔案不存在: ${file}`);
+                });
+                // 觸發載入檢查
+                audio.load();
+            });
+        }
+
+        // 頁面載入時初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            log('🔍 音效診斷工具已載入');
+            updateStatus('診斷工具已準備就緒', 'info');
+        });
+    </script>
+</body>
+</html>

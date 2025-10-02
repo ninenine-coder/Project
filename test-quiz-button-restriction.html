@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>筆試測驗按鈕限制測試</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: white;
+        }
+        .container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #fff;
+        }
+        .test-section {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        .button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            cursor: pointer;
+            margin: 10px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+        .button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        }
+        .status {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 15px;
+            margin: 15px 0;
+            border-left: 4px solid #4CAF50;
+        }
+        .button-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        .button-card {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+        }
+        .button-card h4 {
+            margin-top: 0;
+            color: #4CAF50;
+        }
+        .allowed {
+            border-left: 4px solid #4CAF50;
+        }
+        .blocked {
+            border-left: 4px solid #f44336;
+        }
+        .checklist {
+            background: rgba(76, 175, 80, 0.2);
+            border-radius: 10px;
+            padding: 15px;
+            margin: 15px 0;
+            border-left: 4px solid #4CAF50;
+        }
+        .checklist ul {
+            margin: 10px 0;
+            padding-left: 20px;
+        }
+        .checklist li {
+            margin: 5px 0;
+        }
+        .warning-list {
+            background: rgba(255, 193, 7, 0.2);
+            border-radius: 10px;
+            padding: 15px;
+            margin: 15px 0;
+            border-left: 4px solid #ffc107;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚫 筆試測驗按鈕限制測試</h1>
+        
+        <div class="test-section">
+            <h2>🔒 按鈕限制規則</h2>
+            <div class="warning-list">
+                <h3>📋 測驗進行中的按鈕限制</h3>
+                <ul>
+                    <li><strong>允許的按鈕</strong>：中/英轉換按鈕、測驗選項按鈕</li>
+                    <li><strong>禁止的按鈕</strong>：所有其他按鈕（側邊欄導航、用戶頭像、登出按鈕等）</li>
+                    <li><strong>點擊效果</strong>：點擊禁止的按鈕會跳出警告視窗</li>
+                    <li><strong>測驗完成後</strong>：所有按鈕恢復正常功能</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h2>🎯 按鈕分類測試</h2>
+            <div class="button-grid">
+                <div class="button-card allowed">
+                    <h4>✅ 允許的按鈕</h4>
+                    <p><strong>中/英轉換按鈕</strong></p>
+                    <p>測驗進行中可以正常點擊</p>
+                    <p><strong>測驗選項按鈕</strong></p>
+                    <p>A)、B)、C)、D) 選項</p>
+                </div>
+                
+                <div class="button-card blocked">
+                    <h4>❌ 禁止的按鈕</h4>
+                    <p><strong>側邊欄導航</strong></p>
+                    <p>資訊、練習專區、考試專區等</p>
+                    <p><strong>用戶操作</strong></p>
+                    <p>用戶頭像、登出按鈕</p>
+                    <p><strong>其他按鈕</strong></p>
+                    <p>任何帶有 onclick 的元素</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h2>🧪 測試檢查清單</h2>
+            <div class="checklist">
+                <h3>📋 測驗進行中測試</h3>
+                <ol>
+                    <li><strong>開始測驗</strong>
+                        <ul>
+                            <li>點擊「開始筆試測驗」進入測驗</li>
+                            <li>確認測驗界面正常顯示</li>
+                        </ul>
+                    </li>
+                    
+                    <li><strong>測試允許的按鈕</strong>
+                        <ul>
+                            <li>點擊中/英轉換按鈕，確認可以正常切換語言</li>
+                            <li>點擊測驗選項（A、B、C、D），確認可以正常選擇答案</li>
+                        </ul>
+                    </li>
+                    
+                    <li><strong>測試禁止的按鈕</strong>
+                        <ul>
+                            <li>點擊側邊欄「資訊」按鈕 → 應該跳出警告視窗</li>
+                            <li>點擊側邊欄「練習專區」按鈕 → 應該跳出警告視窗</li>
+                            <li>點擊側邊欄「歷史成績」按鈕 → 應該跳出警告視窗</li>
+                            <li>點擊側邊欄「團隊」按鈕 → 應該跳出警告視窗</li>
+                            <li>點擊用戶頭像 → 應該跳出警告視窗</li>
+                            <li>點擊登出按鈕 → 應該跳出警告視窗</li>
+                        </ul>
+                    </li>
+                    
+                    <li><strong>警告視窗測試</strong>
+                        <ul>
+                            <li>確認警告視窗顯示正確的中文訊息</li>
+                            <li>點擊「確認」→ 應該跳轉到考試專區</li>
+                            <li>點擊「取消」→ 應該繼續測驗</li>
+                        </ul>
+                    </li>
+                </ol>
+                
+                <h3>🏁 測驗完成後測試</h3>
+                <ol>
+                    <li><strong>完成測驗</strong>
+                        <ul>
+                            <li>完成所有測驗題目</li>
+                            <li>進入測驗結果頁面</li>
+                        </ul>
+                    </li>
+                    
+                    <li><strong>結果頁面按鈕測試</strong>
+                        <ul>
+                            <li>點擊「返回考試專區」按鈕 → 應該正常跳轉</li>
+                            <li>點擊「重新測驗」按鈕 → 應該正常重新載入</li>
+                        </ul>
+                    </li>
+                    
+                    <li><strong>恢復正常功能測試</strong>
+                        <ul>
+                            <li>點擊側邊欄導航按鈕 → 應該正常跳轉</li>
+                            <li>點擊用戶頭像 → 應該正常顯示用戶選單</li>
+                            <li>點擊登出按鈕 → 應該正常登出</li>
+                        </ul>
+                    </li>
+                </ol>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h2>🎯 快速測試</h2>
+            <button class="button" onclick="goToQuiz()">🧪 前往筆試測驗</button>
+            <button class="button" onclick="testButtonRestriction()">🚫 測試按鈕限制</button>
+            <button class="button" onclick="checkLanguageSwitch()">🌐 檢查語言切換</button>
+        </div>
+
+        <div class="status" id="status">
+            <strong>測試狀態：</strong>等待測試...
+        </div>
+
+        <div class="test-section">
+            <h2>📊 預期結果</h2>
+            <div class="checklist">
+                <h3>✅ 應該正常工作的功能</h3>
+                <ul>
+                    <li><strong>語言切換</strong>：測驗進行中可以正常切換中英文</li>
+                    <li><strong>測驗選項</strong>：可以正常選擇 A、B、C、D 答案</li>
+                    <li><strong>按鈕攔截</strong>：其他按鈕點擊時會跳出警告視窗</li>
+                    <li><strong>警告訊息</strong>：顯示正確的警告訊息和選項</li>
+                    <li><strong>測驗完成後恢復</strong>：所有按鈕功能恢復正常</li>
+                    <li><strong>結果頁面</strong>：測驗結果頁面的按鈕可以正常使用</li>
+                </ul>
+                
+                <h3>⚠️ 測試重點</h3>
+                <ul>
+                    <li><strong>側邊欄導航</strong>：所有側邊欄按鈕都應該被攔截</li>
+                    <li><strong>用戶操作</strong>：用戶頭像和登出按鈕應該被攔截</li>
+                    <li><strong>語言切換例外</strong>：語言切換按鈕應該可以正常使用</li>
+                    <li><strong>測驗選項例外</strong>：測驗選項按鈕應該可以正常使用</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function goToQuiz() {
+            window.location.href = 'exam_quiz.html';
+        }
+
+        function testButtonRestriction() {
+            const status = document.getElementById('status');
+            status.innerHTML = '<strong>測試狀態：</strong>🚫 按鈕限制測試：請進入筆試測驗，在測驗進行中嘗試點擊各種按鈕，檢查是否正確攔截';
+            status.className = 'status';
+        }
+
+        function checkLanguageSwitch() {
+            const status = document.getElementById('status');
+            status.innerHTML = '<strong>測試狀態：</strong>🌐 語言切換測試：請進入筆試測驗，在測驗進行中點擊中/英轉換按鈕，確認可以正常切換語言';
+            status.className = 'status';
+        }
+
+        // 頁面載入時顯示狀態
+        document.addEventListener('DOMContentLoaded', function() {
+            const status = document.getElementById('status');
+            status.innerHTML = '<strong>測試狀態：</strong>✅ 筆試測驗按鈕限制測試頁面已載入';
+            status.className = 'status';
+        });
+    </script>
+</body>
+</html>

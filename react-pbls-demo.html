@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PBLS Knowledge Base - React i18n Demo</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Microsoft JhengHei', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        #root {
+            width: 100%;
+            min-height: 100vh;
+        }
+        
+        .demo-notice {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 10px;
+            text-align: center;
+            z-index: 1001;
+            font-size: 14px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .demo-notice a {
+            color: #ffeb3b;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        
+        .demo-notice a:hover {
+            text-decoration: underline;
+        }
+        
+        /* 為 React 組件預留空間 */
+        .react-app {
+            margin-top: 50px;
+        }
+    </style>
+</head>
+<body>
+    <div class="demo-notice">
+        🚀 <strong>React i18n Demo</strong> - 這是一個使用 React + react-i18next 的國際化演示
+        | <a href="info.html" target="_blank">查看原始 Vue/HTML 版本</a>
+        | 點擊右上角按鈕切換語言
+    </div>
+    
+    <div id="root" class="react-app">
+        <!-- React 組件將在這裡渲染 -->
+        <div style="
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 50vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-align: center;
+            padding: 40px;
+        ">
+            <div>
+                <h1 style="font-size: 48px; margin-bottom: 20px;">🚀 React i18n Demo</h1>
+                <p style="font-size: 20px; margin-bottom: 30px;">
+                    這是一個使用 React + react-i18next 的國際化演示
+                </p>
+                <div style="
+                    background: rgba(255, 255, 255, 0.2);
+                    padding: 20px;
+                    border-radius: 15px;
+                    backdrop-filter: blur(10px);
+                    max-width: 600px;
+                    margin: 0 auto;
+                ">
+                    <h3 style="margin-bottom: 15px;">📋 功能特色：</h3>
+                    <ul style="text-align: left; line-height: 1.8;">
+                        <li>✅ 使用 react-i18next 實現中英文切換</li>
+                        <li>✅ Hero 區塊背景圖片輪播</li>
+                        <li>✅ 流程圖根據語言切換圖片</li>
+                        <li>✅ 五大情境模擬案例卡片</li>
+                        <li>✅ 響應式設計與動畫效果</li>
+                        <li>✅ 語言切換按鈕在右上角</li>
+                    </ul>
+                </div>
+                <div style="margin-top: 30px;">
+                    <p style="font-size: 16px; opacity: 0.9;">
+                        要運行這個 React 組件，請執行：
+                    </p>
+                    <code style="
+                        background: rgba(0, 0, 0, 0.3);
+                        padding: 10px 20px;
+                        border-radius: 8px;
+                        font-family: 'Courier New', monospace;
+                        display: inline-block;
+                        margin-top: 10px;
+                    ">
+                        npm install && npm run dev
+                    </code>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 模擬組件內容 -->
+        <div style="padding: 40px; background: white;">
+            <h2 style="text-align: center; margin-bottom: 30px; color: #2c3e50;">
+                🎯 組件結構說明
+            </h2>
+            <div style="
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+                gap: 20px;
+                max-width: 1200px;
+                margin: 0 auto;
+            ">
+                <div style="
+                    background: #f8f9fa;
+                    padding: 20px;
+                    border-radius: 15px;
+                    border-left: 4px solid #667eea;
+                ">
+                    <h3 style="color: #667eea; margin-bottom: 15px;">📁 文件結構</h3>
+                    <ul style="line-height: 1.6; color: #555;">
+                        <li><code>src/lib/i18n.ts</code> - i18n 配置</li>
+                        <li><code>src/components/PBLSKnowledgeBase.tsx</code> - 主組件</li>
+                        <li><code>src/main.tsx</code> - React 入口</li>
+                        <li><code>package.json</code> - 依賴配置</li>
+                    </ul>
+                </div>
+                
+                <div style="
+                    background: #f8f9fa;
+                    padding: 20px;
+                    border-radius: 15px;
+                    border-left: 4px solid #28a745;
+                ">
+                    <h3 style="color: #28a745; margin-bottom: 15px;">🌐 國際化功能</h3>
+                    <ul style="line-height: 1.6; color: #555;">
+                        <li>中英文翻譯資源</li>
+                        <li>語言切換按鈕</li>
+                        <li>圖片路徑動態切換</li>
+                        <li>本地存儲語言偏好</li>
+                    </ul>
+                </div>
+                
+                <div style="
+                    background: #f8f9fa;
+                    padding: 20px;
+                    border-radius: 15px;
+                    border-left: 4px solid #ffc107;
+                ">
+                    <h3 style="color: #e67e22; margin-bottom: 15px;">🎨 UI 特色</h3>
+                    <ul style="line-height: 1.6; color: #555;">
+                        <li>Framer Motion 動畫</li>
+                        <li>響應式網格布局</li>
+                        <li>漸變背景與陰影</li>
+                        <li>懸停交互效果</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // 模擬語言切換功能
+        function toggleLanguage() {
+            const notice = document.querySelector('.demo-notice');
+            const isZh = notice.textContent.includes('React i18n Demo');
+            
+            if (isZh) {
+                notice.innerHTML = `
+                    🚀 <strong>React i18n Demo</strong> - This is an internationalization demo using React + react-i18next
+                    | <a href="info.html" target="_blank">View Original Vue/HTML Version</a>
+                    | Click the button in the top right to switch language
+                `;
+            } else {
+                notice.innerHTML = `
+                    🚀 <strong>React i18n Demo</strong> - 這是一個使用 React + react-i18next 的國際化演示
+                    | <a href="info.html" target="_blank">查看原始 Vue/HTML 版本</a>
+                    | 點擊右上角按鈕切換語言
+                `;
+            }
+        }
+        
+        // 添加語言切換按鈕
+        const languageBtn = document.createElement('button');
+        languageBtn.innerHTML = 'EN';
+        languageBtn.style.cssText = `
+            position: fixed;
+            top: 70px;
+            right: 20px;
+            z-index: 1000;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 25px;
+            padding: 10px 20px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+        `;
+        languageBtn.onclick = toggleLanguage;
+        languageBtn.onmouseenter = () => {
+            languageBtn.style.transform = 'translateY(-2px)';
+            languageBtn.style.boxShadow = '0 6px 20px rgba(0, 0, 0, 0.3)';
+        };
+        languageBtn.onmouseleave = () => {
+            languageBtn.style.transform = 'translateY(0)';
+            languageBtn.style.boxShadow = '0 4px 15px rgba(0, 0, 0, 0.2)';
+        };
+        document.body.appendChild(languageBtn);
+    </script>
+</body>
+</html>

@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>筆試測驗版面測試</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: white;
+        }
+        .container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #fff;
+        }
+        .test-section {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        .button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            cursor: pointer;
+            margin: 10px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+        .button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        }
+        .status {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 15px;
+            margin: 15px 0;
+            border-left: 4px solid #4CAF50;
+        }
+        .layout-diagram {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 20px;
+            margin: 15px 0;
+            font-family: 'Courier New', monospace;
+        }
+        .checklist {
+            background: rgba(76, 175, 80, 0.2);
+            border-radius: 10px;
+            padding: 15px;
+            margin: 15px 0;
+            border-left: 4px solid #4CAF50;
+        }
+        .checklist ul {
+            margin: 10px 0;
+            padding-left: 20px;
+        }
+        .checklist li {
+            margin: 5px 0;
+        }
+        .fix-list {
+            background: rgba(255, 193, 7, 0.2);
+            border-radius: 10px;
+            padding: 15px;
+            margin: 15px 0;
+            border-left: 4px solid #ffc107;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎨 筆試測驗版面修復測試</h1>
+        
+        <div class="test-section">
+            <h2>🔧 版面修復內容</h2>
+            <div class="fix-list">
+                <h3>📐 版面結構優化</h3>
+                <ul>
+                    <li><strong>統一測驗界面</strong>：創建 <code>#quiz-interface</code> 容器統一管理測驗元素</li>
+                    <li><strong>正確的元素順序</strong>：計時器 → 題目 → 選項空間 → 進度條</li>
+                    <li><strong>預留選項空間</strong>：選項容器有固定的最小高度（300px）</li>
+                    <li><strong>進度條位置</strong>：進度條位於測驗界面底部，不會影響選項顯示</li>
+                </ul>
+                
+                <h3>🎯 版面佈局邏輯</h3>
+                <ul>
+                    <li><strong>測驗說明階段</strong>：顯示測驗說明卡片</li>
+                    <li><strong>測驗進行階段</strong>：隱藏說明，顯示完整測驗界面</li>
+                    <li><strong>元素顯示順序</strong>：先顯示題目，再顯示選項，最後顯示進度條</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h2>📐 新版面結構圖</h2>
+            <div class="layout-diagram">
+測驗說明階段：
+┌─────────────────────────┐
+│    測驗說明卡片         │
+│  ┌─────────────────┐    │
+│  │ 筆試測驗        │    │
+│  │ 測驗描述...     │    │
+│  │ [開始筆試測驗]  │    │
+│  └─────────────────┘    │
+└─────────────────────────┘
+
+測驗進行階段：
+┌─────────────────────────┐
+│    #quiz-interface      │
+│  ┌─────────────────┐    │
+│  │   計時器        │    │
+│  └─────────────────┘    │
+│  ┌─────────────────┐    │
+│  │   題目文字      │    │
+│  └─────────────────┘    │
+│  ┌─────────────────┐    │
+│  │   選項空間      │    │ ← 預留300px高度
+│  │   (選項A-D)     │    │
+│  └─────────────────┘    │
+│  ┌─────────────────┐    │
+│  │   進度條        │    │ ← 位於底部
+│  └─────────────────┘    │
+└─────────────────────────┘
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h2>✅ 修復的問題</h2>
+            <div class="checklist">
+                <h3>🐛 原來的問題</h3>
+                <ul>
+                    <li><strong>版面混亂</strong>：進度條在選項容器內部，導致版面錯亂</li>
+                    <li><strong>元素分散</strong>：測驗元素分散在不同容器中，難以管理</li>
+                    <li><strong>空間不足</strong>：選項空間沒有預留足夠高度</li>
+                    <li><strong>顯示順序</strong>：元素顯示順序不正確</li>
+                </ul>
+                
+                <h3>✅ 修復後的改善</h3>
+                <ul>
+                    <li><strong>統一管理</strong>：所有測驗元素都在 <code>#quiz-interface</code> 中</li>
+                    <li><strong>正確順序</strong>：計時器 → 題目 → 選項空間 → 進度條</li>
+                    <li><strong>預留空間</strong>：選項容器有300px最小高度，確保有足夠空間</li>
+                    <li><strong>底部進度條</strong>：進度條位於測驗界面底部，不影響選項顯示</li>
+                    <li><strong>美觀設計</strong>：題目有白色背景卡片，視覺效果更好</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h2>🧪 測試檢查清單</h2>
+            <div class="checklist">
+                <h3>📋 版面測試步驟</h3>
+                <ol>
+                    <li><strong>測驗說明階段</strong>
+                        <ul>
+                            <li>進入筆試測驗頁面</li>
+                            <li>確認顯示測驗說明卡片</li>
+                            <li>檢查測驗描述文字正確</li>
+                            <li>確認開始按鈕可以點擊</li>
+                        </ul>
+                    </li>
+                    
+                    <li><strong>測驗進行階段</strong>
+                        <ul>
+                            <li>點擊「開始筆試測驗」按鈕</li>
+                            <li>確認測驗說明卡片消失</li>
+                            <li>確認測驗界面正確顯示</li>
+                            <li>檢查元素順序：計時器 → 題目 → 選項空間 → 進度條</li>
+                        </ul>
+                    </li>
+                    
+                    <li><strong>選項顯示測試</strong>
+                        <ul>
+                            <li>確認選項空間有足夠高度</li>
+                            <li>檢查選項按鈕正確顯示</li>
+                            <li>確認選項不會被進度條遮擋</li>
+                            <li>測試選項點擊功能正常</li>
+                        </ul>
+                    </li>
+                    
+                    <li><strong>進度條測試</strong>
+                        <ul>
+                            <li>確認進度條位於測驗界面底部</li>
+                            <li>檢查進度條不會影響選項顯示</li>
+                            <li>確認進度條正確顯示當前進度</li>
+                        </ul>
+                    </li>
+                </ol>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h2>🎯 快速測試</h2>
+            <button class="button" onclick="goToQuiz()">🧪 前往筆試測驗</button>
+            <button class="button" onclick="checkLayout()">📐 檢查版面結構</button>
+            <button class="button" onclick="testInterface()">🖥️ 測試界面切換</button>
+        </div>
+
+        <div class="status" id="status">
+            <strong>測試狀態：</strong>等待測試...
+        </div>
+
+        <div class="test-section">
+            <h2>📊 預期結果</h2>
+            <div class="checklist">
+                <h3>✅ 應該正常工作的功能</h3>
+                <ul>
+                    <li><strong>版面整潔</strong>：測驗界面元素排列整齊，不會重疊</li>
+                    <li><strong>選項空間充足</strong>：選項有足夠的顯示空間</li>
+                    <li><strong>進度條位置正確</strong>：進度條位於底部，不影響選項</li>
+                    <li><strong>界面切換流暢</strong>：從說明界面切換到測驗界面順暢</li>
+                    <li><strong>視覺效果良好</strong>：題目有美觀的卡片背景</li>
+                    <li><strong>響應式設計</strong>：在不同螢幕尺寸下都能正常顯示</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function goToQuiz() {
+            window.location.href = 'exam_quiz.html';
+        }
+
+        function checkLayout() {
+            const status = document.getElementById('status');
+            status.innerHTML = '<strong>測試狀態：</strong>✅ 版面結構已修復，請前往筆試測驗頁面檢查新版面佈局';
+            status.className = 'status';
+        }
+
+        function testInterface() {
+            const status = document.getElementById('status');
+            status.innerHTML = '<strong>測試狀態：</strong>🖥️ 界面切換測試：請進入測驗頁面，點擊「開始筆試測驗」檢查界面切換是否流暢';
+            status.className = 'status';
+        }
+
+        // 頁面載入時顯示狀態
+        document.addEventListener('DOMContentLoaded', function() {
+            const status = document.getElementById('status');
+            status.innerHTML = '<strong>測試狀態：</strong>✅ 筆試測驗版面修復測試頁面已載入';
+            status.className = 'status';
+        });
+    </script>
+</body>
+</html>

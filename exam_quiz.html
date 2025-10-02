@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>筆試測驗 - PBLS VR教學平台</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="quiz_sound_manager.js"></script>
+    <script src="countdown_animation.js"></script>
     <style>
         * {
             margin: 0;
@@ -231,6 +233,30 @@
             opacity: 1;
         }
 
+        /* 語言切換按鈕容器 - 固定在底部 */
+        .language-switcher-container {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 10px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* 語言切換按鈕特殊樣式 */
+        .language-switcher {
+            background: rgba(46, 204, 113, 0.8) !important;
+            border: 2px solid rgba(46, 204, 113, 0.6) !important;
+            margin: 0;
+        }
+
+        .language-switcher:hover {
+            background: rgba(46, 204, 113, 1) !important;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(46, 204, 113, 0.4),
+                        inset 0 1px 0 rgba(255, 255, 255, 0.3);
+        }
+
         /* 主要內容區域 */
         .main-content {
             flex: 1;
@@ -250,20 +276,169 @@
         #quiz-container {
             padding: 30px;
             min-height: calc(100vh - 180px);
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(20px);
-            border-radius: 20px;
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: transparent;
+            backdrop-filter: none;
+            border-radius: 0;
+            box-shadow: none;
+            border: none;
             max-width: 800px;
             margin: 0 auto;
+            position: relative; /* 添加相對定位，讓倒數動畫能正確定位 */
         }
 
-        #question-text {
+        /* 測驗說明樣式 */
+        .quiz-info {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            max-width: 600px;
+            margin: 20px auto;
+        }
+
+        .quiz-title {
+            color: #2c3e50;
+            font-size: 28px;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+
+        .quiz-description {
+            color: #34495e;
+            font-size: 16px;
+            line-height: 1.6;
+            margin-bottom: 30px;
+            text-align: left;
+        }
+
+        .start-quiz-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 25px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .start-quiz-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        /* 測驗界面樣式 */
+        #quiz-interface {
+            width: 100%;
+            max-width: 800px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        #quiz-interface #timer {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        #quiz-interface #question-text {
             font-size: 24px;
             color: #2c3e50;
-            margin-bottom: 30px;
-            line-height: 1.5;
+            margin-bottom: 20px;
+            text-align: center;
+            line-height: 1.4;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            opacity: 0;
+            transform: translateY(-20px);
+            animation: questionAppear 0.8s ease forwards;
+        }
+
+        #quiz-interface #options-container {
+            min-height: 300px;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            margin-bottom: 20px;
+        }
+
+        #quiz-interface #options {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        #quiz-interface #quiz-progress {
+            margin-top: auto;
+            padding: 20px 0;
+        }
+
+        /* 舊的樣式已移至 #quiz-interface 中 */
+
+        /* 測驗進度條樣式 */
+        #quiz-progress {
+            margin-top: auto; /* 將進度條推到底部 */
+            padding-top: 20px;
+        }
+
+        .progress-container {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .progress-bar-full {
+            flex: 1;
+            height: 12px;
+            background: transparent;
+            border-radius: 0;
+            overflow: hidden;
+            position: relative;
+            box-shadow: none;
+        }
+
+        .progress-fill-full {
+            height: 100%;
+            background: linear-gradient(90deg, #27ae60 0%, #2ecc71 50%, #58d68d 100%);
+            border-radius: 10px;
+            transition: width 0.5s ease;
+            position: relative;
+            width: 0%;
+        }
+
+        .progress-fill-full::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.3) 50%, transparent 100%);
+            animation: shimmer 2s infinite;
+        }
+
+        .progress-text {
+            font-size: 16px;
+            font-weight: bold;
+            color: #2c3e50;
+            min-width: 50px;
+            text-align: center;
+        }
+
+        @keyframes questionAppear {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         #options {
@@ -273,61 +448,88 @@
         .option {
             display: block;
             width: 100%;
-            padding: 15px 20px;
+            padding: 15px 60px 15px 20px;
             margin-bottom: 10px;
-            background: white;
+            background: transparent;
             border: 2px solid #e0e0e0;
             border-radius: 10px;
             cursor: pointer;
             transition: all 0.3s ease;
             font-size: 16px;
             text-align: left;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: optionAppear 0.5s ease forwards;
+            position: relative;
+        }
+
+        @keyframes optionAppear {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         .option:hover {
             border-color: #3498db;
-            background: #f8f9fa;
+            background: transparent;
         }
 
         .option.selected {
             border-color: #3498db;
-            background: #e3f2fd;
+            background: transparent;
         }
 
         .option.correct {
             border-color: #27ae60;
-            background: #d5f4e6;
+            background: transparent;
             color: #27ae60;
+            font-weight: bold;
+            position: relative;
+        }
+
+        .option.correct::after {
+            content: '✓';
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #27ae60;
+            font-size: 24px;
             font-weight: bold;
         }
 
         .option.incorrect {
             border-color: #e74c3c;
-            background: #fadbd8;
+            background: transparent;
             color: #e74c3c;
+            font-weight: bold;
+            position: relative;
+        }
+
+        .option.incorrect::after {
+            content: '✗';
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #e74c3c;
+            font-size: 24px;
             font-weight: bold;
         }
 
-        #next-btn {
-            background: #3498db;
-            color: white;
-            border: none;
-            padding: 12px 30px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 16px;
-            transition: background 0.3s ease;
-            margin-bottom: 20px;
+        .option:disabled {
+            opacity: 0.6;
+            cursor: not-allowed !important;
+            pointer-events: none;
         }
 
-        #next-btn:hover {
-            background: #2980b9;
+        .option:disabled:hover {
+            border-color: #e0e0e0;
+            background: transparent;
+            transform: none;
         }
 
-        #next-btn:disabled {
-            background: #bdc3c7;
-            cursor: not-allowed;
-        }
 
         #timer {
             font-size: 18px;
@@ -713,6 +915,10 @@
 
         <!-- 選單 -->
         <div class="sidebar-menu">
+            <div class="sidebar-icon" onclick="window.location.href='info.html'">
+                <i class="fas fa-info-circle"></i>
+                <span>資訊</span>
+            </div>
             <div class="sidebar-icon" onclick="window.location.href='index.html'">
                 <i class="fas fa-play-circle"></i>
                 <span>練習專區</span>
@@ -725,13 +931,17 @@
                 <i class="fas fa-chart-line"></i>
                 <span>歷史成績</span>
             </div>
-            <div class="sidebar-icon" onclick="window.location.href='info.html'">
-                <i class="fas fa-info-circle"></i>
-                <span>資訊</span>
-            </div>
             <div class="sidebar-icon" onclick="window.location.href='team.html'">
                 <i class="fas fa-users"></i>
                 <span>團隊</span>
+            </div>
+        </div>
+
+        <!-- 語言切換按鈕 - 固定在底部 -->
+        <div class="language-switcher-container">
+            <div class="sidebar-icon language-switcher" onclick="toggleLanguage()">
+                <i class="fas fa-globe"></i>
+                <span id="language-text">EN</span>
             </div>
         </div>
     </div>
@@ -768,6 +978,16 @@
     <div class="main-content">
         <!-- 測驗容器 -->
         <div id="quiz-container">
+            <!-- 測驗說明 -->
+            <div class="quiz-info">
+                <h2 class="quiz-title">筆試測驗</h2>
+                <p class="quiz-description" id="quiz-description">載入中...</p>
+                <button class="start-quiz-btn" onclick="loadQuestions()">開始筆試測驗</button>
+            </div>
+            
+            <!-- 測驗界面 -->
+            <div id="quiz-interface" style="display: none;">
+                <!-- 計時器 -->
             <div id="timer">
                 <div class="timer-clock">
                     <div class="time-text" id="time-text">5</div>
@@ -776,9 +996,25 @@
                     <div class="progress-fill" id="progress-fill"></div>
                 </div>
             </div>
+                
+                <!-- 題目 -->
             <h2 id="question-text"></h2>
-            <div id="options"></div>
-            <button id="next-btn">下一題</button>
+            
+                <!-- 選項空間 -->
+            <div id="options-container">
+                <div id="options"></div>
+                </div>
+                
+                <!-- 測驗進度條 -->
+                <div id="quiz-progress">
+                    <div class="progress-container">
+                        <div class="progress-bar-full">
+                            <div class="progress-fill-full" id="quiz-progress-fill"></div>
+                        </div>
+                        <div class="progress-text" id="progress-percentage">1/20</div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -792,55 +1028,727 @@
         let timerInterval;
         let timeRemaining = 5; // 每題5秒
         let isNextLocked = false; // 防止快速點擊的鎖定變數
+        let shuffledOptions = []; // 存儲隨機化後的選項順序
+        let isQuizActive = false; // 測驗是否正在進行中
+        let isQuizCompleted = false; // 測驗是否已完成
+        let isTransitioning = false; // 是否正在題目轉換中（禁用所有按鈕）
+        let currentDisplayState = 'none'; // 當前顯示狀態：'countdown', 'question', 'options', 'answering'
+        let countdownProgress = 0; // 倒數動畫進度（0-3，對應3、2、1）
+        let countdownTimeout = null; // 倒數動畫的setTimeout引用
+        let questionDisplayStartTime = null; // 題目顯示開始時間
+        let optionsDisplayStartTime = null; // 選項顯示開始時間
+
+        // 檢查當前題目是否已作答
+        function isCurrentQuestionAnswered() {
+            return userAnswers.length > currentQuestionIndex;
+        }
+        
+        // 禁用所有按鈕（包括語言切換按鈕）
+        function disableAllButtons() {
+            console.log('Disabling all buttons');
+            isTransitioning = true;
+            
+            // 禁用所有選項按鈕
+            document.querySelectorAll('.option').forEach(button => {
+                button.disabled = true;
+                button.style.cursor = 'not-allowed';
+                button.style.opacity = '0.5';
+            });
+            
+            // 禁用語言切換按鈕
+            const languageSwitcher = document.querySelector('.language-switcher');
+            if (languageSwitcher) {
+                languageSwitcher.style.pointerEvents = 'none';
+                languageSwitcher.style.opacity = '0.5';
+                languageSwitcher.style.cursor = 'not-allowed';
+            }
+            
+            // 禁用其他可能的按鈕
+            document.querySelectorAll('button').forEach(button => {
+                if (!button.classList.contains('option') && !button.classList.contains('language-switcher')) {
+                    button.disabled = true;
+                    button.style.cursor = 'not-allowed';
+                    button.style.opacity = '0.5';
+                }
+            });
+        }
+        
+        // 啟用所有按鈕
+        function enableAllButtons() {
+            console.log('Enabling all buttons');
+            isTransitioning = false;
+            
+            // 啟用所有選項按鈕
+            document.querySelectorAll('.option').forEach(button => {
+                button.disabled = false;
+                button.style.cursor = 'pointer';
+                button.style.opacity = '1';
+            });
+            
+            // 啟用語言切換按鈕
+            const languageSwitcher = document.querySelector('.language-switcher');
+            if (languageSwitcher) {
+                languageSwitcher.style.pointerEvents = 'auto';
+                languageSwitcher.style.opacity = '1';
+                languageSwitcher.style.cursor = 'pointer';
+            }
+            
+            // 啟用其他可能的按鈕
+            document.querySelectorAll('button').forEach(button => {
+                if (!button.classList.contains('option') && !button.classList.contains('language-switcher')) {
+                    button.disabled = false;
+                    button.style.cursor = 'pointer';
+                    button.style.opacity = '1';
+                }
+            });
+        }
+        
+        // 語言切換後重新顯示當前題目
+        async function displayCurrentQuestionAfterLanguageSwitch() {
+            try {
+                console.log('displayCurrentQuestionAfterLanguageSwitch: currentQuestionIndex =', currentQuestionIndex);
+                
+                // 根據當前語言選擇題目文件
+                const currentLang = localStorage.getItem('pbls_language') || 'zh';
+                const questionFile = currentLang === 'en' ? 'data/questions_en.json' : 'data/questions.json';
+                
+                console.log('Loading question file:', questionFile);
+                
+                // 重新載入題目文件
+                const response = await fetch(questionFile);
+                const newQuestions = await response.json();
+                
+                // 重要：更新整個 selectedQuestions 數組，而不只是當前題目
+                // 這樣確保所有後續題目都使用新語言版本
+                const originalQuestionIds = selectedQuestions.map(q => q.id);
+                const updatedQuestions = [];
+                
+                // 根據原始題目ID從新語言文件中找到對應的題目
+                for (let i = 0; i < originalQuestionIds.length; i++) {
+                    const originalId = originalQuestionIds[i];
+                    const newQuestion = newQuestions.find(q => q.id === originalId);
+                    if (newQuestion) {
+                        // 確保新題目有正確的結構
+                        console.log(`Updating question ${originalId} with new language version`);
+                        console.log('New question options count:', newQuestion.options.length);
+                        console.log('New question options:', newQuestion.options);
+                        updatedQuestions.push(newQuestion);
+                    } else {
+                        // 如果找不到對應的題目，使用原始題目
+                        console.log(`Question ${originalId} not found in new language file, using original`);
+                        updatedQuestions.push(selectedQuestions[i]);
+                    }
+                }
+                
+                // 更新整個 selectedQuestions 數組
+                selectedQuestions = updatedQuestions;
+                
+                console.log('Updated entire selectedQuestions array with new language');
+                console.log('Current question:', selectedQuestions[currentQuestionIndex].question);
+                console.log('Current question options count:', selectedQuestions[currentQuestionIndex].options.length);
+                console.log('Current question options:', selectedQuestions[currentQuestionIndex].options);
+                
+                // 使用專門的語言切換顯示函數，確保正確的流程
+                displayQuestionForLanguageSwitch();
+            } catch (error) {
+                console.error('載入新語言題目失敗:', error);
+                // 如果失敗，繼續使用原題目
+                displayQuestion();
+            }
+        }
+        
+        // 語言切換後顯示下一題（用於已作答的情況）
+        async function displayNextQuestionAfterLanguageSwitch() {
+            try {
+                console.log('displayNextQuestionAfterLanguageSwitch: currentQuestionIndex =', currentQuestionIndex);
+                
+                // 先更新題目索引到下一題
+                currentQuestionIndex++;
+                console.log('Updated currentQuestionIndex to:', currentQuestionIndex);
+                
+                // 根據當前語言選擇題目文件
+                const currentLang = localStorage.getItem('pbls_language') || 'zh';
+                const questionFile = currentLang === 'en' ? 'data/questions_en.json' : 'data/questions.json';
+                
+                console.log('Loading question file:', questionFile);
+                
+                // 重新載入題目文件
+                const response = await fetch(questionFile);
+                const newQuestions = await response.json();
+                
+                // 重要：更新整個 selectedQuestions 數組，而不只是當前題目
+                // 這樣確保所有後續題目都使用新語言版本
+                const originalQuestionIds = selectedQuestions.map(q => q.id);
+                const updatedQuestions = [];
+                
+                // 根據原始題目ID從新語言文件中找到對應的題目
+                for (let i = 0; i < originalQuestionIds.length; i++) {
+                    const originalId = originalQuestionIds[i];
+                    const newQuestion = newQuestions.find(q => q.id === originalId);
+                    if (newQuestion) {
+                        // 確保新題目有正確的結構
+                        console.log(`Updating question ${originalId} with new language version`);
+                        console.log('New question options count:', newQuestion.options.length);
+                        console.log('New question options:', newQuestion.options);
+                        updatedQuestions.push(newQuestion);
+                    } else {
+                        // 如果找不到對應的題目，使用原始題目
+                        console.log(`Question ${originalId} not found in new language file, using original`);
+                        updatedQuestions.push(selectedQuestions[i]);
+                    }
+                }
+                
+                // 更新整個 selectedQuestions 數組
+                selectedQuestions = updatedQuestions;
+                
+                console.log('Updated entire selectedQuestions array with new language');
+                console.log('Next question:', selectedQuestions[currentQuestionIndex].question);
+                console.log('Next question options count:', selectedQuestions[currentQuestionIndex].options.length);
+                console.log('Next question options:', selectedQuestions[currentQuestionIndex].options);
+                
+                // 使用專門的語言切換後顯示函數，直接顯示題目和選項並開始計時
+                displayQuestionAfterLanguageSwitch();
+            } catch (error) {
+                console.error('載入新語言題目失敗:', error);
+                // 如果失敗，繼續使用原題目
+                displayQuestion();
+            }
+        }
+        
+        // 語言切換後顯示題目（直接顯示，不包含倒數動畫）
+        function displayQuestionAfterLanguageSwitch() {
+            const question = selectedQuestions[currentQuestionIndex];
+            console.log('displayQuestionAfterLanguageSwitch: showing question', currentQuestionIndex + 1, ':', question.question);
+            console.log('Original options count:', question.options.length);
+            console.log('Original options:', question.options);
+            
+            // 隨機化選項順序
+            const shuffled = shuffleOptions(question.options, question.correct);
+            question.shuffledOptions = shuffled.shuffledOptions;
+            question.currentCorrectIndex = shuffled.correctIndex;
+            
+            console.log('Shuffled options count:', question.shuffledOptions.length);
+            console.log('Shuffled options:', question.shuffledOptions);
+            
+            // 更新測驗進度
+            updateQuizProgress();
+            
+            // 顯示題目
+            document.getElementById('question-text').textContent = 
+                `${currentQuestionIndex + 1}. ${question.question}`;
+            
+            // 清空選項容器
+            const optionsContainer = document.getElementById('options');
+            optionsContainer.innerHTML = '';
+            
+            // 重置鎖定狀態
+            isNextLocked = false;
+            
+            // 創建選項按鈕
+            question.shuffledOptions.forEach((option, index) => {
+                const optionElement = document.createElement('button');
+                optionElement.className = 'option';
+                // 為選項添加A)、B)、C)、D)標記，支持更多選項
+                const optionLabels = ['A)', 'B)', 'C)', 'D)', 'E)', 'F)', 'G)', 'H)'];
+                const label = optionLabels[index] || `${String.fromCharCode(65 + index)})`; // 如果超出預定義範圍，使用字母
+                optionElement.textContent = `${label} ${option}`;
+                optionElement.onclick = () => selectOption(index);
+                // 確保新選項是可點擊的
+                optionElement.disabled = false;
+                optionElement.style.cursor = 'pointer';
+                optionElement.style.opacity = '1';
+                optionsContainer.appendChild(optionElement);
+            });
+            
+            console.log('displayQuestionAfterLanguageSwitch: created', question.shuffledOptions.length, 'options');
+            
+            // 清除所有選項的顏色標記
+            document.querySelectorAll('.option').forEach(option => {
+                option.classList.remove('correct', 'incorrect', 'selected');
+            });
+            
+            // 重置計時器顯示
+            document.getElementById('time-text').textContent = '5';
+            document.getElementById('progress-fill').style.width = '0%';
+            document.querySelector('.timer-clock').style.setProperty('--progress', '0deg');
+            document.querySelector('.timer-clock').style.background = 'linear-gradient(135deg, #9b59b6 0%, #a569bd 100%)';
+            
+            // 重置動畫效果
+            const timerClock = document.querySelector('.timer-clock');
+            const timeText = document.getElementById('time-text');
+            timerClock.classList.remove('danger');
+            timeText.style.animation = 'none';
+            timeText.style.textShadow = '0 3px 6px rgba(0, 0, 0, 0.4)';
+            
+            // 顯示計時器和選項
+            const timerElement = document.getElementById('timer');
+            timerElement.style.opacity = '1';
+            timerElement.style.transition = 'opacity 0.5s ease';
+            
+            optionsContainer.style.opacity = '1';
+            optionsContainer.style.transform = 'translateY(0)';
+            optionsContainer.style.transition = 'all 0.5s ease';
+            
+            // 播放答題音效
+            setTimeout(() => {
+                window.quizSoundManager.playQuestion();
+            }, 100);
+            
+            // 開始計時器
+            startTimer();
+            
+            // 啟用所有按鈕（下一題已完全顯示）
+            setTimeout(() => {
+                enableAllButtons();
+            }, 500); // 延遲500ms確保題目完全顯示
+        }
+        
+        // 語言切換後只更新文字內容（保持當前顯示狀態和進度）
+        function displayQuestionForLanguageSwitch() {
+            const question = selectedQuestions[currentQuestionIndex];
+            console.log('displayQuestionForLanguageSwitch: updating question text only, preserving current display state:', currentDisplayState);
+            
+            // 只更新題目文字，不改變任何其他狀態
+            document.getElementById('question-text').textContent = 
+                `${currentQuestionIndex + 1}. ${question.question}`;
+            
+            // 更新選項文字（如果已經顯示）
+            const optionsContainer = document.getElementById('options');
+            const existingOptions = optionsContainer.querySelectorAll('.option');
+            
+            if (existingOptions.length > 0 && question.shuffledOptions) {
+                console.log('Updating existing options with new language');
+                // 為選項添加A)、B)、C)、D)標記
+                const optionLabels = ['A)', 'B)', 'C)', 'D)', 'E)', 'F)', 'G)', 'H)'];
+                
+                existingOptions.forEach((option, index) => {
+                    if (question.shuffledOptions[index]) {
+                        const label = optionLabels[index] || `${String.fromCharCode(65 + index)})`;
+                        option.textContent = `${label} ${question.shuffledOptions[index]}`;
+                    }
+                });
+            }
+            
+            // 更新測驗進度
+            updateQuizProgress();
+            
+            console.log('displayQuestionForLanguageSwitch: text updated, display state preserved');
+        }
+        
+        // 將函數和變量暴露到全局作用域，供語言切換器使用
+        window.isCurrentQuestionAnswered = isCurrentQuestionAnswered;
+        window.displayQuestion = displayQuestion;
+        window.displayQuestionWithDelay = displayQuestionWithDelay;
+        window.displayCurrentQuestionAfterLanguageSwitch = displayCurrentQuestionAfterLanguageSwitch;
+        window.displayNextQuestionAfterLanguageSwitch = displayNextQuestionAfterLanguageSwitch;
+        window.displayQuestionAfterLanguageSwitch = displayQuestionAfterLanguageSwitch;
+        window.displayQuestionForLanguageSwitch = displayQuestionForLanguageSwitch;
+        window.endQuiz = endQuiz;
+        window.isQuizActive = () => isQuizActive;
+        window.isQuizCompleted = () => isQuizCompleted;
+        window.getCurrentQuestionIndex = () => currentQuestionIndex;
+        window.setCurrentQuestionIndex = (index) => { currentQuestionIndex = index; };
+        window.getSelectedQuestions = () => selectedQuestions;
+        window.isTransitioning = () => isTransitioning;
+        window.disableAllButtons = disableAllButtons;
+        window.enableAllButtons = enableAllButtons;
+        window.getCurrentDisplayState = () => currentDisplayState;
+        window.getQuestionDisplayStartTime = () => questionDisplayStartTime;
+        window.getOptionsDisplayStartTime = () => optionsDisplayStartTime;
 
         // 頁面載入時初始化測驗
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', async function() {
+            // 初始化音效系統
+            await window.quizSoundManager.init();
+            
+            // 設置頁面跳轉攔截
+            setupNavigationInterception();
+            
             loadQuestions();
+            
+            // 初始化測驗描述
+            updateQuizDescriptionText();
         });
+
+        // 動態更新測驗描述文字
+        function updateQuizDescriptionText() {
+            const currentLang = localStorage.getItem('pbls_language') || 'zh';
+            const questionCount = allQuestions ? allQuestions.length : 20;
+            const actualQuestions = Math.min(20, questionCount);
+            
+            let description;
+            if (currentLang === 'en') {
+                description = `${actualQuestions} multiple choice questions, 5 seconds per question. Please make the most of your precious first aid time and respond correctly.`;
+            } else {
+                description = `${actualQuestions}題選擇題，每題5秒鐘的時間作答，請把握寶貴的急救時間，正確做出應對措施`;
+            }
+            
+            const descriptionElement = document.getElementById('quiz-description');
+            if (descriptionElement) {
+                descriptionElement.textContent = description;
+            }
+            
+            console.log(`測驗描述已更新：${description}`);
+        }
+
+        // 將函數設為全局，供語言切換器調用
+        window.updateQuizDescriptionText = updateQuizDescriptionText;
+
+        // 隱藏測驗說明，顯示測驗界面
+        function hideQuizInfo() {
+            const quizInfo = document.querySelector('.quiz-info');
+            const quizInterface = document.getElementById('quiz-interface');
+            
+            if (quizInfo) {
+                quizInfo.style.display = 'none';
+            }
+            
+            if (quizInterface) {
+                quizInterface.style.display = 'block';
+            }
+        }
+
+        // 設置頁面跳轉攔截
+        function setupNavigationInterception() {
+            // 攔截側邊欄點擊事件（除了語言切換按鈕）
+            document.querySelectorAll('.sidebar-icon').forEach(icon => {
+                const originalOnclick = icon.onclick;
+                icon.onclick = function(event) {
+                    if (isQuizActive && !isQuizCompleted) {
+                        // 檢查是否為語言切換按鈕
+                        const isLanguageSwitcher = this.classList.contains('language-switcher');
+                        
+                        if (!isLanguageSwitcher) {
+                            // 非語言切換按鈕，攔截並顯示警告
+                            event.preventDefault();
+                            event.stopPropagation();
+                            showExitConfirmation();
+                            return false;
+                        }
+                        // 語言切換按鈕允許正常執行
+                    }
+                    if (originalOnclick) {
+                        return originalOnclick.call(this, event);
+                    }
+                };
+            });
+
+            // 攔截頁面跳轉
+            window.addEventListener('beforeunload', function(event) {
+                if (isQuizActive && !isQuizCompleted) {
+                    event.preventDefault();
+                    const exitMessage = window.quizExitMessage || '尚未完成筆試測驗，若現在離開測驗將不會記錄，確定是否離開？';
+                    event.returnValue = exitMessage;
+                    return event.returnValue;
+                }
+            });
+
+            // 攔截瀏覽器後退按鈕
+            window.addEventListener('popstate', function(event) {
+                if (isQuizActive && !isQuizCompleted) {
+                    event.preventDefault();
+                    showExitConfirmation();
+                    // 重新推入當前狀態以防止後退
+                    history.pushState(null, null, window.location.href);
+                }
+            });
+
+            // 攔截鍵盤快捷鍵（F5, Ctrl+R等）
+            document.addEventListener('keydown', function(event) {
+                if (isQuizActive && !isQuizCompleted) {
+                    // F5 或 Ctrl+R 重新整理
+                    if (event.key === 'F5' || (event.ctrlKey && event.key === 'r')) {
+                        event.preventDefault();
+                        showExitConfirmation();
+                        return false;
+                    }
+                    // Alt+Left 或 Alt+Right 瀏覽器導航
+                    if (event.altKey && (event.key === 'ArrowLeft' || event.key === 'ArrowRight')) {
+                        event.preventDefault();
+                        showExitConfirmation();
+                        return false;
+                    }
+                    // Ctrl+W 關閉標籤頁
+                    if (event.ctrlKey && event.key === 'w') {
+                        event.preventDefault();
+                        showExitConfirmation();
+                        return false;
+                    }
+                }
+            });
+
+            // 攔截所有鏈接和按鈕點擊事件（除了語言切換和測驗選項）
+            document.addEventListener('click', function(event) {
+                if (isQuizActive && !isQuizCompleted) {
+                    const target = event.target;
+                    const clickedElement = target.closest('a, button, [onclick]');
+                    
+                    if (clickedElement) {
+                        // 檢查是否為允許的按鈕
+                        const isLanguageSwitcher = clickedElement.classList.contains('language-switcher') || 
+                                                 target.classList.contains('language-switcher') ||
+                                                 (clickedElement.onclick && clickedElement.onclick.toString().includes('toggleLanguage'));
+                        const isQuizOption = clickedElement.classList.contains('option') || 
+                                           target.classList.contains('option');
+                        const isStartQuizBtn = clickedElement.classList.contains('start-quiz-btn');
+                        
+                        // 檢查是否為測驗結果頁面的按鈕（測驗完成後允許）
+                        const isResultButton = clickedElement.onclick && 
+                                             (clickedElement.onclick.toString().includes('exam.html') || 
+                                              clickedElement.onclick.toString().includes('location.reload'));
+                        
+                        // 如果不是允許的按鈕，則攔截
+                        if (!isLanguageSwitcher && !isQuizOption && !isStartQuizBtn && !isResultButton) {
+                            event.preventDefault();
+                            event.stopPropagation();
+                            showExitConfirmation();
+                            return false;
+                        }
+                    }
+                }
+            });
+
+            // 攔截表單提交
+            document.addEventListener('submit', function(event) {
+                if (isQuizActive && !isQuizCompleted) {
+                    event.preventDefault();
+                    showExitConfirmation();
+                    return false;
+                }
+            });
+
+            // 防止右鍵菜單（可選，但可能會影響用戶體驗）
+            document.addEventListener('contextmenu', function(event) {
+                if (isQuizActive && !isQuizCompleted) {
+                    // 不阻止右鍵，只是提醒
+                    console.log('測驗進行中，請專心作答');
+                }
+            });
+        }
+
+        // 顯示離開確認對話框
+        function showExitConfirmation() {
+            const exitMessage = window.quizExitMessage || '尚未完成筆試測驗，若現在離開測驗將不會記錄，確定是否離開？';
+            const userChoice = confirm(exitMessage);
+            if (userChoice) {
+                // 用戶確認離開，回到考試專區頁面
+                isQuizActive = false;
+                window.location.href = 'exam.html';
+            }
+            // 用戶取消離開，繼續測驗（不需要做任何操作）
+        }
 
         // 載入問題數據
         async function loadQuestions() {
             try {
-                const response = await fetch('data/questions.json');
+                // 根據當前語言選擇題目文件
+                const currentLang = localStorage.getItem('pbls_language') || 'zh';
+                const questionFile = currentLang === 'en' ? 'data/questions_en.json' : 'data/questions.json';
+                
+                const response = await fetch(questionFile);
                 allQuestions = await response.json();
+                
+                // 更新測驗描述以反映實際題目數量
+                updateQuizDescriptionText();
+                
+                // 隱藏測驗說明，顯示開始測驗按鈕
+                hideQuizInfo();
+                
+                // 開始測驗
                 startQuiz();
             } catch (error) {
                 console.error('載入問題失敗:', error);
+                // 如果英文題目載入失敗，嘗試載入中文題目
+                if (questionFile.includes('_en.json')) {
+                    try {
+                        const response = await fetch('data/questions.json');
+                        allQuestions = await response.json();
+                        
+                        // 更新測驗描述以反映實際題目數量
+                        updateQuizDescriptionText();
+                        
+                        // 隱藏測驗說明，顯示開始測驗按鈕
+                        hideQuizInfo();
+                        
+                        startQuiz();
+                    } catch (fallbackError) {
+                        console.error('載入中文問題也失敗:', fallbackError);
                 alert('載入測驗題目失敗，請重新整理頁面。');
+                    }
+                } else {
+                    alert('載入測驗題目失敗，請重新整理頁面。');
+                }
             }
         }
 
         // 開始測驗
         function startQuiz() {
-            // 隨機選擇20題
-            selectedQuestions = getRandomQuestions(20);
+            // 檢查可用題目數量，動態決定測驗題目數量
+            const maxQuestions = Math.min(20, allQuestions.length); // 最多20題，但不超過可用題目數
+            selectedQuestions = getRandomQuestions(maxQuestions);
+            
+            console.log(`開始測驗：共 ${selectedQuestions.length} 題，來自 ${allQuestions.length} 題題庫`);
+            
             currentQuestionIndex = 0;
             userAnswers = [];
             quizStartTime = new Date();
             timeRemaining = 5; // 每題5秒
             
-            // 開始計時器
-            startTimer();
+            // 設置測驗狀態
+            isQuizActive = true;
+            isQuizCompleted = false;
             
-            // 顯示第一題
-            displayQuestion();
+            // 測驗界面已經在 hideQuizInfo() 中顯示，不需要隱藏
+            
+            // 在倒數動畫期間隱藏計時器和進度條
+            hideTimerAndProgress();
+            
+            // 播放答題倒數音效
+            window.quizSoundManager.playCountdown();
+            
+            // 開始倒數動畫
+            window.countdownAnimation.start(() => {
+                // 倒數動畫完成後顯示計時器和進度條，然後進入第一題
+                showTimerAndProgress();
+                displayQuestionWithDelay();
+            });
         }
 
-        // 隨機選擇問題
+        // 隱藏計時器和進度條（用於倒數動畫期間）
+        function hideTimerAndProgress() {
+            const timerElement = document.getElementById('timer');
+            const progressElement = document.getElementById('quiz-progress');
+            
+            if (timerElement) {
+                timerElement.style.display = 'none';
+            }
+            if (progressElement) {
+                progressElement.style.display = 'none';
+            }
+        }
+
+        // 顯示計時器和進度條（倒數動畫完成後）
+        function showTimerAndProgress() {
+            const timerElement = document.getElementById('timer');
+            const progressElement = document.getElementById('quiz-progress');
+            
+            if (timerElement) {
+                timerElement.style.display = 'flex';
+            }
+            if (progressElement) {
+                progressElement.style.display = 'block';
+            }
+        }
+
+        // 隱藏測驗元素（計時器和進度條）
+        function hideQuizElements() {
+            const timerElement = document.getElementById('timer');
+            const progressElement = document.getElementById('quiz-progress');
+            
+            if (timerElement) {
+                timerElement.style.display = 'none';
+            }
+            if (progressElement) {
+                progressElement.style.display = 'none';
+            }
+        }
+
+        // 顯示測驗元素（計時器和進度條）
+        function showQuizElements() {
+            const timerElement = document.getElementById('timer');
+            const progressElement = document.getElementById('quiz-progress');
+            
+            if (timerElement) {
+                timerElement.style.display = 'flex';
+            }
+            if (progressElement) {
+                progressElement.style.display = 'block';
+            }
+        }
+
+        // 隨機選擇問題（確保不重複）
         function getRandomQuestions(count) {
-            const shuffled = [...allQuestions].sort(() => 0.5 - Math.random());
-            return shuffled.slice(0, count);
+            // 如果要求的題目數量超過可用題目總數，則返回所有題目
+            if (count >= allQuestions.length) {
+                console.log(`要求 ${count} 題，但只有 ${allQuestions.length} 題可用，返回所有題目`);
+                return [...allQuestions]; // 返回所有題目的副本
+            }
+            
+            // 使用 Fisher-Yates 洗牌算法確保真正的隨機性和不重複
+            const shuffled = [...allQuestions];
+            for (let i = shuffled.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+            }
+            
+            // 返回前 count 個題目
+            const selected = shuffled.slice(0, count);
+            console.log(`從 ${allQuestions.length} 題中隨機選擇了 ${selected.length} 題`);
+            
+            // 確保沒有重複的題目
+            const questionIds = selected.map(q => q.id);
+            const uniqueIds = [...new Set(questionIds)];
+            if (questionIds.length !== uniqueIds.length) {
+                console.error('警告：發現重複題目！');
+            }
+            
+            return selected;
+        }
+
+        // 更新測驗進度
+        function updateQuizProgress() {
+            const totalQuestions = selectedQuestions.length;
+            const currentProgress = currentQuestionIndex;
+            const percentage = Math.round((currentProgress / totalQuestions) * 100);
+            const currentQuestionNum = currentQuestionIndex + 1;
+            
+            // 更新進度條
+            document.getElementById('quiz-progress-fill').style.width = percentage + '%';
+            document.getElementById('progress-percentage').textContent = `${currentQuestionNum}/${totalQuestions}`;
+        }
+
+        // 隨機化選項順序
+        function shuffleOptions(originalOptions, correctIndex) {
+            // 創建帶索引的選項數組
+            const indexedOptions = originalOptions.map((option, index) => ({
+                text: option,
+                originalIndex: index
+            }));
+            
+            // 隨機排序所有選項
+            const shuffled = indexedOptions.sort(() => 0.5 - Math.random());
+            
+            // 找到正確答案的新位置
+            const newCorrectIndex = shuffled.findIndex(item => item.originalIndex === correctIndex);
+            
+            return { 
+                shuffledOptions: shuffled.map(item => item.text), 
+                correctIndex: newCorrectIndex 
+            };
         }
 
         // 開始計時器
         function startTimer() {
-            timeRemaining = 5; // 每題5秒
+            // 確保清除之前的計時器
+            if (timerInterval) {
+                clearInterval(timerInterval);
+                timerInterval = null;
+            }
+            
+            // 重置時間為5秒
+            timeRemaining = 5;
+            
+            // 立即更新計時器顯示
+            updateTimer();
+            
+            // 開始新的計時器
             timerInterval = setInterval(() => {
                 timeRemaining--;
                 updateTimer();
                 
                 if (timeRemaining <= 0) {
                     clearInterval(timerInterval);
+                    timerInterval = null;
                     // 時間到視為錯誤，記錄未作答
                     handleTimeout();
                 }
@@ -895,15 +1803,22 @@
         function handleTimeout() {
             const question = selectedQuestions[currentQuestionIndex];
             
+            // 停止答題音效
+            window.quizSoundManager.stopCurrentSound();
+            
+            // 播放錯誤音效（超時視為答錯）
+            window.quizSoundManager.playWrong();
+            
             // 記錄未作答的答案
+            const optionLabels = ['A)', 'B)', 'C)', 'D)'];
             userAnswers.push({
                 question: question.question,
                 userAnswer: -1, // -1 表示未作答
-                correctAnswer: question.correct,
+                correctAnswer: question.currentCorrectIndex,
                 isCorrect: false,
                 explanation: question.explanation,
                 userAnswerText: "未作答",
-                correctAnswerText: question.options[question.correct]
+                correctAnswerText: `${optionLabels[question.currentCorrectIndex]} ${question.shuffledOptions[question.currentCorrectIndex]}`
             });
             
             // 顯示正確選項（綠色）
@@ -912,25 +1827,25 @@
 
         // 顯示超時反饋
         function showTimeoutFeedback(question) {
+            // 立即鎖住所有選項按鈕
+            document.querySelectorAll('.option').forEach(option => {
+                option.disabled = true;
+                option.style.cursor = 'not-allowed';
+                option.style.opacity = '0.6';
+            });
+            
             // 標記正確選項為綠色
             document.querySelectorAll('.option').forEach((option, index) => {
-                if (index === question.correct) {
+                if (index === question.currentCorrectIndex) {
                     option.classList.add('correct');
                 }
             });
-            
-            // 更新按鈕文字
-            if (currentQuestionIndex < selectedQuestions.length - 1) {
-                document.getElementById('next-btn').textContent = '下一題';
-            } else {
-                document.getElementById('next-btn').textContent = '完成測驗';
-            }
             
             // 2秒後跳到下一題
             setTimeout(() => {
                 if (currentQuestionIndex < selectedQuestions.length - 1) {
                     currentQuestionIndex++;
-                    displayQuestion();
+                    displayQuestionWithDelay();
                 } else {
                     endQuiz();
                 }
@@ -938,9 +1853,127 @@
         }
 
 
-        // 顯示當前問題
+        // 延遲顯示問題（先顯示題目，隔一秒後顯示選項並開始計時）
+        function displayQuestionWithDelay() {
+            const question = selectedQuestions[currentQuestionIndex];
+            
+            // 隨機化選項順序
+            const shuffled = shuffleOptions(question.options, question.correct);
+            question.shuffledOptions = shuffled.shuffledOptions;
+            question.currentCorrectIndex = shuffled.correctIndex;
+            
+            // 測驗界面已經在 hideQuizInfo() 中顯示
+            
+            // 更新測驗進度
+            updateQuizProgress();
+            
+            // 先顯示題目
+            document.getElementById('question-text').textContent = 
+                `${currentQuestionIndex + 1}. ${question.question}`;
+            
+            // 記錄題目顯示狀態和時間
+            currentDisplayState = 'question';
+            questionDisplayStartTime = Date.now();
+            console.log('Question displayed, state:', currentDisplayState, 'start time:', questionDisplayStartTime);
+            
+            // 立即啟用語言切換按鈕（在顯示題目時就開放）
+            const languageSwitcher = document.querySelector('.language-switcher');
+            if (languageSwitcher) {
+                languageSwitcher.style.pointerEvents = 'auto';
+                languageSwitcher.style.opacity = '1';
+                languageSwitcher.style.cursor = 'pointer';
+            }
+            
+            // 延遲0.5秒後播放答題音效（循環播放）
+            setTimeout(() => {
+                window.quizSoundManager.playQuestion();
+            }, 500);
+            
+            // 清空選項並隱藏
+            const optionsContainer = document.getElementById('options');
+            optionsContainer.innerHTML = '';
+            optionsContainer.style.opacity = '0';
+            optionsContainer.style.transform = 'translateY(20px)';
+            
+            // 隱藏計時器
+            const timerElement = document.getElementById('timer');
+            timerElement.style.opacity = '0';
+            
+            // 重置狀態（移除按鈕相關代碼）
+            
+            // 3秒後顯示選項並開始計時
+            setTimeout(() => {
+                // 重置鎖定狀態
+                isNextLocked = false;
+                
+                // 顯示隨機化後的選項
+                question.shuffledOptions.forEach((option, index) => {
+                    const optionElement = document.createElement('button');
+                    optionElement.className = 'option';
+                    // 為選項添加A)、B)、C)、D)標記
+                    const optionLabels = ['A)', 'B)', 'C)', 'D)'];
+                    optionElement.textContent = `${optionLabels[index]} ${option}`;
+                    optionElement.onclick = () => selectOption(index);
+                    // 確保新選項是可點擊的
+                    optionElement.disabled = false;
+                    optionElement.style.cursor = 'pointer';
+                    optionElement.style.opacity = '1';
+                    optionsContainer.appendChild(optionElement);
+                });
+                
+                // 顯示選項動畫
+                optionsContainer.style.opacity = '1';
+                optionsContainer.style.transform = 'translateY(0)';
+                optionsContainer.style.transition = 'all 0.5s ease';
+                
+                // 記錄選項顯示狀態和時間
+                currentDisplayState = 'options';
+                optionsDisplayStartTime = Date.now();
+                console.log('Options displayed, state:', currentDisplayState, 'start time:', optionsDisplayStartTime);
+                
+                // 重置計時器顯示為初始狀態
+                document.getElementById('time-text').textContent = '5';
+                document.getElementById('progress-fill').style.width = '0%';
+                document.querySelector('.timer-clock').style.setProperty('--progress', '0deg');
+                document.querySelector('.timer-clock').style.background = 'linear-gradient(135deg, #9b59b6 0%, #a569bd 100%)';
+                
+                // 重置動畫效果
+                const timerClock = document.querySelector('.timer-clock');
+                const timeText = document.getElementById('time-text');
+                timerClock.classList.remove('danger');
+                timeText.style.animation = 'countdown 1s ease-in-out';
+                timeText.style.textShadow = '0 3px 6px rgba(0, 0, 0, 0.4)';
+                
+                // 顯示計時器並開始計時
+                timerElement.style.opacity = '1';
+                timerElement.style.transition = 'opacity 0.5s ease';
+                
+                // 開始計時器
+                startTimer();
+                
+                // 啟用所有按鈕（題目已完全顯示）
+                enableAllButtons();
+            }, 3000);
+        }
+
+        // 顯示當前問題（原函數保留用於其他情況）
         function displayQuestion() {
             const question = selectedQuestions[currentQuestionIndex];
+            console.log('displayQuestion: showing question', currentQuestionIndex + 1, ':', question.question);
+            console.log('Original options count:', question.options.length);
+            console.log('Original options:', question.options);
+            
+            // 隨機化選項順序
+            const shuffled = shuffleOptions(question.options, question.correct);
+            question.shuffledOptions = shuffled.shuffledOptions;
+            question.currentCorrectIndex = shuffled.correctIndex;
+            
+            console.log('Shuffled options count:', question.shuffledOptions.length);
+            console.log('Shuffled options:', question.shuffledOptions);
+            
+            // 更新測驗進度
+            updateQuizProgress();
+            
             document.getElementById('question-text').textContent = 
                 `${currentQuestionIndex + 1}. ${question.question}`;
             
@@ -948,18 +1981,28 @@
             const optionsContainer = document.getElementById('options');
             optionsContainer.innerHTML = '';
             
-            // 創建選項按鈕
-            question.options.forEach((option, index) => {
+            // 重置鎖定狀態
+            isNextLocked = false;
+            
+            // 創建隨機化後的選項按鈕
+            question.shuffledOptions.forEach((option, index) => {
                 const optionElement = document.createElement('button');
                 optionElement.className = 'option';
-                optionElement.textContent = option;
+                // 為選項添加A)、B)、C)、D)標記，支持更多選項
+                const optionLabels = ['A)', 'B)', 'C)', 'D)', 'E)', 'F)', 'G)', 'H)'];
+                const label = optionLabels[index] || `${String.fromCharCode(65 + index)})`; // 如果超出預定義範圍，使用字母
+                optionElement.textContent = `${label} ${option}`;
                 optionElement.onclick = () => selectOption(index);
+                // 確保新選項是可點擊的
+                optionElement.disabled = false;
+                optionElement.style.cursor = 'pointer';
+                optionElement.style.opacity = '1';
                 optionsContainer.appendChild(optionElement);
             });
             
-            // 重置按鈕狀態
-            document.getElementById('next-btn').disabled = true;
-            document.getElementById('next-btn').textContent = '下一題';
+            console.log('displayQuestion: created', question.shuffledOptions.length, 'options');
+            
+            // 重置狀態（移除按鈕相關代碼）
             
             // 清除所有選項的顏色標記
             document.querySelectorAll('.option').forEach(option => {
@@ -979,19 +2022,39 @@
             timeText.style.animation = 'countdown 1s ease-in-out';
             timeText.style.textShadow = '0 3px 6px rgba(0, 0, 0, 0.4)';
             
-            // 重新開始計時器
+            // 確保清除之前的計時器並重新開始
             if (timerInterval) {
                 clearInterval(timerInterval);
+                timerInterval = null;
             }
             startTimer();
         }
 
         // 選擇選項
         function selectOption(optionIndex) {
+            // 如果已經選擇過答案或正在轉換中，直接返回，防止重複點擊
+            if (isNextLocked || isTransitioning) {
+                return;
+            }
+            
+            // 立即禁用所有按鈕（包括語言切換按鈕）
+            disableAllButtons();
+            
+            // 設置鎖定，防止重複點擊
+            isNextLocked = true;
+            
             // 停止計時器
             if (timerInterval) {
                 clearInterval(timerInterval);
+                timerInterval = null;
             }
+            
+            // 禁用所有選項按鈕
+            document.querySelectorAll('.option').forEach(option => {
+                option.disabled = true;
+                option.style.cursor = 'not-allowed';
+                option.style.opacity = '0.6';
+            });
             
             // 移除所有選項的選中狀態
             document.querySelectorAll('.option').forEach(option => {
@@ -1001,69 +2064,70 @@
             // 標記選中的選項
             document.querySelectorAll('.option')[optionIndex].classList.add('selected');
             
-            // 啟用下一題按鈕
-            document.getElementById('next-btn').disabled = false;
+            // 立即處理答案並跳轉
+            handleAnswerSelection(optionIndex);
         }
 
-        // 下一題按鈕點擊事件
-        document.getElementById('next-btn').addEventListener('click', function() {
-            if (this.disabled || isNextLocked) return;
+        // 處理答案選擇
+        function handleAnswerSelection(optionIndex) {
+            const question = selectedQuestions[currentQuestionIndex];
+            const isCorrect = optionIndex === question.currentCorrectIndex;
             
-            // 設置鎖定
-            isNextLocked = true;
+            // 立即停止答題音效
+            window.quizSoundManager.stopCurrentSound();
+            
+            // 播放對應音效
+            if (isCorrect) {
+                window.quizSoundManager.playCorrect();
+            } else {
+                window.quizSoundManager.playWrong();
+            }
             
             // 記錄用戶答案
-            const selectedOption = document.querySelector('.option.selected');
-            if (selectedOption) {
-                const optionIndex = Array.from(document.querySelectorAll('.option')).indexOf(selectedOption);
-                const question = selectedQuestions[currentQuestionIndex];
-                const isCorrect = optionIndex === question.correct;
-                
-                userAnswers.push({
-                    question: question.question,
-                    userAnswer: optionIndex,
-                    correctAnswer: question.correct,
-                    isCorrect: isCorrect,
-                    explanation: question.explanation,
-                    userAnswerText: question.options[optionIndex],
-                    correctAnswerText: question.options[question.correct]
-                });
-                
-                // 顯示解釋
-                showExplanation(question, optionIndex, isCorrect);
-            }
-        });
+            const optionLabels = ['A)', 'B)', 'C)', 'D)'];
+            userAnswers.push({
+                question: question.question,
+                userAnswer: optionIndex,
+                correctAnswer: question.currentCorrectIndex,
+                isCorrect: isCorrect,
+                explanation: question.explanation,
+                userAnswerText: `${optionLabels[optionIndex]} ${question.shuffledOptions[optionIndex]}`,
+                correctAnswerText: `${optionLabels[question.currentCorrectIndex]} ${question.shuffledOptions[question.currentCorrectIndex]}`
+            });
+            
+            // 顯示解釋
+            showExplanation(question, optionIndex, isCorrect);
+        }
 
         // 顯示解釋
         function showExplanation(question, userAnswer, isCorrect) {
             // 停止當前計時器
             if (timerInterval) {
                 clearInterval(timerInterval);
+                timerInterval = null;
             }
+            
+            // 立即鎖住所有選項按鈕
+            document.querySelectorAll('.option').forEach(option => {
+                option.disabled = true;
+                option.style.cursor = 'not-allowed';
+                option.style.opacity = '0.6';
+            });
             
             // 標記正確和錯誤的選項
             document.querySelectorAll('.option').forEach((option, index) => {
-                if (index === question.correct) {
+                if (index === question.currentCorrectIndex) {
                     option.classList.add('correct');
                 } else if (index === userAnswer && !isCorrect) {
                     option.classList.add('incorrect');
                 }
             });
             
-            // 更新按鈕文字
-            if (currentQuestionIndex < selectedQuestions.length - 1) {
-                document.getElementById('next-btn').textContent = '下一題';
-            } else {
-                document.getElementById('next-btn').textContent = '完成測驗';
-            }
-            
-            // 移動到下一題或結束測驗
+            // 自動跳轉到下一題或結束測驗
             setTimeout(() => {
                 if (currentQuestionIndex < selectedQuestions.length - 1) {
                     currentQuestionIndex++;
-                    displayQuestion();
-                    // 在顯示下一題時解鎖
-                    isNextLocked = false;
+                    displayQuestionWithDelay();
                 } else {
                     endQuiz();
                 }
@@ -1074,7 +2138,15 @@
         function endQuiz() {
             if (timerInterval) {
                 clearInterval(timerInterval);
+                timerInterval = null;
             }
+            
+            // 停止所有音效
+            window.quizSoundManager.stopAllSounds();
+            
+            // 設置測驗完成狀態
+            isQuizActive = false;
+            isQuizCompleted = true;
             
             const endTime = new Date();
             const totalTime = Math.floor((endTime - quizStartTime) / 1000);
@@ -1114,29 +2186,45 @@
             const minutes = Math.floor(totalTime / 60);
             const seconds = totalTime % 60;
             
+            // 獲取翻譯文字
+            const translations = window.quizTranslations || {
+                score: '分',
+                correctAnswers: '答對題數',
+                totalQuestions: '總題數',
+                timeUsed: '用時',
+                details: '測驗詳情',
+                retakeButton: '重新測驗',
+                correct: '正確',
+                incorrect: '錯誤',
+                noAnswer: '未作答',
+                yourAnswer: '您的答案：',
+                explanation: '解釋',
+                correctAnswer: '正確答案'
+            };
+            
             document.getElementById('quiz-container').innerHTML = `
                 <div class="quiz-summary">
                     <div class="total-score">
                         <div class="score-number">${score}</div>
-                        <div class="score-label">分</div>
+                        <div class="score-label">${translations.score}</div>
                     </div>
                     
                     <div class="summary-stats">
                         <div class="stat-item">
                             <div class="stat-number">${correctAnswers}</div>
-                            <div class="stat-label">答對題數</div>
+                            <div class="stat-label">${translations.correctAnswers}</div>
                         </div>
                         <div class="stat-item">
                             <div class="stat-number">${totalQuestions}</div>
-                            <div class="stat-label">總題數</div>
+                            <div class="stat-label">${translations.totalQuestions}</div>
                         </div>
                         <div class="stat-item">
                             <div class="stat-number">${minutes}:${seconds.toString().padStart(2, '0')}</div>
-                            <div class="stat-label">用時</div>
+                            <div class="stat-label">${translations.timeUsed}</div>
                         </div>
                     </div>
                     
-                    <h3 style="margin-bottom: 20px; color: #2c3e50; border-bottom: 2px solid #3498db; padding-bottom: 10px;">測驗詳情</h3>
+                    <h3 style="margin-bottom: 20px; color: #2c3e50; border-bottom: 2px solid #3498db; padding-bottom: 10px;">${translations.details}</h3>
                     
                     <ol class="questions-list">
                         ${userAnswers.map((answer, index) => `
@@ -1149,16 +2237,16 @@
                                 <div class="answer-status">
                                     <span class="status-icon">${answer.isCorrect ? '✅' : '❌'}</span>
                                     <span class="${answer.isCorrect ? 'correct-answer' : 'incorrect-answer'}">
-                                        ${answer.isCorrect ? '正確' : '錯誤'}
+                                        ${answer.isCorrect ? translations.correct : translations.incorrect}
                                     </span>
                                     <span class="user-answer">
-                                        ${answer.userAnswer === -1 ? '未作答' : `您的答案：${answer.userAnswerText}`}
+                                        ${answer.userAnswer === -1 ? translations.noAnswer : `${translations.yourAnswer}${answer.userAnswerText}`}
                                     </span>
                                 </div>
                                 
                                 <div class="explanation">
-                                    <strong>解釋：</strong>${answer.explanation}
-                                    ${!answer.isCorrect ? `<br><strong style="color: #27ae60;">正確答案：${answer.correctAnswerText}</strong>` : ''}
+                                    <strong>${translations.explanation}：</strong>${answer.explanation}
+                                    ${!answer.isCorrect ? `<br><strong style="color: #27ae60;">${translations.correctAnswer}：${answer.correctAnswerText}</strong>` : ''}
                                 </div>
                             </li>
                         `).join('')}
@@ -1189,7 +2277,7 @@
                             box-shadow: 0 4px 8px rgba(39, 174, 96, 0.3);
                             transition: all 0.3s ease;
                         " onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 12px rgba(39, 174, 96, 0.4)'" 
-                           onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 8px rgba(39, 174, 96, 0.3)'">重新測驗</button>
+                           onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 8px rgba(39, 174, 96, 0.3)'">${translations.retakeButton}</button>
                     </div>
                 </div>
             `;
@@ -1197,11 +2285,19 @@
 
         // 用戶頭像功能
         function showUserProfile() {
+            if (isQuizActive && !isQuizCompleted) {
+                showExitConfirmation();
+                return;
+            }
             alert('用戶資料功能開發中，敬請期待！');
         }
 
         // 登出功能
         function logout() {
+            if (isQuizActive && !isQuizCompleted) {
+                showExitConfirmation();
+                return;
+            }
             if (confirm('確定要登出嗎？')) {
                 // 清除本地儲存
                 localStorage.removeItem('pbls_user');
@@ -1212,5 +2308,6 @@
             }
         }
     </script>
+    <script src="src/js/language-switcher.js"></script>
 </body>
 </html>

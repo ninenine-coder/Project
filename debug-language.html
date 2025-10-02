@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>語言切換調試</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background: #f0f0f0;
+        }
+        .debug-section {
+            background: white;
+            padding: 20px;
+            margin: 10px 0;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .scenario-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            margin: 5px;
+            cursor: pointer;
+        }
+        .debug-info {
+            background: #e3f2fd;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+            font-family: monospace;
+        }
+    </style>
+</head>
+<body>
+    <div class="debug-section">
+        <h2>語言切換調試頁面</h2>
+        
+        <div class="debug-info" id="debugInfo">
+            等待初始化...
+        </div>
+        
+        <button onclick="testToggle()">切換語言</button>
+        <button onclick="debugButtons()">檢查按鈕</button>
+        
+        <div>
+            <h3>測試按鈕：</h3>
+            <button class="scenario-btn">處理措施</button>
+            <button class="scenario-btn">處理措施</button>
+            <button class="scenario-btn">處理措施</button>
+        </div>
+    </div>
+
+    <script src="src/js/language-switcher.js"></script>
+    <script>
+        let debugInfo = document.getElementById('debugInfo');
+        
+        function log(message) {
+            debugInfo.innerHTML += '<br>' + new Date().toLocaleTimeString() + ': ' + message;
+            console.log(message);
+        }
+        
+        function testToggle() {
+            try {
+                log('開始切換語言...');
+                if (window.languageSwitcher) {
+                    log('語言切換器存在');
+                    log('當前語言: ' + window.languageSwitcher.currentLang);
+                    window.languageSwitcher.toggleLanguage();
+                    log('切換後語言: ' + window.languageSwitcher.currentLang);
+                } else {
+                    log('錯誤: 語言切換器不存在');
+                }
+            } catch (error) {
+                log('錯誤: ' + error.message);
+            }
+        }
+        
+        function debugButtons() {
+            const buttons = document.querySelectorAll('.scenario-btn');
+            log('找到 ' + buttons.length + ' 個按鈕');
+            buttons.forEach((btn, index) => {
+                log(`按鈕 ${index + 1}: "${btn.textContent}"`);
+            });
+        }
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            log('頁面載入完成');
+            if (window.languageSwitcher) {
+                log('語言切換器已載入');
+                log('當前語言: ' + window.languageSwitcher.currentLang);
+            } else {
+                log('錯誤: 語言切換器未載入');
+            }
+        });
+    </script>
+</body>
+</html>

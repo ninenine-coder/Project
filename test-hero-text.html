@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hero 文字測試</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: white;
+        }
+        .container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+        .hero-section {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.8), rgba(118, 75, 162, 0.8));
+            border-radius: 20px;
+            padding: 60px 40px;
+            text-align: center;
+            margin: 20px 0;
+            position: relative;
+            overflow: hidden;
+        }
+        .hero-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 20px;
+            z-index: 1;
+        }
+        .hero-content {
+            position: relative;
+            z-index: 2;
+        }
+        .hero-title {
+            font-size: 42px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            color: white;
+            text-shadow: 0 3px 6px rgba(0, 0, 0, 0.8);
+        }
+        .hero-description {
+            font-size: 20px;
+            max-width: 900px;
+            margin: 0 auto 35px auto;
+            line-height: 1.7;
+            color: rgba(255, 255, 255, 0.95);
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.6);
+        }
+        .learn-more-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 25px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        }
+        .learn-more-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+        }
+        .test-section {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        .button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            cursor: pointer;
+            margin: 10px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+        .button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        }
+        .status {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 15px;
+            margin: 15px 0;
+            border-left: 4px solid #4CAF50;
+        }
+        @media (max-width: 768px) {
+            .hero-section {
+                padding: 40px 25px;
+            }
+            .hero-title {
+                font-size: 32px;
+            }
+            .hero-description {
+                font-size: 18px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎯 Hero 文字更新測試</h1>
+        
+        <div class="test-section">
+            <h2>測試更新後的文字內容</h2>
+            <button class="button" onclick="switchToChinese()">顯示中文版本</button>
+            <button class="button" onclick="switchToEnglish()">顯示英文版本</button>
+            <button class="button" onclick="toggleLanguage()">切換語言</button>
+        </div>
+
+        <div class="hero-section">
+            <div class="hero-content">
+                <h1 class="hero-title" id="heroTitle">小兒基本生命支持（PBLS）</h1>
+                <p class="hero-description" id="heroDescription">小兒基本生命支持（PBLS）是專為兒童與嬰幼兒設計的重要急救流程，協助第一時間正確判斷並處理呼吸或心跳驟停的狀況。本平台提供完整的學習資源，涵蓋標準理論基礎、系統化流程操作與多情境模擬，透過圖解說明與互動式演練，幫助學員快速理解並熟練應變步驟，最終目標是讓每位學習者在關鍵時刻都能正確反應，提升急救成功率，守護孩子的生命安全</p>
+                <button class="learn-more-btn" id="learnMoreBtn">了解更多</button>
+            </div>
+        </div>
+
+        <div class="status" id="status">
+            <strong>狀態：</strong>等待測試...
+        </div>
+
+        <div class="test-section">
+            <h3>📝 更新內容對比</h3>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                <div>
+                    <h4>🔤 中文版本（新）</h4>
+                    <p style="font-size: 14px; line-height: 1.5; color: #333; background: rgba(255,255,255,0.8); padding: 15px; border-radius: 10px;">
+                        <strong>標題：</strong>小兒基本生命支持（PBLS）<br><br>
+                        <strong>描述：</strong>小兒基本生命支持（PBLS）是專為兒童與嬰幼兒設計的重要急救流程，協助第一時間正確判斷並處理呼吸或心跳驟停的狀況。本平台提供完整的學習資源，涵蓋標準理論基礎、系統化流程操作與多情境模擬，透過圖解說明與互動式演練，幫助學員快速理解並熟練應變步驟，最終目標是讓每位學習者在關鍵時刻都能正確反應，提升急救成功率，守護孩子的生命安全
+                    </p>
+                </div>
+                <div>
+                    <h4>🔤 英文版本</h4>
+                    <p style="font-size: 14px; line-height: 1.5; color: #333; background: rgba(255,255,255,0.8); padding: 15px; border-radius: 10px;">
+                        <strong>Title:</strong> Pediatric Basic Life Support (PBLS)<br><br>
+                        <strong>Description:</strong> Pediatric Basic Life Support (PBLS) is the essential guideline for rescuing infants and children in cardiac or respiratory arrest. This platform provides systematic training combining theory, process flow, and scenario simulations.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="src/js/language-switcher.js"></script>
+    <script>
+        let languageSwitcher;
+
+        // 頁面載入時初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            if (typeof LanguageSwitcher !== 'undefined') {
+                languageSwitcher = new LanguageSwitcher();
+                updateStatus('語言切換器已載入，當前語言：' + languageSwitcher.currentLang);
+                applyCurrentLanguage();
+            } else {
+                updateStatus('❌ 語言切換器載入失敗');
+            }
+        });
+
+        // 切換到中文
+        function switchToChinese() {
+            if (languageSwitcher) {
+                languageSwitcher.currentLang = 'zh';
+                languageSwitcher.applyLanguage('zh');
+                updateStatus('已切換到中文版本');
+            }
+        }
+
+        // 切換到英文
+        function switchToEnglish() {
+            if (languageSwitcher) {
+                languageSwitcher.currentLang = 'en';
+                languageSwitcher.applyLanguage('en');
+                updateStatus('已切換到英文版本');
+            }
+        }
+
+        // 切換語言
+        function toggleLanguage() {
+            if (languageSwitcher) {
+                languageSwitcher.toggleLanguage();
+                updateStatus('語言已切換到：' + languageSwitcher.currentLang);
+            }
+        }
+
+        // 應用當前語言
+        function applyCurrentLanguage() {
+            if (languageSwitcher) {
+                const content = languageSwitcher.translations[languageSwitcher.currentLang].content;
+                
+                document.getElementById('heroTitle').textContent = content.hero.title;
+                document.getElementById('heroDescription').textContent = content.hero.description;
+                document.getElementById('learnMoreBtn').textContent = content.hero.learnMore;
+            }
+        }
+
+        // 更新狀態顯示
+        function updateStatus(message) {
+            const status = document.getElementById('status');
+            status.innerHTML = '<strong>狀態：</strong>' + message;
+        }
+    </script>
+</body>
+</html>

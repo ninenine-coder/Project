@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>測驗語言切換修復測試</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: white;
+        }
+        .container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #fff;
+        }
+        .test-section {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        .button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            cursor: pointer;
+            margin: 10px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+        .button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        }
+        .status {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 15px;
+            margin: 15px 0;
+            border-left: 4px solid #4CAF50;
+        }
+        .problem-section {
+            background: rgba(255, 152, 0, 0.2);
+            border-radius: 10px;
+            padding: 15px;
+            margin: 15px 0;
+            border-left: 4px solid #ff9800;
+        }
+        .solution-section {
+            background: rgba(33, 150, 243, 0.2);
+            border-radius: 10px;
+            padding: 15px;
+            margin: 15px 0;
+            border-left: 4px solid #2196f3;
+        }
+        .technical-details {
+            background: rgba(255, 193, 7, 0.2);
+            border-radius: 10px;
+            padding: 15px;
+            margin: 15px 0;
+            border-left: 4px solid #ffc107;
+            font-family: 'Courier New', monospace;
+        }
+        .checklist {
+            background: rgba(76, 175, 80, 0.2);
+            border-radius: 10px;
+            padding: 15px;
+            margin: 15px 0;
+            border-left: 4px solid #4CAF50;
+        }
+        .checklist ul {
+            margin: 10px 0;
+            padding-left: 20px;
+        }
+        .checklist li {
+            margin: 5px 0;
+        }
+        .comparison-table {
+            background: rgba(33, 150, 243, 0.2);
+            border-radius: 10px;
+            padding: 15px;
+            margin: 15px 0;
+            border-left: 4px solid #2196f3;
+        }
+        .comparison-table table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 10px 0;
+        }
+        .comparison-table th,
+        .comparison-table td {
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            padding: 8px;
+            text-align: left;
+        }
+        .comparison-table th {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        .debug-info {
+            background: rgba(156, 39, 176, 0.2);
+            border-radius: 10px;
+            padding: 15px;
+            margin: 15px 0;
+            border-left: 4px solid #9c27b0;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔧 測驗語言切換修復測試</h1>
+        
+        <div class="test-section">
+            <h2>🎯 問題描述</h2>
+            <div class="problem-section">
+                <h3>❌ 觀察到的問題</h3>
+                <p>從截圖中可以看到：</p>
+                <ul>
+                    <li>✅ 左側選單已經切換為英文（Information, Practice, Exam, History, Team）</li>
+                    <li>✅ 語言切換按鈕顯示為中文「中」</li>
+                    <li><strong>❌ 題目和選項仍然是中文</strong></li>
+                </ul>
+                <p><strong>問題原因：</strong>測驗狀態變量沒有正確暴露到全局作用域，導致語言切換器無法檢測到測驗正在進行中。</p>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h2>🔧 修復方案</h2>
+            <div class="solution-section">
+                <h3>✅ 核心修復點</h3>
+                <div class="technical-details">
+<h4>1. 暴露測驗狀態變量到全局作用域：</h4>
+<pre>// 在 exam_quiz.html 中添加
+window.isQuizActive = () => isQuizActive;
+window.isQuizCompleted = () => isQuizCompleted;
+window.getCurrentQuestionIndex = () => currentQuestionIndex;
+window.setCurrentQuestionIndex = (index) => { currentQuestionIndex = index; };
+window.getSelectedQuestions = () => selectedQuestions;</pre>
+
+<h4>2. 更新語言切換器中的狀態檢測：</h4>
+<pre>// 在 language-switcher.js 中修改
+const isQuizActive = typeof window.isQuizActive === 'function' ? window.isQuizActive() : false;
+const isQuizCompleted = typeof window.isQuizCompleted === 'function' ? window.isQuizCompleted() : false;
+
+if (isQuizActive && !isQuizCompleted) {
+  window.handleQuizLanguageSwitch();
+}</pre>
+
+<h4>3. 修復變量引用：</h4>
+<pre>// 使用正確的函數調用
+const currentIndex = typeof window.getCurrentQuestionIndex === 'function' ? window.getCurrentQuestionIndex() : 0;
+const questions = typeof window.getSelectedQuestions === 'function' ? window.getSelectedQuestions() : [];
+
+// 正確設置題目索引
+if (typeof window.setCurrentQuestionIndex === 'function') {
+  window.setCurrentQuestionIndex(currentIndex + 1);
+}</pre>
+                </div>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h2>📊 修復前後對比</h2>
+            <div class="comparison-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>元素</th>
+                            <th>修復前</th>
+                            <th>修復後</th>
+                            <th>狀態</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>左側選單</strong></td>
+                            <td>✅ 正常切換</td>
+                            <td>✅ 正常切換</td>
+                            <td>✅ 無需修改</td>
+                        </tr>
+                        <tr>
+                            <td><strong>語言切換按鈕</strong></td>
+                            <td>✅ 正常切換</td>
+                            <td>✅ 正常切換</td>
+                            <td>✅ 無需修改</td>
+                        </tr>
+                        <tr>
+                            <td><strong>測驗狀態檢測</strong></td>
+                            <td>❌ 無法檢測</td>
+                            <td>✅ 正確檢測</td>
+                            <td>🔧 已修復</td>
+                        </tr>
+                        <tr>
+                            <td><strong>題目內容切換</strong></td>
+                            <td>❌ 不切換</td>
+                            <td>✅ 正確切換</td>
+                            <td>🔧 已修復</td>
+                        </tr>
+                        <tr>
+                            <td><strong>選項內容切換</strong></td>
+                            <td>❌ 不切換</td>
+                            <td>✅ 正確切換</td>
+                            <td>🔧 已修復</td>
+                        </tr>
+                        <tr>
+                            <td><strong>變量訪問</strong></td>
+                            <td>❌ 無法訪問</td>
+                            <td>✅ 正確訪問</td>
+                            <td>🔧 已修復</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h2>🧪 測試步驟</h2>
+            <div class="checklist">
+                <h3>📋 詳細測試流程</h3>
+                <ol>
+                    <li><strong>準備測試環境</strong>
+                        <ul>
+                            <li>確保有中英文題目文件（questions.json 和 questions_en.json）</li>
+                            <li>前往筆試測驗頁面</li>
+                            <li>開啟開發者工具 Console 標籤</li>
+                        </ul>
+                    </li>
+                    
+                    <li><strong>測試測驗狀態檢測</strong>
+                        <ul>
+                            <li>開始測驗</li>
+                            <li>在 Console 中輸入：<code>window.isQuizActive()</code></li>
+                            <li>應該返回 <code>true</code></li>
+                            <li>輸入：<code>window.isQuizCompleted()</code></li>
+                            <li>應該返回 <code>false</code></li>
+                        </ul>
+                    </li>
+                    
+                    <li><strong>測試題目內容語言切換</strong>
+                        <ul>
+                            <li>在測驗進行中點擊語言切換按鈕</li>
+                            <li>觀察 Console 中的調試信息</li>
+                            <li>確認題目文字從中文切換為英文</li>
+                            <li>確認選項文字從中文切換為英文</li>
+                            <li>確認可以正常回答切換後的題目</li>
+                        </ul>
+                    </li>
+                    
+                    <li><strong>測試變量訪問</strong>
+                        <ul>
+                            <li>在 Console 中輸入：<code>window.getCurrentQuestionIndex()</code></li>
+                            <li>應該返回當前題目索引（數字）</li>
+                            <li>輸入：<code>window.getSelectedQuestions()</code></li>
+                            <li>應該返回題目數組</li>
+                            <li>輸入：<code>window.setCurrentQuestionIndex(1)</code></li>
+                            <li>應該成功設置題目索引</li>
+                        </ul>
+                    </li>
+                </ol>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h2>🎯 快速測試</h2>
+            <button class="button" onclick="goToQuiz()">🧪 前往筆試測驗</button>
+            <button class="button" onclick="testStateDetection()">🔍 測試狀態檢測</button>
+            <button class="button" onclick="testContentSwitch()">🔄 測試內容切換</button>
+            <button class="button" onclick="testVariableAccess()">📊 測試變量訪問</button>
+        </div>
+
+        <div class="status" id="status">
+            <strong>測試狀態：</strong>等待測試...
+        </div>
+
+        <div class="test-section">
+            <h2>🔍 預期調試信息</h2>
+            <div class="debug-info">
+<h4>在開發者工具 Console 中應該看到的調試信息：</h4>
+<pre>// 語言切換時
+toggleLanguage: switching from zh to en
+updateQuizPage called
+Quiz is active, handling question content language switch
+handleQuizLanguageSwitch: handling language switch during quiz
+Current question answered: false
+Current question index: 0
+Total questions: 20
+Current question not answered, continuing with current question in new language
+Loading question file: data/questions_en.json
+displayCurrentQuestionAfterLanguageSwitch: currentQuestionIndex = 0
+Updated question for index 0: What should you do first when someone is found collapsed?
+displayQuestion: showing question 1: What should you do first when someone is found collapsed?
+displayQuestion: created 4 options</pre>
+
+<h4>狀態檢測測試：</h4>
+<pre>// 在 Console 中輸入
+window.isQuizActive()  // 應該返回 true
+window.isQuizCompleted()  // 應該返回 false
+window.getCurrentQuestionIndex()  // 應該返回數字
+window.getSelectedQuestions()  // 應該返回數組</pre>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h2>📊 預期結果</h2>
+            <div class="checklist">
+                <h3>✅ 修復後應該正常工作的功能</h3>
+                <ul>
+                    <li><strong>狀態檢測</strong>：語言切換器能正確檢測測驗是否正在進行</li>
+                    <li><strong>變量訪問</strong>：能正確訪問和修改測驗相關變量</li>
+                    <li><strong>題目切換</strong>：題目文字正確切換到新語言版本</li>
+                    <li><strong>選項切換</strong>：選項文字正確切換到新語言版本</li>
+                    <li><strong>功能正常</strong>：切換後的題目可以正常回答</li>
+                    <li><strong>狀態一致</strong>：測驗進度和狀態保持一致</li>
+                    <li><strong>調試信息</strong>：Console 中顯示詳細的調試信息</li>
+                </ul>
+                
+                <h3>🎯 測試重點</h3>
+                <ul>
+                    <li><strong>狀態檢測準確性</strong>：確保測驗狀態被正確檢測</li>
+                    <li><strong>變量訪問正確性</strong>：確保所有變量都能正確訪問</li>
+                    <li><strong>內容切換完整性</strong>：確保所有內容都正確切換</li>
+                    <li><strong>功能穩定性</strong>：確保切換後功能正常</li>
+                    <li><strong>調試信息完整性</strong>：確保調試信息完整且有用</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function goToQuiz() {
+            window.location.href = 'exam_quiz.html';
+        }
+
+        function testStateDetection() {
+            const status = document.getElementById('status');
+            status.innerHTML = '<strong>測試狀態：</strong>🔍 狀態檢測測試：請前往測驗頁面，開始測驗後在 Console 中輸入 window.isQuizActive() 和 window.isQuizCompleted() 檢查狀態檢測是否正確';
+            status.className = 'status';
+        }
+
+        function testContentSwitch() {
+            const status = document.getElementById('status');
+            status.innerHTML = '<strong>測試狀態：</strong>🔄 內容切換測試：請在測驗進行中點擊語言切換按鈕，觀察題目和選項是否正確切換為英文，並檢查 Console 中的調試信息';
+            status.className = 'status';
+        }
+
+        function testVariableAccess() {
+            const status = document.getElementById('status');
+            status.innerHTML = '<strong>測試狀態：</strong>📊 變量訪問測試：請在測驗進行中在 Console 中測試 window.getCurrentQuestionIndex()、window.getSelectedQuestions() 等函數是否能正確訪問變量';
+            status.className = 'status';
+        }
+
+        // 頁面載入時顯示狀態
+        document.addEventListener('DOMContentLoaded', function() {
+            const status = document.getElementById('status');
+            status.innerHTML = '<strong>測試狀態：</strong>✅ 測驗語言切換修復測試頁面已載入，請按照測試步驟進行測試';
+            status.className = 'status';
+        });
+    </script>
+</body>
+</html>

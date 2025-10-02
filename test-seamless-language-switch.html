@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>無縫語言切換測試</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: white;
+        }
+        .container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #fff;
+        }
+        .test-section {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        .button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            cursor: pointer;
+            margin: 10px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+        .button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        }
+        .status {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 15px;
+            margin: 15px 0;
+            border-left: 4px solid #4CAF50;
+        }
+        .problem-section {
+            background: rgba(255, 152, 0, 0.2);
+            border-radius: 10px;
+            padding: 15px;
+            margin: 15px 0;
+            border-left: 4px solid #ff9800;
+        }
+        .solution-section {
+            background: rgba(33, 150, 243, 0.2);
+            border-radius: 10px;
+            padding: 15px;
+            margin: 15px 0;
+            border-left: 4px solid #2196f3;
+        }
+        .technical-details {
+            background: rgba(255, 193, 7, 0.2);
+            border-radius: 10px;
+            padding: 15px;
+            margin: 15px 0;
+            border-left: 4px solid #ffc107;
+            font-family: 'Courier New', monospace;
+        }
+        .checklist {
+            background: rgba(76, 175, 80, 0.2);
+            border-radius: 10px;
+            padding: 15px;
+            margin: 15px 0;
+            border-left: 4px solid #4CAF50;
+        }
+        .checklist ul {
+            margin: 10px 0;
+            padding-left: 20px;
+        }
+        .checklist li {
+            margin: 5px 0;
+        }
+        .scenario-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin: 20px 0;
+        }
+        .scenario-card {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 15px;
+        }
+        .scenario-card.before {
+            border-left: 4px solid #ff9800;
+        }
+        .scenario-card.after {
+            border-left: 4px solid #4CAF50;
+        }
+        .comparison-table {
+            background: rgba(33, 150, 243, 0.2);
+            border-radius: 10px;
+            padding: 15px;
+            margin: 15px 0;
+            border-left: 4px solid #2196f3;
+        }
+        .comparison-table table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 10px 0;
+        }
+        .comparison-table th,
+        .comparison-table td {
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            padding: 8px;
+            text-align: left;
+        }
+        .comparison-table th {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        .flow-diagram {
+            background: rgba(76, 175, 80, 0.2);
+            border-radius: 10px;
+            padding: 15px;
+            margin: 15px 0;
+            border-left: 4px solid #4CAF50;
+        }
+        .flow-diagram .flow-step {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 10px;
+            margin: 8px 0;
+            border-left: 3px solid #4CAF50;
+        }
+        .flow-diagram .flow-arrow {
+            text-align: center;
+            font-size: 20px;
+            color: #4CAF50;
+            margin: 5px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔄 無縫語言切換測試</h1>
+        
+        <div class="test-section">
+            <h2>🎯 問題描述</h2>
+            <div class="problem-section">
+                <h3>用戶需求</h3>
+                <p><strong>"在中英文切換後，要接續上一步的顯示動作，例如:在每一題，上一步中文顯示3秒，在切換時英文就要從3秒開始顯示，這才是一個通順的網頁"</strong></p>
+                <ul>
+                    <li>✅ 期望：語言切換後接續原有的顯示狀態和進度</li>
+                    <li>❌ 問題：語言切換後重新開始顯示流程</li>
+                    <li>🎯 目標：實現無縫的語言切換體驗</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h2>🔧 解決方案</h2>
+            <div class="solution-section">
+                <h3>✅ 無縫語言切換機制</h3>
+                <div class="flow-diagram">
+                    <div class="flow-step"><strong>核心理念：只更新文字，保持狀態</strong></div>
+                    <div class="flow-step">1. 追蹤當前顯示狀態（題目、選項、答題中）</div>
+                    <div class="flow-step">2. 記錄各階段的開始時間</div>
+                    <div class="flow-step">3. 語言切換時只更新文字內容</div>
+                    <div class="flow-step">4. 保持原有的顯示狀態和進度</div>
+                    <div class="flow-step">5. 繼續原有的顯示流程 ✅</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h2>⚙️ 技術實現詳情</h2>
+            <div class="technical-details">
+<h4>核心實現：</h4>
+<pre>1. 狀態追蹤變量：
+   - currentDisplayState: 'question', 'options', 'answering'
+   - questionDisplayStartTime: 題目顯示開始時間
+   - optionsDisplayStartTime: 選項顯示開始時間
+
+2. displayQuestionForLanguageSwitch() 函數：
+   - 只更新題目文字
+   - 如果已顯示選項，也更新選項文字
+   - 不改變任何顯示狀態
+   - 不重新開始任何動畫或計時器
+
+3. 狀態記錄：
+   - 顯示題目時記錄狀態和時間
+   - 顯示選項時記錄狀態和時間
+   - 語言切換時保持這些狀態不變</pre>
+
+<h4>關鍵代碼：</h4>
+<pre>// 語言切換後只更新文字內容
+function displayQuestionForLanguageSwitch() {
+  // 只更新題目文字
+  document.getElementById('question-text').textContent = 
+    `${currentQuestionIndex + 1}. ${question.question}`;
+  
+  // 如果已顯示選項，更新選項文字
+  const existingOptions = document.querySelectorAll('.option');
+  if (existingOptions.length > 0) {
+    existingOptions.forEach((option, index) => {
+      const label = optionLabels[index];
+      option.textContent = `${label} ${question.shuffledOptions[index]}`;
+    });
+  }
+  
+  // 不改變任何狀態，保持原有進度
+}</pre>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h2>📊 修復前後對比</h2>
+            <div class="scenario-grid">
+                <div class="scenario-card before">
+                    <h4>❌ 修復前</h4>
+                    <p><strong>顯示流程：</strong></p>
+                    <ol>
+                        <li>倒數3、2、1</li>
+                        <li>顯示題目（中文）</li>
+                        <li>第3秒時用戶切換語言</li>
+                        <li>重新開始顯示流程</li>
+                        <li>倒數3、2、1（重複）</li>
+                        <li>顯示題目（英文）從第1秒開始 ❌</li>
+                    </ol>
+                    <p><strong>問題：</strong>用戶體驗中斷，重複顯示</p>
+                </div>
+                
+                <div class="scenario-card after">
+                    <h4>✅ 修復後</h4>
+                    <p><strong>顯示流程：</strong></p>
+                    <ol>
+                        <li>倒數3、2、1</li>
+                        <li>顯示題目（中文）</li>
+                        <li>第3秒時用戶切換語言</li>
+                        <li>只更新題目文字為英文</li>
+                        <li>繼續從第3秒顯示</li>
+                        <li>無縫接續顯示流程 ✅</li>
+                    </ol>
+                    <p><strong>優點：</strong>流暢的用戶體驗，無中斷</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h2>📊 詳細對比表</h2>
+            <div class="comparison-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>場景</th>
+                            <th>修復前</th>
+                            <th>修復後</th>
+                            <th>狀態</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>題目顯示時切換</strong></td>
+                            <td>❌ 重新開始倒數和顯示</td>
+                            <td>✅ 只更新文字，繼續顯示</td>
+                            <td>🔧 已修復</td>
+                        </tr>
+                        <tr>
+                            <td><strong>選項顯示時切換</strong></td>
+                            <td>❌ 重新創建選項</td>
+                            <td>✅ 只更新選項文字</td>
+                            <td>🔧 已修復</td>
+                        </tr>
+                        <tr>
+                            <td><strong>答題中切換</strong></td>
+                            <td>❌ 重置計時器</td>
+                            <td>✅ 保持計時器進度</td>
+                            <td>🔧 已修復</td>
+                        </tr>
+                        <tr>
+                            <td><strong>顯示進度</strong></td>
+                            <td>❌ 從頭開始</td>
+                            <td>✅ 接續原有進度</td>
+                            <td>🔧 已修復</td>
+                        </tr>
+                        <tr>
+                            <td><strong>用戶體驗</strong></td>
+                            <td>❌ 中斷、重複</td>
+                            <td>✅ 流暢、無縫</td>
+                            <td>🔧 已修復</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h2>🧪 測試步驟</h2>
+            <div class="checklist">
+                <h3>📋 詳細測試流程</h3>
+                <ol>
+                    <li><strong>測試1：題目顯示時切換語言</strong>
+                        <ul>
+                            <li>開始測驗</li>
+                            <li>等待倒數3、2、1完成</li>
+                            <li>題目顯示後第2-3秒時點擊語言切換</li>
+                            <li>觀察是否只有文字改變，沒有重新開始顯示</li>
+                            <li>確認顯示流程繼續進行</li>
+                        </ul>
+                    </li>
+                    
+                    <li><strong>測試2：選項顯示後切換語言</strong>
+                        <ul>
+                            <li>等待選項顯示出來</li>
+                            <li>在計時器倒數中點擊語言切換</li>
+                            <li>觀察選項文字是否更新</li>
+                            <li>確認計時器繼續倒數，沒有重置</li>
+                            <li>確認選項位置和狀態沒有改變</li>
+                        </ul>
+                    </li>
+                    
+                    <li><strong>測試3：多次切換語言</strong>
+                        <ul>
+                            <li>在題目顯示階段切換多次語言</li>
+                            <li>確認每次都只更新文字</li>
+                            <li>確認顯示流程不會重新開始</li>
+                            <li>確認沒有出現卡頓或異常</li>
+                        </ul>
+                    </li>
+                    
+                    <li><strong>測試4：不同階段切換</strong>
+                        <ul>
+                            <li>在倒數階段嘗試切換（應該被禁用）</li>
+                            <li>在題目顯示階段切換</li>
+                            <li>在選項顯示後切換</li>
+                            <li>在答題後切換（進入下一題）</li>
+                        </ul>
+                    </li>
+                </ol>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h2>🎯 快速測試</h2>
+            <button class="button" onclick="goToQuiz()">🧪 前往筆試測驗</button>
+            <button class="button" onclick="testQuestionSwitch()">📝 測試題目顯示時切換</button>
+            <button class="button" onclick="testOptionsSwitch()">🔘 測試選項顯示後切換</button>
+            <button class="button" onclick="testMultipleSwitch()">🔄 測試多次切換</button>
+        </div>
+
+        <div class="status" id="status">
+            <strong>測試狀態：</strong>等待測試...
+        </div>
+
+        <div class="test-section">
+            <h2>🔍 預期調試信息</h2>
+            <div class="technical-details">
+<h4>題目顯示時應該看到的調試信息：</h4>
+<pre>// 題目顯示時
+Question displayed, state: question, start time: 1234567890123
+
+// 語言切換時
+displayQuestionForLanguageSwitch: updating question text only, preserving current display state: question
+displayQuestionForLanguageSwitch: text updated, display state preserved
+
+// 選項顯示時
+Options displayed, state: options, start time: 1234567893456</pre>
+
+<h4>關鍵調試信息：</h4>
+<pre>✅ "preserving current display state: question" - 確認保持原有狀態
+✅ "text updated, display state preserved" - 確認只更新文字
+✅ 不會看到重新開始的倒數動畫
+✅ 不會看到重置計時器的信息</pre>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h2>📊 預期結果</h2>
+            <div class="checklist">
+                <h3>✅ 修復後應該正常工作的功能</h3>
+                <ul>
+                    <li><strong>無縫切換</strong>：語言切換後只更新文字，不中斷顯示流程</li>
+                    <li><strong>狀態保持</strong>：切換後保持原有的顯示狀態和進度</li>
+                    <li><strong>計時繼續</strong>：計時器不重置，繼續倒數</li>
+                    <li><strong>選項保持</strong>：選項位置和狀態不改變</li>
+                    <li><strong>流暢體驗</strong>：用戶感受不到任何中斷</li>
+                </ul>
+                
+                <h3>🎯 測試重點</h3>
+                <ul>
+                    <li><strong>文字更新</strong>：確認文字正確更新為新語言</li>
+                    <li><strong>狀態保持</strong>：確認顯示狀態和進度不變</li>
+                    <li><strong>無重複動畫</strong>：確認不會重新播放倒數動畫</li>
+                    <li><strong>計時器不重置</strong>：確認計時器繼續原有進度</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function goToQuiz() {
+            window.location.href = 'exam_quiz.html';
+        }
+
+        function testQuestionSwitch() {
+            const status = document.getElementById('status');
+            status.innerHTML = '<strong>測試狀態：</strong>📝 題目顯示時切換測試：請開始測驗，等待倒數完成後，在題目顯示的第2-3秒時點擊語言切換，觀察是否只有文字改變，沒有重新開始顯示';
+            status.className = 'status';
+        }
+
+        function testOptionsSwitch() {
+            const status = document.getElementById('status');
+            status.innerHTML = '<strong>測試狀態：</strong>🔘 選項顯示後切換測試：請等待選項顯示出來，在計時器倒數中點擊語言切換，觀察選項文字是否更新，計時器是否繼續倒數';
+            status.className = 'status';
+        }
+
+        function testMultipleSwitch() {
+            const status = document.getElementById('status');
+            status.innerHTML = '<strong>測試狀態：</strong>🔄 多次切換測試：請在題目顯示階段多次切換語言，確認每次都只更新文字，顯示流程不會重新開始';
+            status.className = 'status';
+        }
+
+        // 頁面載入時顯示狀態
+        document.addEventListener('DOMContentLoaded', function() {
+            const status = document.getElementById('status');
+            status.innerHTML = '<strong>測試狀態：</strong>✅ 無縫語言切換測試頁面已載入，請按照測試步驟進行測試';
+            status.className = 'status';
+        });
+    </script>
+</body>
+</html>

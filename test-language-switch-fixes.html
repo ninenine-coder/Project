@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>語言切換修復測試</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: white;
+        }
+        .container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #fff;
+        }
+        .test-section {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        .button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            cursor: pointer;
+            margin: 10px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+        .button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        }
+        .status {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 15px;
+            margin: 15px 0;
+            border-left: 4px solid #4CAF50;
+        }
+        .problem-section {
+            background: rgba(255, 152, 0, 0.2);
+            border-radius: 10px;
+            padding: 15px;
+            margin: 15px 0;
+            border-left: 4px solid #ff9800;
+        }
+        .solution-section {
+            background: rgba(33, 150, 243, 0.2);
+            border-radius: 10px;
+            padding: 15px;
+            margin: 15px 0;
+            border-left: 4px solid #2196f3;
+        }
+        .technical-details {
+            background: rgba(255, 193, 7, 0.2);
+            border-radius: 10px;
+            padding: 15px;
+            margin: 15px 0;
+            border-left: 4px solid #ffc107;
+            font-family: 'Courier New', monospace;
+        }
+        .checklist {
+            background: rgba(76, 175, 80, 0.2);
+            border-radius: 10px;
+            padding: 15px;
+            margin: 15px 0;
+            border-left: 4px solid #4CAF50;
+        }
+        .checklist ul {
+            margin: 10px 0;
+            padding-left: 20px;
+        }
+        .checklist li {
+            margin: 5px 0;
+        }
+        .scenario-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin: 20px 0;
+        }
+        .scenario-card {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 15px;
+        }
+        .scenario-card.before {
+            border-left: 4px solid #ff9800;
+        }
+        .scenario-card.after {
+            border-left: 4px solid #4CAF50;
+        }
+        .comparison-table {
+            background: rgba(33, 150, 243, 0.2);
+            border-radius: 10px;
+            padding: 15px;
+            margin: 15px 0;
+            border-left: 4px solid #2196f3;
+        }
+        .comparison-table table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 10px 0;
+        }
+        .comparison-table th,
+        .comparison-table td {
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            padding: 8px;
+            text-align: left;
+        }
+        .comparison-table th {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        .debug-info {
+            background: rgba(156, 39, 176, 0.2);
+            border-radius: 10px;
+            padding: 15px;
+            margin: 15px 0;
+            border-left: 4px solid #9c27b0;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+        }
+        .flow-diagram {
+            background: rgba(76, 175, 80, 0.2);
+            border-radius: 10px;
+            padding: 15px;
+            margin: 15px 0;
+            border-left: 4px solid #4CAF50;
+        }
+        .flow-diagram .flow-step {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 10px;
+            margin: 8px 0;
+            border-left: 3px solid #4CAF50;
+        }
+        .flow-diagram .flow-arrow {
+            text-align: center;
+            font-size: 20px;
+            color: #4CAF50;
+            margin: 5px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔧 語言切換修復測試</h1>
+        
+        <div class="test-section">
+            <h2>🎯 問題描述</h2>
+            <div class="problem-section">
+                <h3>❌ 觀察到的問題</h3>
+                <p>用戶反映兩個主要問題：</p>
+                <ul>
+                    <li><strong>問題1：選項數量異常</strong> - "我在第一題顯示題目時，做切換中英文就會出現8個選項，且四個選項為中文，四個選項為英文"</li>
+                    <li><strong>問題2：按鈕啟用時機錯誤</strong> - "開放中英文切換按鈕是在顯示題目就開放，而不是等選項顯示後才開放，切換後一樣先顯示題目，在顯示選項"</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h2>🔧 解決方案</h2>
+            <div class="solution-section">
+                <h3>✅ 修復方案</h3>
+                <div class="flow-diagram">
+                    <div class="flow-step"><strong>問題1修復：防止8個選項問題</strong></div>
+                    <div class="flow-step">1. 創建新的函數 displayQuestionForLanguageSwitch()</div>
+                    <div class="flow-step">2. 該函數只顯示題目文字，不創建選項</div>
+                    <div class="flow-step">3. 清空選項容器，防止重複選項</div>
+                    <div class="flow-step">4. 在語言切換時使用此函數而非 displayQuestion()</div>
+                    
+                    <div class="flow-arrow">↓</div>
+                    
+                    <div class="flow-step"><strong>問題2修復：正確的按鈕啟用時機</strong></div>
+                    <div class="flow-step">1. 在 displayQuestionWithDelay() 中，顯示題目後立即啟用語言切換按鈕</div>
+                    <div class="flow-step">2. 在 displayQuestionForLanguageSwitch() 中，顯示題目後立即啟用語言切換按鈕</div>
+                    <div class="flow-step">3. 確保語言切換按鈕在題目顯示時就可用</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h2>⚙️ 技術實現詳情</h2>
+            <div class="technical-details">
+<h4>核心修復點：</h4>
+<pre>1. 新增函數 displayQuestionForLanguageSwitch()：
+   - 只顯示題目文字
+   - 清空選項容器（防止重複選項）
+   - 隱藏計時器
+   - 立即啟用語言切換按鈕
+
+2. 修改 displayQuestionWithDelay()：
+   - 在顯示題目文字後立即啟用語言切換按鈕
+   - 確保用戶可以在題目顯示時就進行語言切換
+
+3. 修改 displayCurrentQuestionAfterLanguageSwitch()：
+   - 使用 displayQuestionForLanguageSwitch() 而非 displayQuestion()
+   - 避免創建重複選項</pre>
+
+<h4>關鍵代碼變化：</h4>
+<pre>// 新增函數
+function displayQuestionForLanguageSwitch() {
+  // 顯示題目文字
+  document.getElementById('question-text').textContent = 
+    `${currentQuestionIndex + 1}. ${question.question}`;
+  
+  // 清空選項容器（防止重複選項）
+  const optionsContainer = document.getElementById('options');
+  optionsContainer.innerHTML = '';
+  
+  // 立即啟用語言切換按鈕
+  const languageSwitcher = document.querySelector('.language-switcher');
+  if (languageSwitcher) {
+    languageSwitcher.style.pointerEvents = 'auto';
+    languageSwitcher.style.opacity = '1';
+    languageSwitcher.style.cursor = 'pointer';
+  }
+}
+
+// 修改 displayQuestionWithDelay()
+// 在顯示題目後立即啟用語言切換按鈕
+const languageSwitcher = document.querySelector('.language-switcher');
+if (languageSwitcher) {
+  languageSwitcher.style.pointerEvents = 'auto';
+  languageSwitcher.style.opacity = '1';
+  languageSwitcher.style.cursor = 'pointer';
+}</pre>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h2>📊 修復前後對比</h2>
+            <div class="scenario-grid">
+                <div class="scenario-card before">
+                    <h4>❌ 修復前</h4>
+                    <p><strong>問題1：8個選項問題</strong></p>
+                    <ol>
+                        <li>顯示第1題題目</li>
+                        <li>用戶點擊語言切換</li>
+                        <li>調用 displayQuestion()</li>
+                        <li>創建新選項但不清空舊選項</li>
+                        <li>結果：8個選項（4個中文+4個英文）❌</li>
+                    </ol>
+                    <p><strong>問題2：按鈕啟用時機錯誤</strong></p>
+                    <ol>
+                        <li>顯示題目文字</li>
+                        <li>語言切換按鈕仍然禁用</li>
+                        <li>用戶無法立即切換語言</li>
+                        <li>需要等待選項顯示後才能切換 ❌</li>
+                    </ol>
+                </div>
+                
+                <div class="scenario-card after">
+                    <h4>✅ 修復後</h4>
+                    <p><strong>修復1：正確選項數量</strong></p>
+                    <ol>
+                        <li>顯示第1題題目</li>
+                        <li>用戶點擊語言切換</li>
+                        <li>調用 displayQuestionForLanguageSwitch()</li>
+                        <li>清空選項容器，只顯示題目文字</li>
+                        <li>結果：正確的4個選項 ✅</li>
+                    </ol>
+                    <p><strong>修復2：正確的按鈕啟用時機</strong></p>
+                    <ol>
+                        <li>顯示題目文字</li>
+                        <li>立即啟用語言切換按鈕</li>
+                        <li>用戶可以立即切換語言</li>
+                        <li>切換後先顯示題目，再顯示選項 ✅</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h2>📊 詳細對比表</h2>
+            <div class="comparison-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>問題</th>
+                            <th>修復前</th>
+                            <th>修復後</th>
+                            <th>狀態</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>選項數量</strong></td>
+                            <td>❌ 語言切換時出現8個選項</td>
+                            <td>✅ 始終保持正確的4個選項</td>
+                            <td>🔧 已修復</td>
+                        </tr>
+                        <tr>
+                            <td><strong>選項語言</strong></td>
+                            <td>❌ 4個中文+4個英文混合</td>
+                            <td>✅ 統一使用新語言版本</td>
+                            <td>🔧 已修復</td>
+                        </tr>
+                        <tr>
+                            <td><strong>語言切換按鈕時機</strong></td>
+                            <td>❌ 等選項顯示後才啟用</td>
+                            <td>✅ 顯示題目時就啟用</td>
+                            <td>🔧 已修復</td>
+                        </tr>
+                        <tr>
+                            <td><strong>切換後顯示流程</strong></td>
+                            <td>❌ 直接顯示選項</td>
+                            <td>✅ 先顯示題目，再顯示選項</td>
+                            <td>🔧 已修復</td>
+                        </tr>
+                        <tr>
+                            <td><strong>用戶體驗</strong></td>
+                            <td>❌ 混亂的選項顯示</td>
+                            <td>✅ 清晰的題目顯示流程</td>
+                            <td>🔧 已修復</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h2>🧪 測試步驟</h2>
+            <div class="checklist">
+                <h3>📋 詳細測試流程</h3>
+                <ol>
+                    <li><strong>準備測試環境</strong>
+                        <ul>
+                            <li>前往筆試測驗頁面</li>
+                            <li>開啟開發者工具 Console 標籤</li>
+                            <li>清空 Console 歷史記錄</li>
+                        </ul>
+                    </li>
+                    
+                    <li><strong>測試選項數量修復</strong>
+                        <ul>
+                            <li>開始測驗</li>
+                            <li>在第1題顯示題目時立即點擊語言切換按鈕</li>
+                            <li>觀察選項數量是否正確（應該是4個，不是8個）</li>
+                            <li>確認選項語言統一（都是中文或都是英文）</li>
+                        </ul>
+                    </li>
+                    
+                    <li><strong>測試按鈕啟用時機修復</strong>
+                        <ul>
+                            <li>開始測驗</li>
+                            <li>觀察題目文字顯示後，語言切換按鈕是否立即可用</li>
+                            <li>在選項顯示前嘗試點擊語言切換按鈕</li>
+                            <li>確認可以成功切換語言</li>
+                            <li>確認切換後先顯示題目文字，再顯示選項</li>
+                        </ul>
+                    </li>
+                    
+                    <li><strong>測試完整流程</strong>
+                        <ul>
+                            <li>重複測試多個題目的語言切換</li>
+                            <li>確認每次都能正確顯示4個選項</li>
+                            <li>確認語言切換按鈕在題目顯示時就可用</li>
+                            <li>確認切換後的顯示流程正確</li>
+                        </ul>
+                    </li>
+                </ol>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h2>🎯 快速測試</h2>
+            <button class="button" onclick="goToQuiz()">🧪 前往筆試測驗</button>
+            <button class="button" onclick="testOptionsCount()">🔢 測試選項數量</button>
+            <button class="button" onclick="testButtonTiming()">⏰ 測試按鈕時機</button>
+            <button class="button" onclick="testCompleteFlow()">🔄 測試完整流程</button>
+        </div>
+
+        <div class="status" id="status">
+            <strong>測試狀態：</strong>等待測試...
+        </div>
+
+        <div class="test-section">
+            <h2>🔍 預期調試信息</h2>
+            <div class="debug-info">
+<h4>語言切換時應該看到的調試信息：</h4>
+<pre>// 語言切換時（未作答情況）
+Current question not answered, continuing with current question in new language
+displayCurrentQuestionAfterLanguageSwitch: currentQuestionIndex = 0
+Loading question file: data/questions_en.json
+Updated entire selectedQuestions array with new language
+displayQuestionForLanguageSwitch: showing question 1: What should you do first when someone is found collapsed?
+displayQuestionForLanguageSwitch: question displayed, language switcher enabled</pre>
+
+<h4>關鍵調試信息：</h4>
+<pre>✅ "displayQuestionForLanguageSwitch: showing question 1" - 確認使用新函數
+✅ "displayQuestionForLanguageSwitch: question displayed, language switcher enabled" - 確認語言切換按鈕已啟用
+✅ 不會看到重複的選項創建信息
+✅ 選項容器被正確清空</pre>
+
+<h4>不應該看到的（修復前會出現）：</h4>
+<pre>❌ 8個選項的創建信息
+❌ 混合語言的選項
+❌ 語言切換按鈕延遲啟用的信息</pre>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h2>📊 預期結果</h2>
+            <div class="checklist">
+                <h3>✅ 修復後應該正常工作的功能</h3>
+                <ul>
+                    <li><strong>正確選項數量</strong>：語言切換時始終顯示4個選項</li>
+                    <li><strong>統一語言</strong>：所有選項使用相同的語言版本</li>
+                    <li><strong>按鈕時機</strong>：語言切換按鈕在題目顯示時就可用</li>
+                    <li><strong>顯示流程</strong>：切換後先顯示題目，再顯示選項</li>
+                    <li><strong>用戶體驗</strong>：清晰的語言切換體驗</li>
+                </ul>
+                
+                <h3>🎯 測試重點</h3>
+                <ul>
+                    <li><strong>選項數量</strong>：確認不會出現8個選項</li>
+                    <li><strong>語言一致性</strong>：確認選項語言統一</li>
+                    <li><strong>按鈕可用性</strong>：確認語言切換按鈕及時啟用</li>
+                    <li><strong>顯示順序</strong>：確認先顯示題目，再顯示選項</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function goToQuiz() {
+            window.location.href = 'exam_quiz.html';
+        }
+
+        function testOptionsCount() {
+            const status = document.getElementById('status');
+            status.innerHTML = '<strong>測試狀態：</strong>🔢 選項數量測試：請前往測驗頁面，在第1題顯示題目時立即點擊語言切換按鈕，確認選項數量正確（4個，不是8個）且語言統一';
+            status.className = 'status';
+        }
+
+        function testButtonTiming() {
+            const status = document.getElementById('status');
+            status.innerHTML = '<strong>測試狀態：</strong>⏰ 按鈕時機測試：請觀察題目文字顯示後，語言切換按鈕是否立即可用，在選項顯示前嘗試點擊語言切換按鈕';
+            status.className = 'status';
+        }
+
+        function testCompleteFlow() {
+            const status = document.getElementById('status');
+            status.innerHTML = '<strong>測試狀態：</strong>🔄 完整流程測試：請重複測試多個題目的語言切換，確認每次都能正確顯示4個選項，語言切換按鈕及時啟用，切換後先顯示題目再顯示選項';
+            status.className = 'status';
+        }
+
+        // 頁面載入時顯示狀態
+        document.addEventListener('DOMContentLoaded', function() {
+            const status = document.getElementById('status');
+            status.innerHTML = '<strong>測試狀態：</strong>✅ 語言切換修復測試頁面已載入，請按照測試步驟進行測試';
+            status.className = 'status';
+        });
+    </script>
+</body>
+</html>

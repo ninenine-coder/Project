@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>選項數量調試測試</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: white;
+        }
+        .container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #fff;
+        }
+        .test-section {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        .button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            cursor: pointer;
+            margin: 10px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+        .button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        }
+        .status {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 15px;
+            margin: 15px 0;
+            border-left: 4px solid #4CAF50;
+        }
+        .problem-section {
+            background: rgba(255, 152, 0, 0.2);
+            border-radius: 10px;
+            padding: 15px;
+            margin: 15px 0;
+            border-left: 4px solid #ff9800;
+        }
+        .solution-section {
+            background: rgba(33, 150, 243, 0.2);
+            border-radius: 10px;
+            padding: 15px;
+            margin: 15px 0;
+            border-left: 4px solid #2196f3;
+        }
+        .technical-details {
+            background: rgba(255, 193, 7, 0.2);
+            border-radius: 10px;
+            padding: 15px;
+            margin: 15px 0;
+            border-left: 4px solid #ffc107;
+            font-family: 'Courier New', monospace;
+        }
+        .checklist {
+            background: rgba(76, 175, 80, 0.2);
+            border-radius: 10px;
+            padding: 15px;
+            margin: 15px 0;
+            border-left: 4px solid #4CAF50;
+        }
+        .checklist ul {
+            margin: 10px 0;
+            padding-left: 20px;
+        }
+        .checklist li {
+            margin: 5px 0;
+        }
+        .debug-info {
+            background: rgba(156, 39, 176, 0.2);
+            border-radius: 10px;
+            padding: 15px;
+            margin: 15px 0;
+            border-left: 4px solid #9c27b0;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+        }
+        .comparison-table {
+            background: rgba(33, 150, 243, 0.2);
+            border-radius: 10px;
+            padding: 15px;
+            margin: 15px 0;
+            border-left: 4px solid #2196f3;
+        }
+        .comparison-table table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 10px 0;
+        }
+        .comparison-table th,
+        .comparison-table td {
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            padding: 8px;
+            text-align: left;
+        }
+        .comparison-table th {
+            background: rgba(255, 255, 255, 0.2);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔍 選項數量調試測試</h1>
+        
+        <div class="test-section">
+            <h2>🎯 問題描述</h2>
+            <div class="problem-section">
+                <h3>❌ 觀察到的問題</h3>
+                <p>用戶反映：<strong>"為什麼題目會出現8個選項"</strong></p>
+                <ul>
+                    <li>✅ 正常情況下，PBLS測驗應該是4個選項（A、B、C、D）</li>
+                    <li>❌ 但某些情況下會出現8個選項</li>
+                    <li>❌ 這可能導致用戶困惑和答題困難</li>
+                </ul>
+                <p><strong>可能原因：</strong></p>
+                <ul>
+                    <li>語言切換過程中選項被重複或合併</li>
+                    <li>題目文件格式問題</li>
+                    <li>JavaScript邏輯錯誤導致選項數組異常</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h2>🔧 調試方案</h2>
+            <div class="solution-section">
+                <h3>✅ 已添加的調試功能</h3>
+                <div class="technical-details">
+<h4>1. 在 displayQuestion() 函數中添加調試信息：</h4>
+<pre>console.log('Original options count:', question.options.length);
+console.log('Original options:', question.options);
+console.log('Shuffled options count:', question.shuffledOptions.length);
+console.log('Shuffled options:', question.shuffledOptions);</pre>
+
+<h4>2. 在語言切換函數中添加調試信息：</h4>
+<pre>console.log('New question options count:', newQuestion.options.length);
+console.log('New question options:', newQuestion.options);</pre>
+
+<h4>3. 修復選項標籤顯示問題：</h4>
+<pre>// 支持更多選項的標籤
+const optionLabels = ['A)', 'B)', 'C)', 'D)', 'E)', 'F)', 'G)', 'H)'];
+const label = optionLabels[index] || `${String.fromCharCode(65 + index)})`;</pre>
+                </div>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h2>📊 可能的原因分析</h2>
+            <div class="comparison-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>可能原因</th>
+                            <th>描述</th>
+                            <th>調試方法</th>
+                            <th>狀態</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>語言切換問題</strong></td>
+                            <td>在語言切換過程中，選項被重複或合併</td>
+                            <td>檢查 Console 中的語言切換調試信息</td>
+                            <td>🔍 待確認</td>
+                        </tr>
+                        <tr>
+                            <td><strong>題目文件問題</strong></td>
+                            <td>questions.json 或 questions_en.json 中有異常題目</td>
+                            <td>檢查題目文件格式和內容</td>
+                            <td>🔍 待確認</td>
+                        </tr>
+                        <tr>
+                            <td><strong>數組操作問題</strong></td>
+                            <td>JavaScript 數組操作導致選項重複</td>
+                            <td>檢查 selectedQuestions 數組內容</td>
+                            <td>🔍 待確認</td>
+                        </tr>
+                        <tr>
+                            <td><strong>隨機化問題</strong></td>
+                            <td>shuffleOptions 函數有問題</td>
+                            <td>檢查隨機化後的選項數量</td>
+                            <td>🔍 待確認</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h2>🧪 調試步驟</h2>
+            <div class="checklist">
+                <h3>📋 詳細調試流程</h3>
+                <ol>
+                    <li><strong>準備調試環境</strong>
+                        <ul>
+                            <li>前往筆試測驗頁面</li>
+                            <li>開啟開發者工具 Console 標籤</li>
+                            <li>清空 Console 歷史記錄</li>
+                        </ul>
+                    </li>
+                    
+                    <li><strong>測試正常情況</strong>
+                        <ul>
+                            <li>開始測驗（不進行語言切換）</li>
+                            <li>檢查第1題的選項數量</li>
+                            <li>在 Console 中查看調試信息</li>
+                            <li>確認選項數量是否為4個</li>
+                        </ul>
+                    </li>
+                    
+                    <li><strong>測試語言切換情況</strong>
+                        <ul>
+                            <li>開始測驗後立即切換語言</li>
+                            <li>檢查切換後的選項數量</li>
+                            <li>在 Console 中查看語言切換調試信息</li>
+                            <li>確認選項數量是否異常</li>
+                        </ul>
+                    </li>
+                    
+                    <li><strong>檢查題目文件</strong>
+                        <ul>
+                            <li>在 Console 中輸入：<code>fetch('data/questions.json').then(r => r.json()).then(console.log)</code></li>
+                            <li>檢查第1題的選項數量</li>
+                            <li>在 Console 中輸入：<code>fetch('data/questions_en.json').then(r => r.json()).then(console.log)</code></li>
+                            <li>檢查第1題的選項數量</li>
+                        </ul>
+                    </li>
+                    
+                    <li><strong>檢查數組狀態</strong>
+                        <ul>
+                            <li>在測驗進行中，在 Console 中輸入：<code>window.getSelectedQuestions()</code></li>
+                            <li>檢查返回的題目數組</li>
+                            <li>檢查每個題目的選項數量</li>
+                        </ul>
+                    </li>
+                </ol>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h2>🎯 快速調試</h2>
+            <button class="button" onclick="goToQuiz()">🧪 前往筆試測驗</button>
+            <button class="button" onclick="testNormalOptions()">🔍 測試正常選項</button>
+            <button class="button" onclick="testLanguageSwitchOptions()">🔄 測試語言切換選項</button>
+            <button class="button" onclick="checkQuestionFiles()">📄 檢查題目文件</button>
+        </div>
+
+        <div class="status" id="status">
+            <strong>調試狀態：</strong>等待調試...
+        </div>
+
+        <div class="test-section">
+            <h2>🔍 預期調試信息</h2>
+            <div class="debug-info">
+<h4>正常情況下應該看到的調試信息：</h4>
+<pre>// 正常顯示題目時
+displayQuestion: showing question 1: 在進行CPR時，正確的按壓深度應該是？
+Original options count: 4
+Original options: ["至少5公分", "至少3公分", "至少7公分", "至少10公分"]
+Shuffled options count: 4
+Shuffled options: ["至少7公分", "至少5公分", "至少3公分", "至少10公分"]
+displayQuestion: created 4 options</pre>
+
+<h4>語言切換時應該看到的調試信息：</h4>
+<pre>// 語言切換時
+Updating question 1 with new language version
+New question options count: 4
+New question options: ["At least 5 cm", "At least 3 cm", "At least 7 cm", "At least 10 cm"]
+Updated entire selectedQuestions array with new language
+Current question: What is the correct compression depth during CPR?
+Current question options count: 4</pre>
+
+<h4>如果出現8個選項，可能看到的異常信息：</h4>
+<pre>// 異常情況
+Original options count: 8
+Original options: ["至少5公分", "至少3公分", "至少7公分", "至少10公分", "At least 5 cm", "At least 3 cm", "At least 7 cm", "At least 10 cm"]
+// 或者
+New question options count: 8
+// 這表示選項被重複或合併了</pre>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h2>📊 預期結果</h2>
+            <div class="checklist">
+                <h3>✅ 正常情況下應該看到</h3>
+                <ul>
+                    <li><strong>選項數量</strong>：每個題目都應該有4個選項</li>
+                    <li><strong>選項標籤</strong>：A)、B)、C)、D)</li>
+                    <li><strong>調試信息</strong>：Original options count: 4, Shuffled options count: 4</li>
+                    <li><strong>功能正常</strong>：可以正常選擇和回答題目</li>
+                </ul>
+                
+                <h3>🎯 如果發現異常</h3>
+                <ul>
+                    <li><strong>記錄異常信息</strong>：記錄 Console 中的異常調試信息</li>
+                    <li><strong>檢查觸發條件</strong>：確認是在什麼情況下出現8個選項</li>
+                    <li><strong>檢查題目文件</strong>：確認題目文件格式是否正確</li>
+                    <li><strong>檢查數組狀態</strong>：確認 selectedQuestions 數組是否正常</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function goToQuiz() {
+            window.location.href = 'exam_quiz.html';
+        }
+
+        function testNormalOptions() {
+            const status = document.getElementById('status');
+            status.innerHTML = '<strong>調試狀態：</strong>🔍 正常選項測試：請前往測驗頁面，開始測驗後不進行語言切換，檢查第1題是否顯示4個選項，並查看 Console 中的調試信息';
+            status.className = 'status';
+        }
+
+        function testLanguageSwitchOptions() {
+            const status = document.getElementById('status');
+            status.innerHTML = '<strong>調試狀態：</strong>🔄 語言切換選項測試：請開始測驗後立即切換語言，檢查是否出現8個選項，並查看 Console 中的語言切換調試信息';
+            status.className = 'status';
+        }
+
+        function checkQuestionFiles() {
+            const status = document.getElementById('status');
+            status.innerHTML = '<strong>調試狀態：</strong>📄 題目文件檢查：請在 Console 中輸入 fetch("data/questions.json").then(r => r.json()).then(console.log) 來檢查題目文件格式';
+            status.className = 'status';
+        }
+
+        // 頁面載入時顯示狀態
+        document.addEventListener('DOMContentLoaded', function() {
+            const status = document.getElementById('status');
+            status.innerHTML = '<strong>調試狀態：</strong>✅ 選項數量調試測試頁面已載入，請按照調試步驟進行測試';
+            status.className = 'status';
+        });
+    </script>
+</body>
+</html>
