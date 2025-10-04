@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>頁面跳轉時間連續性測試</title>
+    <style>
+        body {
+            font-family: 'Microsoft JhengHei', sans-serif;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .time-display {
+            font-size: 36px;
+            font-weight: bold;
+            color: #2196F3;
+            text-align: center;
+            margin: 20px 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 15px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+        .navigation-buttons {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        .nav-button {
+            background: #2196F3;
+            color: white;
+            border: none;
+            padding: 15px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            text-align: center;
+        }
+        .nav-button:hover {
+            background: #1976D2;
+            transform: translateY(-2px);
+        }
+        .nav-button.success {
+            background: #28a745;
+        }
+        .nav-button.success:hover {
+            background: #218838;
+        }
+        .nav-button.warning {
+            background: #ffc107;
+            color: #212529;
+        }
+        .nav-button.warning:hover {
+            background: #e0a800;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        .stat-card {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            border: 1px solid #e9ecef;
+        }
+        .stat-value {
+            font-size: 20px;
+            font-weight: bold;
+            color: #2196F3;
+        }
+        .stat-label {
+            font-size: 12px;
+            color: #666;
+            margin-top: 5px;
+        }
+        .log {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            font-family: monospace;
+            font-size: 12px;
+            max-height: 400px;
+            overflow-y: auto;
+            border: 1px solid #e9ecef;
+        }
+        .instructions {
+            background: #e3f2fd;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #2196F3;
+            margin: 20px 0;
+        }
+        .current-page {
+            background: #fff3cd;
+            padding: 10px;
+            border-radius: 5px;
+            text-align: center;
+            font-weight: bold;
+            color: #856404;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔄 頁面跳轉時間連續性測試</h1>
+        
+        <div class="current-page" id="currentPage">當前頁面: 測試頁面</div>
+        
+        <div class="instructions">
+            <h3>📋 測試說明</h3>
+            <p>此測試用於驗證頁面跳轉時的時間連續性：</p>
+            <ul>
+                <li>✅ 在網站內跳轉頁面時，時間應該繼續累積</li>
+                <li>✅ 不應該回到跳轉前的時間</li>
+                <li>✅ 會話時間應該保持連續</li>
+                <li>✅ 只有離開網站（切換標籤頁或應用程式）時才停止計時</li>
+            </ul>
+        </div>
+
+        <div class="time-display" id="currentTime">0:00:00</div>
+        
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-value" id="firebaseTime">0</div>
+                <div class="stat-label">Firebase時間 (秒)</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="sessionTime">0</div>
+                <div class="stat-label">會話時間 (秒)</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="totalTime">0</div>
+                <div class="stat-label">總時間 (秒)</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="pageLoads">0</div>
+                <div class="stat-label">頁面載入次數</div>
+            </div>
+        </div>
+
+        <div class="navigation-buttons">
+            <a href="history.html" class="nav-button">📊 歷史成績</a>
+            <a href="index.html" class="nav-button">🏠 首頁</a>
+            <a href="info.html" class="nav-button">ℹ️ 資訊頁面</a>
+            <a href="login.html" class="nav-button warning">🔐 登入頁面</a>
+            <button class="nav-button success" onclick="reloadPage()">🔄 重新載入當前頁面</button>
+            <button class="nav-button" onclick="clearLog()">🗑️ 清除日誌</button>
+        </div>
+
+        <div class="log" id="testLog"></div>
+    </div>
+
+    <!-- 載入學習時間時鐘服務 -->
+    <script src="./src/services/learningTimeClockService.js"></script>
+
+    <script>
+        let pageLoadCount = 0;
+
+        // 測試日誌
+        function log(message, type = 'info') {
+            const logDiv = document.getElementById('testLog');
+            const timestamp = new Date().toLocaleTimeString();
+            const logEntry = document.createElement('div');
+            logEntry.style.color = type === 'error' ? 'red' : type === 'success' ? 'green' : type === 'warning' ? 'orange' : 'black';
+            logEntry.textContent = `[${timestamp}] ${message}`;
+            logDiv.appendChild(logEntry);
+            logDiv.scrollTop = logDiv.scrollHeight;
+            console.log(`[測試] ${message}`);
+        }
+
+        function clearLog() {
+            document.getElementById('testLog').innerHTML = '';
+        }
+
+        function reloadPage() {
+            log('🔄 重新載入頁面...', 'info');
+            setTimeout(() => {
+                window.location.reload();
+            }, 1000);
+        }
+
+        // 更新統計顯示
+        function updateStats(event) {
+            if (event && event.detail) {
+                document.getElementById('firebaseTime').textContent = event.detail.firebaseTime || 0;
+                document.getElementById('sessionTime').textContent = event.detail.sessionTime || 0;
+                document.getElementById('totalTime').textContent = event.detail.totalSeconds || 0;
+            }
+        }
+
+        // 檢查會話資料
+        function checkSessionData() {
+            const userData = JSON.parse(localStorage.getItem('pbls_user') || 'null');
+            if (userData && userData.uid) {
+                const sessionKey = `pbls_session_${userData.uid}`;
+                const sessionData = localStorage.getItem(sessionKey);
+                
+                if (sessionData) {
+                    try {
+                        const session = JSON.parse(sessionData);
+                        const now = Date.now();
+                        const sessionDuration = Math.floor((now - session.sessionStartTime) / 1000);
+                        log(`📊 會話資料 - 開始時間: ${new Date(session.sessionStartTime).toLocaleTimeString()}, 持續時間: ${sessionDuration}秒`, 'info');
+                    } catch (error) {
+                        log(`❌ 解析會話資料失敗: ${error.message}`, 'error');
+                    }
+                } else {
+                    log('⚠️ 沒有找到會話資料', 'warning');
+                }
+            }
+        }
+
+        // 監聽學習時間更新事件
+        window.addEventListener('learningTimeUpdate', (event) => {
+            // 更新時間顯示
+            const timeElement = document.getElementById('currentTime');
+            if (timeElement && event.detail.formattedTime) {
+                timeElement.textContent = event.detail.formattedTime;
+            }
+            
+            // 更新統計
+            updateStats(event);
+            
+            // 每30秒記錄一次詳細資訊
+            if (event.detail.sessionTime % 30 === 0 && event.detail.sessionTime > 0) {
+                log(`📊 時間統計 - 總時間: ${event.detail.formattedTime}, 會話時間: ${event.detail.sessionTime}秒, Firebase: ${event.detail.firebaseTime}秒`);
+            }
+        });
+
+        // 頁面載入時初始化
+        document.addEventListener('DOMContentLoaded', () => {
+            pageLoadCount++;
+            document.getElementById('pageLoads').textContent = pageLoadCount;
+            
+            log(`📱 頁面載入 #${pageLoadCount} - 測試頁面`, 'info');
+            log('💡 點擊上方按鈕測試頁面跳轉時的時間連續性', 'info');
+            
+            // 檢查會話資料
+            checkSessionData();
+            
+            // 自動啟動時鐘
+            setTimeout(() => {
+                const service = window.learningTimeClockService;
+                if (service) {
+                    service.initialize().then(() => {
+                        log('🚀 時鐘服務已啟動', 'success');
+                    });
+                } else {
+                    log('❌ 時鐘服務未載入', 'error');
+                }
+            }, 1000);
+        });
+
+        // 頁面離開時記錄
+        window.addEventListener('beforeunload', () => {
+            log('🚪 頁面即將離開', 'info');
+        });
+
+        // 頁面顯示時記錄
+        window.addEventListener('pageshow', (event) => {
+            if (event.persisted) {
+                log('📄 從快取恢復頁面', 'info');
+            } else {
+                log('📄 正常載入頁面', 'info');
+            }
+        });
+    </script>
+</body>
+</html>

@@ -7,8 +7,8 @@
     <style>
         body {
             font-family: 'Microsoft JhengHei', sans-serif;
-            max-width: 600px;
-            margin: 50px auto;
+            max-width: 800px;
+            margin: 0 auto;
             padding: 20px;
             background: #f5f5f5;
         }
@@ -18,191 +18,267 @@
             border-radius: 10px;
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
         }
-        .test-section {
-            background: #f8f9fa;
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
             padding: 20px;
-            margin: 15px 0;
-            border-radius: 8px;
-            border-left: 4px solid #667eea;
-        }
-        .btn {
-            background: #667eea;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
-            padding: 10px 20px;
+            border-radius: 10px;
+        }
+        .user-info {
+            background: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 14px;
+            color: #333;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+        .logout-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #e74c3c;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+        .logout-btn:hover {
+            transform: scale(1.1);
+        }
+        .controls {
+            text-align: center;
+            margin: 20px 0;
+        }
+        .button {
+            background: #2196F3;
+            color: white;
             border: none;
-            border-radius: 5px;
+            padding: 12px 24px;
+            border-radius: 8px;
             cursor: pointer;
             margin: 5px;
+            font-size: 16px;
+            transition: all 0.3s ease;
         }
-        .btn:hover {
-            background: #5a6fd8;
+        .button:hover {
+            background: #1976D2;
+            transform: translateY(-2px);
         }
-        .btn-danger {
+        .button.danger {
             background: #dc3545;
         }
-        .btn-danger:hover {
+        .button.danger:hover {
             background: #c82333;
         }
-        .status {
-            padding: 10px;
-            border-radius: 5px;
-            margin: 10px 0;
+        .button.success {
+            background: #28a745;
         }
-        .status.success {
-            background: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
-        }
-        .status.error {
-            background: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
+        .button.success:hover {
+            background: #218838;
         }
         .log {
-            background: #f1f1f1;
+            background: #f8f9fa;
             padding: 15px;
             border-radius: 5px;
             font-family: monospace;
             font-size: 12px;
-            max-height: 200px;
+            max-height: 300px;
             overflow-y: auto;
+            border: 1px solid #e9ecef;
+        }
+        .instructions {
+            background: #e3f2fd;
+            padding: 20px;
+            border-radius: 8px;
+            border-left: 4px solid #2196F3;
+            margin: 20px 0;
+        }
+        .status {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            border-left: 4px solid #28a745;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>登出功能測試</h1>
-        
-        <div class="test-section">
-            <h3>測試登出功能</h3>
-            <p>點擊下面的按鈕測試登出功能：</p>
-            <button class="btn btn-danger" onclick="testLogout()">測試登出</button>
-            <button class="btn" onclick="simulateUser()">模擬用戶登入</button>
-            <button class="btn" onclick="clearLog()">清除日誌</button>
-        </div>
-
-        <div class="test-section">
-            <h3>當前狀態</h3>
-            <div class="status" id="userStatus">
-                <strong>用戶狀態:</strong> <span id="userStatusText">檢查中...</span>
+        <div class="header">
+            <h1>🚪 登出功能測試</h1>
+            <div class="user-info" id="user-info-display">載入中...</div>
+            <div class="logout-btn" onclick="logout()">
+                <i class="fas fa-sign-out-alt"></i>
             </div>
         </div>
-
-        <div class="test-section">
-            <h3>操作日誌</h3>
-            <div id="log" class="log"></div>
+        
+        <div class="instructions">
+            <h3>📋 測試說明</h3>
+            <p>此頁面用於測試登出功能是否正常工作：</p>
+            <ul>
+                <li>✅ 點擊右上角的登出按鈕測試登出功能</li>
+                <li>✅ 檢查學習時間是否正確保存到Firebase</li>
+                <li>✅ 檢查本地存儲是否正確清除</li>
+                <li>✅ 檢查是否正確跳轉到登入頁面</li>
+            </ul>
         </div>
+
+        <div class="status" id="logoutStatus">
+            <strong>登出狀態：</strong> <span id="statusText">準備測試</span>
+        </div>
+
+        <div class="controls">
+            <button class="button success" onclick="testLogout()">🚪 測試登出</button>
+            <button class="button" onclick="checkUserStatus()">👤 檢查用戶狀態</button>
+            <button class="button" onclick="simulateLogin()">🔐 模擬登入</button>
+            <button class="button danger" onclick="clearLog()">🗑️ 清除日誌</button>
+        </div>
+
+        <div class="log" id="testLog"></div>
     </div>
 
-    <!-- 學習時間時鐘服務 -->
-    <script type="module" src="src/services/learningTimeClockService.js"></script>
-    
+    <!-- 載入學習時間服務 -->
+    <script src="./src/services/learningTimeService.js"></script>
+
     <script>
-        // 日誌功能
-        function addLog(message, type = 'info') {
-            const log = document.getElementById('log');
+        // 測試日誌
+        function log(message, type = 'info') {
+            const logDiv = document.getElementById('testLog');
             const timestamp = new Date().toLocaleTimeString();
-            log.innerHTML += `[${timestamp}] ${message}\n`;
-            log.scrollTop = log.scrollHeight;
+            const logEntry = document.createElement('div');
+            logEntry.style.color = type === 'error' ? 'red' : type === 'success' ? 'green' : type === 'warning' ? 'orange' : 'black';
+            logEntry.textContent = `[${timestamp}] ${message}`;
+            logDiv.appendChild(logEntry);
+            logDiv.scrollTop = logDiv.scrollHeight;
+            console.log(`[測試] ${message}`);
         }
 
         function clearLog() {
-            document.getElementById('log').innerHTML = '';
+            document.getElementById('testLog').innerHTML = '';
         }
 
-        // 更新用戶狀態
-        function updateUserStatus() {
-            const user = JSON.parse(localStorage.getItem('pbls_user') || 'null');
-            const statusElement = document.getElementById('userStatus');
-            const statusTextElement = document.getElementById('userStatusText');
+        // 更新狀態顯示
+        function updateStatus(message, type = 'info') {
+            const statusText = document.getElementById('statusText');
+            statusText.textContent = message;
+            statusText.style.color = type === 'error' ? 'red' : type === 'success' ? 'green' : type === 'warning' ? 'orange' : 'black';
+        }
+
+        // 更新用戶資訊顯示
+        function updateUserInfo() {
+            const userData = JSON.parse(localStorage.getItem('pbls_user') || '{}');
+            const userInfoDisplay = document.getElementById('user-info-display');
             
-            if (user && user.uid) {
-                statusElement.className = 'status success';
-                statusTextElement.textContent = `已登入 - ${user.name || user.displayName || '未知用戶'}`;
-                addLog('用戶已登入', 'success');
+            if (userData.uid) {
+                userInfoDisplay.textContent = `${userData.name || '用戶'} (${userData.uid})`;
+                updateStatus('用戶已登入', 'success');
             } else {
-                statusElement.className = 'status error';
-                statusTextElement.textContent = '未登入';
-                addLog('用戶未登入', 'error');
+                userInfoDisplay.textContent = '未登入';
+                updateStatus('用戶未登入', 'warning');
             }
         }
 
-        // 模擬用戶登入
-        function simulateUser() {
-            const mockUser = {
-                uid: 'test-user-' + Date.now(),
-                name: '測試用戶',
-                displayName: '測試用戶',
-                email: 'test@example.com',
-                where: '長庚大學',
-                department: '護理學系'
-            };
+        // 檢查用戶狀態
+        function checkUserStatus() {
+            const userData = JSON.parse(localStorage.getItem('pbls_user') || '{}');
+            const sessionStartTime = localStorage.getItem('sessionStartTime');
             
-            localStorage.setItem('pbls_user', JSON.stringify(mockUser));
-            updateUserStatus();
-            addLog('模擬用戶登入完成', 'success');
+            log('🔍 檢查用戶狀態...', 'info');
+            log(`用戶ID: ${userData.uid || '未登入'}`, 'info');
+            log(`用戶姓名: ${userData.name || 'N/A'}`, 'info');
+            log(`會話開始時間: ${sessionStartTime || '未記錄'}`, 'info');
+            
+            if (userData.uid) {
+                log('✅ 用戶已登入', 'success');
+            } else {
+                log('⚠️ 用戶未登入', 'warning');
+            }
         }
 
-        // 處理登出（用於HTML onclick）
-        function handleLogout() {
+        // 模擬登入
+        function simulateLogin() {
+            const mockUserData = {
+                uid: 'test-user-123',
+                name: '測試用戶',
+                email: 'test@example.com'
+            };
+            
+            localStorage.setItem('pbls_user', JSON.stringify(mockUserData));
+            localStorage.setItem('sessionStartTime', new Date().toISOString());
+            
+            log('🔐 模擬登入完成', 'success');
+            updateUserInfo();
+        }
+
+        // 測試登出
+        function testLogout() {
+            log('🚪 開始測試登出功能...', 'info');
+            updateStatus('正在測試登出...', 'info');
+            
+            // 調用登出函數
             logout();
         }
 
-        // 登出功能
+        // 登出功能（與其他頁面一致）
         async function logout() {
             if (confirm('確定要登出嗎？')) {
                 try {
-                    addLog('開始登出流程...', 'info');
+                    log('🚪 用戶確認登出', 'info');
+                    updateStatus('正在保存學習時間...', 'info');
                     
                     // 保存學習時間到Firebase
-                    if (window.learningTimeClockService) {
-                        await window.learningTimeClockService.saveTimeToFirebase();
-                        window.learningTimeClockService.stop();
-                        addLog('學習時間已保存', 'success');
+                    if (window.learningTimeService && window.learningTimeService.isInitialized) {
+                        log('正在保存學習時間...', 'info');
+                        await window.learningTimeService.handleLogout();
+                        log('✅ 學習時間已保存', 'success');
+                    } else {
+                        log('⚠️ 學習時間服務未初始化，跳過保存', 'warning');
                     }
                     
                     // 清除本地儲存
                     localStorage.removeItem('pbls_user');
                     localStorage.removeItem('pbls_user_profile');
+                    localStorage.removeItem('sessionStartTime');
                     
-                    addLog('本地資料已清除', 'success');
-                    addLog('用戶已登出', 'success');
+                    log('✅ 本地存儲已清除', 'success');
+                    updateStatus('登出成功', 'success');
                     
-                    // 更新狀態
-                    updateUserStatus();
+                    log('🔄 準備跳轉到登入頁面...', 'info');
                     
                     // 跳轉到登入頁面
                     setTimeout(() => {
                         window.location.href = 'login.html';
-                    }, 1000);
+                    }, 2000);
                     
                 } catch (error) {
-                    console.error('登出過程中發生錯誤:', error);
-                    addLog(`登出錯誤: ${error.message}`, 'error');
+                    log(`❌ 登出過程中發生錯誤: ${error.message}`, 'error');
+                    updateStatus('登出失敗', 'error');
                     alert('登出時發生錯誤，請重試');
                 }
             } else {
-                addLog('用戶取消登出', 'info');
+                log('❌ 用戶取消登出', 'info');
+                updateStatus('登出已取消', 'warning');
             }
         }
 
-        // 測試登出功能
-        function testLogout() {
-            addLog('測試登出功能...', 'info');
-            handleLogout();
-        }
-
-        // 頁面載入完成後初始化
-        document.addEventListener('DOMContentLoaded', function() {
-            addLog('頁面載入完成');
-            updateUserStatus();
+        // 頁面載入時初始化
+        document.addEventListener('DOMContentLoaded', () => {
+            log('📱 登出功能測試頁面已載入', 'info');
+            log('💡 點擊右上角登出按鈕或使用下方按鈕測試', 'info');
+            
+            updateUserInfo();
+            
+            // 自動檢查用戶狀態
+            setTimeout(() => {
+                checkUserStatus();
+            }, 1000);
         });
-
-        // 將函數暴露到全域
-        window.testLogout = testLogout;
-        window.simulateUser = simulateUser;
-        window.clearLog = clearLog;
-        window.handleLogout = handleLogout;
     </script>
 </body>
 </html>

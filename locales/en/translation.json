@@ -1,0 +1,170 @@
+{
+  "common": {
+    "pageTitle": {
+      "info": "Information - PBLS VR Learning Platform",
+      "practice": "Practice Area - PBLS VR Learning Platform",
+      "exam": "Exam Area - PBLS VR Learning Platform",
+      "history": "History Results - PBLS VR Learning Platform",
+      "team": "Team - PBLS VR Learning Platform",
+      "quiz": "Written Test - PBLS VR Learning Platform"
+    },
+    "header": {
+      "title": "Welcome to PBLS Learning Platform",
+      "userInfo": "CGU, Information Management"
+    },
+    "marquee": {
+      "item1": "🎯 Welcome to PBLS VR Learning Platform!",
+      "item2": "📚 360° Immersive Teaching Videos for Realistic Learning",
+      "item3": "🤖 Virtual Human Interaction to Improve Communication Skills",
+      "item4": "🎮 VR Practical Operations Simulating Real Emergency Situations",
+      "item5": "📊 Real-time Score Tracking to Monitor Learning Progress",
+      "item6": "💡 Problem-Based Learning to Enhance First Aid Skills"
+    },
+    "menu": {
+      "info": "Information",
+      "practice": "Practice",
+      "exam": "Exam",
+      "history": "History",
+      "team": "Team"
+    },
+    "language": {
+      "toggle": "中"
+    }
+  },
+  "info": {
+    "hero": {
+      "title": "Pediatric Basic Life Support (PBLS)",
+      "description": "Pediatric Basic Life Support (PBLS) is the essential guideline for rescuing infants and children in cardiac or respiratory arrest. This platform provides systematic training combining theory, process flow, and scenario simulations.",
+      "learnMoreButton": "Learn More"
+    },
+    "flowchart": {
+      "title": "PBLS Flowchart"
+    },
+    "scenarios": {
+      "title": "Scenario Simulation Cases",
+      "cardiac": {
+        "title": "Cardiac Arrest",
+        "treatment": "Treatment Measures"
+      },
+      "poisoning": {
+        "title": "Food Poisoning",
+        "treatment": "Treatment Measures"
+      },
+      "drowning": {
+        "title": "Drowning",
+        "treatment": "Treatment Measures"
+      },
+      "fire": {
+        "title": "Fire Inhalation Injury",
+        "treatment": "Treatment Measures"
+      },
+      "trauma": {
+        "title": "Trauma",
+        "treatment": "Treatment Measures"
+      }
+    },
+    "treatmentModal": {
+      "title": "Treatment Measures"
+    },
+    "treatmentData": {
+      "cardiac": {
+        "title": "Cardiac Arrest Treatment Measures",
+        "steps": [
+          "Immediately perform CPR (Cardiopulmonary Resuscitation)",
+          "Use AED for defibrillation (50J)",
+          "Administer Epinephrine",
+          "Progressive defibrillation treatment",
+          "Transfer to ICU"
+        ]
+      },
+      "poisoning": {
+        "title": "Food Poisoning Treatment Measures",
+        "steps": [
+          "Clear airway to ensure patency",
+          "Use bag-mask for artificial ventilation",
+          "Perform CPR",
+          "Use AED for defibrillation (80J)",
+          "Administer Amiodarone"
+        ]
+      },
+      "drowning": {
+        "title": "Drowning Treatment Measures",
+        "steps": [
+          "Suction water from airway",
+          "Use bag-mask for artificial ventilation",
+          "Perform CPR",
+          "Use AED for defibrillation (60J)",
+          "Administer Amiodarone"
+        ]
+      },
+      "fire": {
+        "title": "Fire Inhalation Injury Treatment Measures",
+        "steps": [
+          "Perform endotracheal intubation and provide oxygen",
+          "Perform CPR",
+          "Use AED for defibrillation (80-100J)",
+          "Administer Epinephrine"
+        ]
+      },
+      "trauma": {
+        "title": "Trauma Treatment Measures",
+        "steps": [
+          "Perform hemostasis and establish IV access",
+          "Perform CPR",
+          "Use AED for defibrillation (70J)",
+          "Administer Epinephrine"
+        ]
+      }
+    },
+    "buttons": {
+      "practice": "Start Practice Simulation",
+      "exam": "Enter Exam Test"
+    }
+  },
+  "practice": {
+    "title": "Practice Area",
+    "description": "Here we provide 360° immersive teaching videos and virtual human interaction learning.",
+    "videoSection": {
+      "title": "360° Immersive Teaching Videos",
+      "description": "Watch high-quality 360-degree videos and experience immersive first aid scenarios"
+    },
+    "virtualHumanSection": {
+      "title": "Virtual Human Interaction",
+      "description": "Practice dialogue with AI-driven virtual patients to improve communication skills"
+    }
+  },
+  "quiz": {
+    "title": "Written Test",
+    "description": "20 multiple choice questions, 5 seconds per question. Please make the most of your precious first aid time and respond correctly.",
+    "startButton": "Start Written Test",
+    "exitConfirmation": "The written test is not completed yet. If you leave now, the test will not be recorded. Are you sure you want to leave?",
+    "results": {
+      "score": "points",
+      "correctAnswers": "Correct Answers",
+      "totalQuestions": "Total Questions",
+      "timeUsed": "Time Used",
+      "details": "Test Details",
+      "retakeButton": "Retake Test",
+      "correct": "Correct",
+      "incorrect": "Incorrect",
+      "noAnswer": "No Answer",
+      "yourAnswer": "Your answer: ",
+      "explanation": "Explanation",
+      "correctAnswer": "Correct Answer"
+    }
+  },
+  "history": {
+    "title": "History Results",
+    "totalAttempts": "Total Attempts",
+    "averageScore": "Average Score",
+    "bestScore": "Best Score",
+    "lastAttempt": "Last Attempt Time",
+    "noData": "No test records available",
+    "loading": "Loading...",
+    "error": "Failed to load, please refresh the page"
+  },
+  "team": {
+    "title": "Team Introduction",
+    "description": "Our team is committed to providing the best PBLS learning experience"
+  }
+}

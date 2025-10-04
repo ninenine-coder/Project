@@ -5,6 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>歷史成績 - PBLS VR教學平台</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <!-- i18next -->
+    <script src="https://unpkg.com/i18next@23.7.6/i18next.min.js"></script>
+    <script src="https://unpkg.com/i18next-browser-languagedetector@7.2.0/i18nextBrowserLanguageDetector.min.js"></script>
     <style>
         * {
             margin: 0;
@@ -96,6 +99,9 @@
             color: white;
             cursor: pointer;
             transition: transform 0.3s ease;
+            position: relative;
+            z-index: 1001;
+            pointer-events: auto;
         }
 
         .logout-btn:hover {
@@ -113,13 +119,15 @@
             display: flex;
             align-items: center;
             overflow: hidden;
-            z-index: 998;
+            z-index: 999;
+            backdrop-filter: blur(10px);
         }
 
         .marquee-content {
             display: flex;
             animation: marquee 30s linear infinite;
             white-space: nowrap;
+            width: 100%;
         }
 
         .marquee-item {
@@ -127,11 +135,22 @@
             color: white;
             font-size: 16px;
             font-weight: 500;
+            flex-shrink: 0;
+            padding: 0 20px;
         }
 
         @keyframes marquee {
-            0% { transform: translateX(100%); }
-            100% { transform: translateX(-100%); }
+            0% { 
+                transform: translateX(100vw); 
+            }
+            100% { 
+                transform: translateX(-100%); 
+            }
+        }
+
+        /* 跑馬燈暫停效果 */
+        .marquee:hover .marquee-content {
+            animation-play-state: paused;
         }
 
         /* 側邊欄樣式 */
@@ -597,8 +616,8 @@
     <script type="module" src="src/services/onlineTimeService.js"></script>
     <!-- 用戶資料服務 -->
     <script type="module" src="src/services/userDataService.js"></script>
-    <!-- 學習時間時鐘服務 -->
-    <script type="module" src="src/services/learningTimeClockService.js"></script>
+    <!-- 學習時間服務 -->
+    <script type="module" src="src/services/learningTimeService.js"></script>
 </head>
 <body>
     <!-- 側邊欄 -->
@@ -653,7 +672,7 @@
             <div class="user-avatar" onclick="showUserProfile()">
                 <i class="fas fa-user"></i>
             </div>
-            <div class="logout-btn" onclick="handleLogout()">
+            <div class="logout-btn" onclick="logout()">
                 <i class="fas fa-sign-out-alt"></i>
             </div>
         </div>
@@ -792,9 +811,9 @@
                 updateUserInfoDisplay();
             }, 1000);
             
-            // 初始化學習時間時鐘
+            // 初始化學習時間服務
             setTimeout(() => {
-                initializeLearningTimeClock();
+                initializeLearningTimeService();
             }, 2000);
             
             // 確保跑馬燈正常顯示
@@ -805,23 +824,38 @@
             } else {
                 console.error('❌ 找不到跑馬燈元素');
             }
+            
+            // 測試登出按鈕
+            setTimeout(() => {
+                testLogoutButton();
+            }, 1000);
         });
 
-        // 初始化學習時間時鐘
-        async function initializeLearningTimeClock() {
-            if (window.learningTimeClockService) {
-                if (!window.learningTimeClockService.isInitialized) {
-                    console.log('時鐘服務未初始化，開始初始化...');
-                    await window.learningTimeClockService.initialize();
+        // 初始化學習時間服務
+        async function initializeLearningTimeService() {
+            if (window.learningTimeService) {
+                if (!window.learningTimeService.isInitialized) {
+                    console.log('學習時間服務未初始化，開始初始化...');
+                    await window.learningTimeService.initialize();
                 }
                 
                 const clockElement = document.getElementById('totalTime');
                 if (clockElement) {
                     clockElement.classList.add('clock-running');
                 }
-                console.log('學習時間時鐘已初始化並開始運行');
+                
+                // 監聽學習時間更新事件
+                window.addEventListener('learningTimeUpdate', (event) => {
+                    const clockElement = document.getElementById('totalTime');
+                    if (clockElement) {
+                        clockElement.textContent = event.detail.formattedTime;
+                        console.log(`⏰ 時間更新: ${event.detail.formattedTime}`);
+                    }
+                });
+                
+                console.log('學習時間服務已初始化並開始運行');
             } else {
-                console.log('學習時間時鐘服務未載入');
+                console.log('學習時間服務未載入');
             }
         }
 
@@ -977,38 +1011,74 @@
             alert('用戶資料功能開發中，敬請期待！');
         }
 
-        // 處理登出（用於HTML onclick）
-        function handleLogout() {
-            logout();
+        // 測試登出按鈕是否可點擊
+        function testLogoutButton() {
+            console.log('🧪 測試登出按鈕...');
+            const logoutBtn = document.querySelector('.logout-btn');
+            if (logoutBtn) {
+                console.log('✅ 登出按鈕元素已找到');
+                console.log('按鈕樣式:', window.getComputedStyle(logoutBtn));
+                console.log('按鈕位置:', logoutBtn.getBoundingClientRect());
+                
+                // 測試點擊事件
+                logoutBtn.addEventListener('click', function(e) {
+                    console.log('🎯 登出按鈕點擊事件觸發');
+                });
+                
+                // 測試滑鼠事件
+                logoutBtn.addEventListener('mouseenter', function() {
+                    console.log('🖱️ 滑鼠進入登出按鈕');
+                });
+                
+                logoutBtn.addEventListener('mouseleave', function() {
+                    console.log('🖱️ 滑鼠離開登出按鈕');
+                });
+            } else {
+                console.error('❌ 找不到登出按鈕元素');
+            }
         }
 
         // 登出功能
         async function logout() {
+            console.log('🚪 登出按鈕被點擊');
+            
             if (confirm('確定要登出嗎？')) {
+                console.log('✅ 用戶確認登出');
                 try {
                     // 保存學習時間到Firebase
-                    if (window.learningTimeClockService) {
-                        await window.learningTimeClockService.saveTimeToFirebase();
-                        window.learningTimeClockService.stop();
-                        console.log('學習時間已保存');
+                    if (window.learningTimeService && window.learningTimeService.isInitialized) {
+                        console.log('💾 正在保存學習時間...');
+                        await window.learningTimeService.handleLogout();
+                        console.log('✅ 學習時間已保存');
+                    } else {
+                        console.log('⚠️ 學習時間服務未初始化，跳過保存');
                     }
                     
-                // 清除本地儲存
-                localStorage.removeItem('pbls_user');
-                localStorage.removeItem('pbls_user_profile');
+                    // 清除本地儲存
+                    localStorage.removeItem('pbls_user');
+                    localStorage.removeItem('pbls_user_profile');
+                    console.log('🗑️ 本地存儲已清除');
                     
-                    console.log('用戶已登出');
+                    console.log('✅ 用戶已登出');
                 
-                // 跳轉到登入頁面
-                window.location.href = 'login.html';
+                    // 跳轉到登入頁面
+                    console.log('🔄 跳轉到登入頁面...');
+                    window.location.href = 'login.html';
                 } catch (error) {
-                    console.error('登出過程中發生錯誤:', error);
+                    console.error('❌ 登出過程中發生錯誤:', error);
                     alert('登出時發生錯誤，請重試');
                 }
+            } else {
+                console.log('❌ 用戶取消登出');
             }
         }
 
-        // 語言切換功能已移至 language-switcher.js
+        // 語言切換功能已移至 enhanced-language-manager.js
+    </script>
+    
+    <!-- 載入增強的語言管理器 -->
+    <script type="module">
+        import './src/js/enhanced-language-manager.js';
     </script>
 </body>
 </html>

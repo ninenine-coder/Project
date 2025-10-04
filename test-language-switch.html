@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>語言切換測試</title>
+    <style>
+        body {
+            font-family: 'Microsoft JhengHei', sans-serif;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 10px;
+        }
+        .user-info {
+            background: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 14px;
+            color: #333;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+        .language-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .language-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+        .controls {
+            text-align: center;
+            margin: 20px 0;
+        }
+        .button {
+            background: #2196F3;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            margin: 5px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+        .button:hover {
+            background: #1976D2;
+            transform: translateY(-2px);
+        }
+        .button.success {
+            background: #28a745;
+        }
+        .button.success:hover {
+            background: #218838;
+        }
+        .button.warning {
+            background: #ffc107;
+            color: #212529;
+        }
+        .button.warning:hover {
+            background: #e0a800;
+        }
+        .test-section {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            border: 1px solid #e9ecef;
+        }
+        .test-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid #dee2e6;
+        }
+        .test-item:last-child {
+            border-bottom: none;
+        }
+        .test-label {
+            font-weight: bold;
+            color: #495057;
+        }
+        .test-value {
+            color: #6c757d;
+        }
+        .log {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            font-family: monospace;
+            font-size: 12px;
+            max-height: 300px;
+            overflow-y: auto;
+            border: 1px solid #e9ecef;
+        }
+        .instructions {
+            background: #e3f2fd;
+            padding: 20px;
+            border-radius: 8px;
+            border-left: 4px solid #2196F3;
+            margin: 20px 0;
+        }
+        .success-message {
+            background: #d4edda;
+            color: #155724;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #c3e6cb;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🌐 語言切換測試</h1>
+            <div class="user-info" id="user-info-display">長庚大學, 資管系</div>
+            <button class="language-btn" onclick="toggleLanguage()">
+                <span id="language-text">EN</span>
+            </button>
+        </div>
+        
+        <div class="instructions">
+            <h3>📋 測試目標</h3>
+            <p>驗證中英文切換時長庚大學和資管系的顯示是否正確：</p>
+            <ul>
+                <li>✅ 中文：長庚大學, 資管系</li>
+                <li>✅ 英文：CGU, Information Management</li>
+            </ul>
+        </div>
+
+        <div class="test-section">
+            <h3>🔍 當前顯示內容</h3>
+            <div class="test-item">
+                <span class="test-label">當前語言：</span>
+                <span class="test-value" id="currentLanguage">中文</span>
+            </div>
+            <div class="test-item">
+                <span class="test-label">用戶資訊：</span>
+                <span class="test-value" id="currentUserInfo">長庚大學, 資管系</span>
+            </div>
+            <div class="test-item">
+                <span class="test-label">頁面標題：</span>
+                <span class="test-value" id="currentPageTitle">語言切換測試</span>
+            </div>
+            <div class="test-item">
+                <span class="test-label">語言按鈕：</span>
+                <span class="test-value" id="currentLanguageButton">EN</span>
+            </div>
+        </div>
+
+        <div class="controls">
+            <button class="button success" onclick="testLanguageSwitch()">🔄 測試語言切換</button>
+            <button class="button" onclick="setChinese()">🇹🇼 設為中文</button>
+            <button class="button" onclick="setEnglish()">🇺🇸 設為英文</button>
+            <button class="button warning" onclick="clearLog()">🗑️ 清除日誌</button>
+        </div>
+
+        <div class="log" id="testLog"></div>
+    </div>
+
+    <!-- 載入語言切換器 -->
+    <script src="./src/js/language-switcher.js"></script>
+
+    <script>
+        // 測試日誌
+        function log(message, type = 'info') {
+            const logDiv = document.getElementById('testLog');
+            const timestamp = new Date().toLocaleTimeString();
+            const logEntry = document.createElement('div');
+            logEntry.style.color = type === 'error' ? 'red' : type === 'success' ? 'green' : type === 'warning' ? 'orange' : 'black';
+            logEntry.textContent = `[${timestamp}] ${message}`;
+            logDiv.appendChild(logEntry);
+            logDiv.scrollTop = logDiv.scrollHeight;
+            console.log(`[測試] ${message}`);
+        }
+
+        function clearLog() {
+            document.getElementById('testLog').innerHTML = '';
+        }
+
+        // 更新顯示內容
+        function updateDisplay() {
+            const currentLang = window.languageSwitcher ? window.languageSwitcher.currentLang : 'zh';
+            const userInfo = document.getElementById('user-info-display').textContent;
+            const pageTitle = document.title;
+            const languageButton = document.getElementById('language-text').textContent;
+            
+            document.getElementById('currentLanguage').textContent = currentLang === 'zh' ? '中文' : 'English';
+            document.getElementById('currentUserInfo').textContent = userInfo;
+            document.getElementById('currentPageTitle').textContent = pageTitle;
+            document.getElementById('currentLanguageButton').textContent = languageButton;
+        }
+
+        // 測試語言切換
+        function testLanguageSwitch() {
+            if (window.languageSwitcher) {
+                const oldLang = window.languageSwitcher.currentLang;
+                const newLang = oldLang === 'zh' ? 'en' : 'zh';
+                
+                log(`🔄 開始語言切換測試：${oldLang} → ${newLang}`, 'info');
+                
+                // 執行語言切換
+                window.languageSwitcher.toggleLanguage();
+                
+                // 延遲更新顯示
+                setTimeout(() => {
+                    updateDisplay();
+                    log(`✅ 語言切換完成：${newLang}`, 'success');
+                    
+                    // 檢查用戶資訊是否正確
+                    const userInfo = document.getElementById('user-info-display').textContent;
+                    if (newLang === 'zh') {
+                        if (userInfo === '長庚大學, 資管系') {
+                            log('✅ 中文用戶資訊顯示正確', 'success');
+                        } else {
+                            log(`❌ 中文用戶資訊顯示錯誤：${userInfo}`, 'error');
+                        }
+                    } else {
+                        if (userInfo === 'CGU, Information Management') {
+                            log('✅ 英文用戶資訊顯示正確', 'success');
+                        } else {
+                            log(`❌ 英文用戶資訊顯示錯誤：${userInfo}`, 'error');
+                        }
+                    }
+                }, 100);
+            } else {
+                log('❌ 語言切換器未載入', 'error');
+            }
+        }
+
+        // 設為中文
+        function setChinese() {
+            if (window.languageSwitcher) {
+                log('🇹🇼 設為中文', 'info');
+                window.languageSwitcher.currentLang = 'zh';
+                localStorage.setItem('pbls_language', 'zh');
+                window.languageSwitcher.applyLanguage('zh');
+                setTimeout(updateDisplay, 100);
+            }
+        }
+
+        // 設為英文
+        function setEnglish() {
+            if (window.languageSwitcher) {
+                log('🇺🇸 設為英文', 'info');
+                window.languageSwitcher.currentLang = 'en';
+                localStorage.setItem('pbls_language', 'en');
+                window.languageSwitcher.applyLanguage('en');
+                setTimeout(updateDisplay, 100);
+            }
+        }
+
+        // 語言切換函數
+        function toggleLanguage() {
+            if (window.languageSwitcher) {
+                window.languageSwitcher.toggleLanguage();
+                setTimeout(updateDisplay, 100);
+            }
+        }
+
+        // 頁面載入時初始化
+        document.addEventListener('DOMContentLoaded', () => {
+            log('📱 語言切換測試頁面已載入', 'info');
+            log('💡 點擊語言按鈕或使用下方按鈕測試語言切換', 'info');
+            
+            // 初始化顯示
+            setTimeout(() => {
+                updateDisplay();
+                log('✅ 顯示內容已初始化', 'success');
+            }, 500);
+        });
+
+        // 定期更新顯示
+        setInterval(updateDisplay, 1000);
+    </script>
+</body>
+</html>

@@ -16,7 +16,7 @@ class LanguageSwitcher {
           pageTitle: '資訊 - PBLS VR教學平台',
           header: {
             title: '歡迎使用PBLS教學平台',
-            userInfo: 'CGU(長庚大學), Nursing'
+            userInfo: '長庚大學, 資管系'
           },
           marquee: {
             item1: '🎯 歡迎使用PBLS VR教學平台！',
@@ -134,7 +134,7 @@ class LanguageSwitcher {
             pageTitle: '筆試測驗 - PBLS VR教學平台',
             header: {
               title: '歡迎使用PBLS教學平台',
-              userInfo: 'CGU(長庚大學), Nursing'
+              userInfo: '長庚大學, 資管系'
             },
             marquee: {
               item1: '🎯 歡迎使用PBLS VR教學平台！',
@@ -184,7 +184,7 @@ class LanguageSwitcher {
           pageTitle: 'Information - PBLS VR Learning Platform',
           header: {
             title: 'Welcome to PBLS Learning Platform',
-            userInfo: 'CGU (Chang Gung University), Nursing'
+            userInfo: 'CGU, Information Management'
           },
           marquee: {
             item1: '🎯 Welcome to PBLS VR Learning Platform!',
@@ -302,7 +302,7 @@ class LanguageSwitcher {
             pageTitle: 'Written Test - PBLS VR Learning Platform',
             header: {
               title: 'Welcome to PBLS Learning Platform',
-              userInfo: 'CGU (Chang Gung University), Nursing'
+              userInfo: 'CGU, Information Management'
             },
             marquee: {
               item1: '🎯 Welcome to PBLS VR Learning Platform!',

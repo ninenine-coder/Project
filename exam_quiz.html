@@ -5,6 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>筆試測驗 - PBLS VR教學平台</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <!-- i18next -->
+    <script src="https://unpkg.com/i18next@23.7.6/i18next.min.js"></script>
+    <script src="https://unpkg.com/i18next-browser-languagedetector@7.2.0/i18nextBrowserLanguageDetector.min.js"></script>
     <script src="quiz_sound_manager.js"></script>
     <script src="countdown_animation.js"></script>
     <style>
@@ -2515,6 +2518,9 @@
         // 將函數暴露到全局作用域
         window.handleQuizLanguageSwitch = handleQuizLanguageSwitch;
     </script>
-    <script src="src/js/language-switcher.js"></script>
+    <!-- 載入增強的語言管理器 -->
+    <script type="module">
+        import './src/js/enhanced-language-manager.js';
+    </script>
 </body>
 </html>
