@@ -1,0 +1,198 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>歷史成績</title>
+  <style>
+    body { 
+      font-family: 'Microsoft JhengHei', system-ui, -apple-system, Segoe UI, Roboto; 
+      max-width: 1000px; 
+      margin: 40px auto; 
+      padding: 0 16px; 
+      background: #f8f9fa;
+    }
+    
+    .header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 20px;
+      border-radius: 15px;
+      margin-bottom: 30px;
+      text-align: center;
+    }
+    
+    .header h1 {
+      margin: 0 0 10px 0;
+      font-size: 2rem;
+    }
+    
+    .header p {
+      margin: 0;
+      opacity: 0.9;
+    }
+    
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 15px;
+      margin-bottom: 30px;
+    }
+    
+    .stat-card {
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      text-align: center;
+    }
+    
+    .stat-card .number {
+      font-size: 2rem;
+      font-weight: bold;
+      color: #667eea;
+      margin-bottom: 5px;
+    }
+    
+    .stat-card .label {
+      color: #666;
+      font-size: 0.9rem;
+    }
+    
+    table { 
+      width: 100%; 
+      border-collapse: collapse; 
+      background: white;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    
+    th { 
+      background: #667eea;
+      color: white;
+      padding: 15px 10px;
+      text-align: left;
+      font-weight: 600;
+    }
+    
+    td { 
+      border-bottom: 1px solid #eee; 
+      padding: 12px 10px; 
+      text-align: left;
+    }
+    
+    tr:hover { background: #f8f9ff; }
+    
+    .exam-title {
+      font-weight: 600;
+      color: #333;
+    }
+    
+    .score-excellent { color: #10b981; font-weight: bold; }
+    .score-good { color: #f59e0b; font-weight: bold; }
+    .score-poor { color: #ef4444; font-weight: bold; }
+    
+    .time-info {
+      font-size: 0.9rem;
+      color: #666;
+    }
+    
+    .btn { 
+      display:inline-block; 
+      padding:8px 16px; 
+      border:1px solid #9c27b0; 
+      color:#9c27b0; 
+      border-radius:8px; 
+      text-decoration:none;
+      font-size: 0.9rem;
+      transition: all 0.3s ease;
+    }
+    
+    .btn:hover{ 
+      background:#9c27b0; 
+      color:#fff;
+      transform: translateY(-1px);
+    }
+    
+    .btn-primary {
+      background: #9c27b0;
+      color: white;
+    }
+    
+    .btn-primary:hover {
+      background: #7b1fa2;
+    }
+    
+    .loading {
+      text-align: center;
+      padding: 40px;
+      color: #666;
+    }
+    
+    .no-results {
+      text-align: center;
+      padding: 40px;
+      color: #666;
+    }
+    
+    .refresh-btn {
+      margin-bottom: 20px;
+    }
+  </style>
+</head>
+<body>
+  <h1>歷史成績</h1>
+  <p class="meta"><a class="btn" href="login.html">回登入</a></p>
+  <table>
+    <thead>
+      <tr>
+        <th>考試</th>
+        <th>提交時間</th>
+        <th>分數</th>
+        <th>答對/題數</th>
+        <th>耗時</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody id="rows"></tbody>
+  </table>
+
+  <script type="module">
+    const firebaseConfig = {
+      apiKey: "AIzaSyBuWO8hFVjjTUe2tqJDrqdbeGTrp4PoT5Q",
+      authDomain: "progect-115a5.firebaseapp.com",
+      projectId: "progect-115a5"
+    };
+    const { initializeApp, getApps, getApp } =
+      await import("https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js");
+    await import("https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js");
+    const app = getApps().length ? getApp() : initializeApp(firebaseConfig);
+
+    const { loadMyResults } = await import("./js/results.js");
+
+    const me = JSON.parse(localStorage.getItem('pbls_user') || 'null');
+    if (!me || !me.uid) {
+      alert('請先登入'); location.href = 'login.html';
+    } else {
+      const list = await loadMyResults({ uid: me.uid, limitN: 50 });
+      const tbody = document.getElementById('rows');
+      tbody.innerHTML = list.map(r => {
+        const ts = r.submittedAt?.toDate ? r.submittedAt.toDate() : null;
+        const tstr = ts ? ts.toLocaleString() : '-';
+        const pct = (r.scorePct != null) ? Math.round(r.scorePct * 100) + '%' : (r.scoreRaw ?? '-');
+        const solved = `${r.correctCount ?? '-'} / ${r.totalQuestions ?? '-'}`;
+        const dur = r.durationSec != null ? `${Math.floor(r.durationSec/60)}分${r.durationSec%60}秒` : '-';
+        return `<tr>
+          <td>${r.examTitle || r.examId || '(未命名)'}</td>
+          <td>${tstr}</td>
+          <td>${pct}</td>
+          <td>${solved}</td>
+          <td>${dur}</td>
+          <td><a class="btn" href="result.html?attemptId=${encodeURIComponent(r.id)}">查看</a></td>
+        </tr>`;
+      }).join('');
+    }
+  </script>
+</body>
+</html>

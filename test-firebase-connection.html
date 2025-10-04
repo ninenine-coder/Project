@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Firebase 連接測試</title>
+    <style>
+        body {
+            font-family: 'Microsoft JhengHei', sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .test-result {
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        .success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        #results {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔥 Firebase 連接測試</h1>
+        <p>這個頁面將測試 Firebase 和 Firestore 的連接狀態</p>
+        
+        <button onclick="testConnection()">開始測試</button>
+        <button onclick="clearResults()">清除結果</button>
+        
+        <div id="results"></div>
+    </div>
+
+    <script type="module">
+        // Firebase 配置
+        const firebaseConfig = {
+            apiKey: "AIzaSyBuWO8hFVjjTUe2tqJDrqdbeGTrp4PoT5Q",
+            authDomain: "progect-115a5.firebaseapp.com",
+            databaseURL: "https://progect-115a5-default-rtdb.firebaseio.com",
+            projectId: "progect-115a5",
+            storageBucket: "progect-115a5.firebasestorage.app",
+            messagingSenderId: "109099222287",
+            appId: "1:109099222287:web:4f7b56a1eebe5abbfaaa7a",
+            measurementId: "G-DZVNBQ3G6S"
+        };
+
+        function addResult(type, message) {
+            const resultsDiv = document.getElementById('results');
+            const resultDiv = document.createElement('div');
+            resultDiv.className = `test-result ${type}`;
+            resultDiv.textContent = message;
+            resultsDiv.appendChild(resultDiv);
+        }
+
+        window.testConnection = async function() {
+            const resultsDiv = document.getElementById('results');
+            resultsDiv.innerHTML = '<div class="test-result info">正在測試 Firebase 連接...</div>';
+
+            try {
+                // 1. 測試 Firebase 初始化
+                addResult('info', '1. 正在初始化 Firebase...');
+                
+                const { initializeApp } = await import("https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js");
+                const app = initializeApp(firebaseConfig);
+                
+                addResult('success', '✅ Firebase 初始化成功');
+
+                // 2. 測試 Firestore 初始化
+                addResult('info', '2. 正在初始化 Firestore...');
+                
+                const { getFirestore } = await import("https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js");
+                const db = getFirestore(app);
+                
+                addResult('success', '✅ Firestore 初始化成功');
+
+                // 3. 測試寫入權限
+                addResult('info', '3. 正在測試寫入權限...');
+                
+                const { doc, setDoc, serverTimestamp } = await import("https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js");
+                
+                const testData = {
+                    message: "連接測試",
+                    timestamp: serverTimestamp(),
+                    testId: Math.random().toString(36).substr(2, 9)
+                };
+                
+                await setDoc(doc(db, "test", "connection-test"), testData);
+                
+                addResult('success', '✅ 寫入權限測試成功');
+
+                // 4. 測試讀取權限
+                addResult('info', '4. 正在測試讀取權限...');
+                
+                const { getDoc } = await import("https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js");
+                
+                const docSnap = await getDoc(doc(db, "test", "connection-test"));
+                
+                if (docSnap.exists()) {
+                    addResult('success', '✅ 讀取權限測試成功');
+                } else {
+                    addResult('error', '❌ 讀取權限測試失敗 - 文檔不存在');
+                }
+
+                // 5. 測試用戶集合寫入
+                addResult('info', '5. 正在測試用戶集合寫入...');
+                
+                const userTestData = {
+                    account: "test@example.com",
+                    password: "test123",
+                    "姓名": "測試用戶",
+                    studentId: "TEST123",
+                    department: "測試系所",
+                    "school/hospital": "測試學校",
+                    createdAt: serverTimestamp(),
+                    isActive: true,
+                    lastLogin: null
+                };
+                
+                await setDoc(doc(db, "user", "TEST123"), userTestData);
+                
+                addResult('success', '✅ 用戶集合寫入測試成功');
+
+                // 6. 清理測試數據
+                addResult('info', '6. 正在清理測試數據...');
+                
+                const { deleteDoc } = await import("https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js");
+                await deleteDoc(doc(db, "test", "connection-test"));
+                await deleteDoc(doc(db, "user", "TEST123"));
+                
+                addResult('success', '✅ 測試數據清理完成');
+
+                addResult('success', '🎉 所有測試通過！Firebase 連接正常，可以進行註冊操作。');
+
+            } catch (error) {
+                console.error('測試錯誤:', error);
+                addResult('error', `❌ 測試失敗: ${error.message}`);
+                addResult('error', `錯誤代碼: ${error.code || '未知'}`);
+                
+                if (error.code === 'permission-denied') {
+                    addResult('error', '權限被拒絕 - 請檢查 Firestore 規則設定');
+                } else if (error.code === 'unavailable') {
+                    addResult('error', '服務不可用 - 請檢查網路連線');
+                }
+            }
+        };
+
+        window.clearResults = function() {
+            document.getElementById('results').innerHTML = '';
+        };
+
+        // 頁面載入完成後自動測試
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Firebase 連接測試頁面已載入');
+        });
+    </script>
+</body>
+</html>

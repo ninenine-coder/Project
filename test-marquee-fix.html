@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>跑馬燈修復測試</title>
+    <style>
+        body {
+            font-family: 'Microsoft JhengHei', sans-serif;
+            margin: 0;
+            padding: 0;
+            background: white;
+            min-height: 100vh;
+            color: #333;
+        }
+
+        /* 跑馬燈樣式 */
+        .marquee {
+            position: fixed;
+            top: 80px;
+            left: 0;
+            right: 0;
+            height: 60px;
+            background: rgba(52, 152, 219, 0.9);
+            display: flex;
+            align-items: center;
+            overflow: hidden;
+            z-index: 998;
+        }
+
+        .marquee-content {
+            display: flex;
+            animation: marquee 30s linear infinite;
+            white-space: nowrap;
+        }
+
+        .marquee-item {
+            margin-right: 50px;
+            color: white;
+            font-size: 16px;
+            font-weight: 500;
+        }
+
+        @keyframes marquee {
+            0% { transform: translateX(100%); }
+            100% { transform: translateX(-100%); }
+        }
+
+        /* 測試內容 */
+        .test-container {
+            margin-top: 160px;
+            padding: 20px;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .test-section {
+            background: #f8f9fa;
+            padding: 20px;
+            margin: 15px 0;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+
+        .btn {
+            background: #667eea;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+
+        .btn:hover {
+            background: #5a6fd8;
+        }
+
+        .status {
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .log {
+            background: #f1f1f1;
+            padding: 15px;
+            border-radius: 5px;
+            font-family: monospace;
+            font-size: 12px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body>
+    <!-- 跑馬燈 -->
+    <div class="marquee">
+        <div class="marquee-content">
+            <div class="marquee-item">🎯 歡迎使用PBLS VR教學平台！</div>
+            <div class="marquee-item">📚 360°實境教學影片，身臨其境的學習體驗</div>
+            <div class="marquee-item">🤖 虛擬人互動，提升急救溝通技巧</div>
+            <div class="marquee-item">🎮 VR實際操作，模擬真實急救情境</div>
+            <div class="marquee-item">📊 即時成績追蹤，掌握學習進度</div>
+            <div class="marquee-item">💡 問題導向學習法，提升急救技能</div>
+        </div>
+    </div>
+
+    <div class="test-container">
+        <h1>跑馬燈修復測試</h1>
+        
+        <div class="test-section">
+            <h3>跑馬燈狀態</h3>
+            <div class="status" id="marqueeStatus">
+                <strong>跑馬燈狀態:</strong> <span id="marqueeStatusText">檢查中...</span>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h3>測試操作</h3>
+            <button class="btn" onclick="checkMarquee()">檢查跑馬燈</button>
+            <button class="btn" onclick="showMarquee()">顯示跑馬燈</button>
+            <button class="btn" onclick="hideMarquee()">隱藏跑馬燈</button>
+            <button class="btn" onclick="restartMarquee()">重新啟動跑馬燈</button>
+            <button class="btn" onclick="clearLog()">清除日誌</button>
+        </div>
+
+        <div class="test-section">
+            <h3>操作日誌</h3>
+            <div id="log" class="log"></div>
+        </div>
+    </div>
+
+    <script>
+        // 日誌功能
+        function addLog(message, type = 'info') {
+            const log = document.getElementById('log');
+            const timestamp = new Date().toLocaleTimeString();
+            log.innerHTML += `[${timestamp}] ${message}\n`;
+            log.scrollTop = log.scrollHeight;
+        }
+
+        function clearLog() {
+            document.getElementById('log').innerHTML = '';
+        }
+
+        // 檢查跑馬燈狀態
+        function checkMarquee() {
+            const marquee = document.querySelector('.marquee');
+            const statusElement = document.getElementById('marqueeStatus');
+            const statusTextElement = document.getElementById('marqueeStatusText');
+            
+            if (marquee) {
+                const computedStyle = window.getComputedStyle(marquee);
+                const display = computedStyle.display;
+                const visibility = computedStyle.visibility;
+                const opacity = computedStyle.opacity;
+                
+                statusElement.className = 'status success';
+                statusTextElement.textContent = `正常 - Display: ${display}, Visibility: ${visibility}, Opacity: ${opacity}`;
+                
+                addLog(`跑馬燈檢查完成 - Display: ${display}, Visibility: ${visibility}, Opacity: ${opacity}`, 'success');
+            } else {
+                statusElement.className = 'status error';
+                statusTextElement.textContent = '錯誤 - 找不到跑馬燈元素';
+                addLog('跑馬燈檢查失敗 - 找不到元素', 'error');
+            }
+        }
+
+        // 顯示跑馬燈
+        function showMarquee() {
+            const marquee = document.querySelector('.marquee');
+            if (marquee) {
+                marquee.style.display = 'flex';
+                addLog('跑馬燈已顯示', 'success');
+                checkMarquee();
+            } else {
+                addLog('無法顯示跑馬燈 - 找不到元素', 'error');
+            }
+        }
+
+        // 隱藏跑馬燈
+        function hideMarquee() {
+            const marquee = document.querySelector('.marquee');
+            if (marquee) {
+                marquee.style.display = 'none';
+                addLog('跑馬燈已隱藏', 'success');
+                checkMarquee();
+            } else {
+                addLog('無法隱藏跑馬燈 - 找不到元素', 'error');
+            }
+        }
+
+        // 重新啟動跑馬燈
+        function restartMarquee() {
+            const marquee = document.querySelector('.marquee');
+            if (marquee) {
+                // 先隱藏
+                marquee.style.display = 'none';
+                
+                // 重新啟動動畫
+                const content = marquee.querySelector('.marquee-content');
+                if (content) {
+                    content.style.animation = 'none';
+                    // 強制重繪
+                    content.offsetHeight;
+                    content.style.animation = 'marquee 30s linear infinite';
+                }
+                
+                // 顯示
+                marquee.style.display = 'flex';
+                
+                addLog('跑馬燈已重新啟動', 'success');
+                checkMarquee();
+            } else {
+                addLog('無法重新啟動跑馬燈 - 找不到元素', 'error');
+            }
+        }
+
+        // 頁面載入完成後初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            addLog('頁面載入完成');
+            
+            // 確保跑馬燈正常顯示
+            const marquee = document.querySelector('.marquee');
+            if (marquee) {
+                console.log('✅ 跑馬燈元素已找到');
+                marquee.style.display = 'flex';
+                addLog('跑馬燈初始化完成', 'success');
+            } else {
+                console.error('❌ 找不到跑馬燈元素');
+                addLog('跑馬燈初始化失敗 - 找不到元素', 'error');
+            }
+            
+            // 初始檢查
+            setTimeout(checkMarquee, 1000);
+        });
+
+        // 將函數暴露到全域
+        window.checkMarquee = checkMarquee;
+        window.showMarquee = showMarquee;
+        window.hideMarquee = hideMarquee;
+        window.restartMarquee = restartMarquee;
+        window.clearLog = clearLog;
+    </script>
+</body>
+</html>

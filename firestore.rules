@@ -1,0 +1,20 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // 只開放 user/{uid}/results 與其 answers 子集合，其他一律關閉
+    match /user/{uid}/results/{attemptId} {
+      allow read, create, update: if true;   // ← 開發測試用
+      allow delete: if false;
+    }
+    match /user/{uid}/results/{attemptId}/answers/{qid} {
+      allow read, create, update: if true;   // ← 開發測試用
+      allow delete: if false;
+    }
+
+    // 其他文件全部禁止
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

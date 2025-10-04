@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>上線時間測試</title>
+    <style>
+        body {
+            font-family: 'Microsoft JhengHei', sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .stat-card {
+            background: #f8f9fa;
+            padding: 20px;
+            margin: 10px 0;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+        .btn {
+            background: #667eea;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        .btn:hover {
+            background: #5a6fd8;
+        }
+        .log {
+            background: #f1f1f1;
+            padding: 15px;
+            border-radius: 5px;
+            font-family: monospace;
+            font-size: 12px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>上線時間記錄測試</h1>
+        
+        <div class="stat-card">
+            <h3>當前狀態</h3>
+            <p><strong>總上線時間:</strong> <span id="totalTime">載入中...</span></p>
+            <p><strong>服務狀態:</strong> <span id="serviceStatus">檢查中...</span></p>
+            <p><strong>用戶ID:</strong> <span id="userId">-</span></p>
+        </div>
+
+        <div class="stat-card">
+            <h3>操作控制</h3>
+            <button class="btn" onclick="refreshStats()">重新整理統計</button>
+            <button class="btn" onclick="forceRecord()">強制記錄時間</button>
+            <button class="btn" onclick="clearLog()">清除日誌</button>
+        </div>
+
+        <div class="stat-card">
+            <h3>操作日誌</h3>
+            <div id="log" class="log"></div>
+        </div>
+    </div>
+
+    <!-- 上線時間服務 -->
+    <script type="module" src="src/services/onlineTimeService.js"></script>
+    
+    <script>
+        // 日誌功能
+        function addLog(message) {
+            const log = document.getElementById('log');
+            const timestamp = new Date().toLocaleTimeString();
+            log.innerHTML += `[${timestamp}] ${message}\n`;
+            log.scrollTop = log.scrollHeight;
+        }
+
+        function clearLog() {
+            document.getElementById('log').innerHTML = '';
+        }
+
+        // 更新統計資訊
+        function updateStats() {
+            const userData = JSON.parse(localStorage.getItem('pbls_user') || '{}');
+            
+            document.getElementById('userId').textContent = userData.uid || '未登入';
+            document.getElementById('serviceStatus').textContent = 
+                window.onlineTimeService && window.onlineTimeService.isInitialized ? '已啟動' : '未啟動';
+            
+            if (window.onlineTimeService) {
+                const totalTime = window.onlineTimeService.getTotalOnlineTime();
+                const formattedTime = window.onlineTimeService.formatDuration(totalTime);
+                document.getElementById('totalTime').textContent = formattedTime;
+            } else {
+                document.getElementById('totalTime').textContent = '服務未載入';
+            }
+        }
+
+        // 重新整理統計
+        function refreshStats() {
+            addLog('重新整理統計資訊...');
+            updateStats();
+        }
+
+        // 強制記錄時間
+        async function forceRecord() {
+            addLog('強制記錄上線時間...');
+            if (window.onlineTimeService) {
+                await window.onlineTimeService.recordOnlineTime();
+                addLog('記錄完成');
+                updateStats();
+            } else {
+                addLog('錯誤: 上線時間服務未載入');
+            }
+        }
+
+        // 頁面載入完成後初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            addLog('頁面載入完成');
+            
+            // 檢查用戶登入狀態
+            const userData = JSON.parse(localStorage.getItem('pbls_user') || '{}');
+            if (!userData.uid) {
+                addLog('警告: 用戶未登入，請先登入');
+            } else {
+                addLog(`用戶已登入: ${userData.uid}`);
+            }
+            
+            // 定期更新統計
+            setInterval(updateStats, 10000); // 每10秒更新一次
+            
+            // 初始更新
+            setTimeout(updateStats, 1000);
+        });
+
+        // 監聽服務狀態變化
+        setInterval(() => {
+            if (window.onlineTimeService && window.onlineTimeService.isInitialized) {
+                addLog('上線時間服務運行正常');
+            }
+        }, 30000); // 每30秒檢查一次
+    </script>
+</body>
+</html>

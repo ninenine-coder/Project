@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Firebase 連接診斷 - PBLS VR教學平台</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Microsoft JhengHei', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            color: #4a148c;
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: #6a1b9a;
+            font-size: 1.1rem;
+        }
+
+        .diagnostic-section {
+            background: rgba(255, 255, 255, 0.8);
+            border: 2px solid #e1bee7;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .diagnostic-section h2 {
+            color: #4a148c;
+            margin-bottom: 15px;
+        }
+
+        .test-item {
+            display: flex;
+            align-items: center;
+            margin: 10px 0;
+            padding: 10px;
+            background: white;
+            border-radius: 8px;
+            border: 1px solid #e1bee7;
+        }
+
+        .test-item .status {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            margin-right: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: white;
+        }
+
+        .test-item .status.success {
+            background: #4caf50;
+        }
+
+        .test-item .status.error {
+            background: #f44336;
+        }
+
+        .test-item .status.loading {
+            background: #ff9800;
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+
+        .test-item .content {
+            flex: 1;
+        }
+
+        .test-item .title {
+            font-weight: bold;
+            color: #4a148c;
+        }
+
+        .test-item .description {
+            color: #6a1b9a;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #9c27b0, #7b1fa2);
+            color: white;
+            text-decoration: none;
+            border-radius: 25px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+            margin: 5px;
+        }
+
+        .btn:hover {
+            background: linear-gradient(135deg, #7b1fa2, #6a1b9a);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(156, 39, 176, 0.3);
+        }
+
+        .btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .error-details {
+            background: #ffebee;
+            border: 2px solid #f44336;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 10px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            white-space: pre-wrap;
+        }
+
+        .success-details {
+            background: #e8f5e8;
+            border: 2px solid #4caf50;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 10px;
+        }
+
+        .config-display {
+            background: #f5f5f5;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 15px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            white-space: pre-wrap;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔧 Firebase 連接診斷</h1>
+            <p>檢查 Firebase 和 Firestore 連接狀態，診斷權限問題</p>
+        </div>
+
+        <div class="diagnostic-section">
+            <h2>📋 診斷測試</h2>
+            <div id="test-results">
+                <div class="test-item">
+                    <div class="status loading" id="status-1">⏳</div>
+                    <div class="content">
+                        <div class="title">Firebase 初始化</div>
+                        <div class="description">檢查 Firebase 配置和初始化</div>
+                    </div>
+                </div>
+                
+                <div class="test-item">
+                    <div class="status loading" id="status-2">⏳</div>
+                    <div class="content">
+                        <div class="title">Firestore 連接</div>
+                        <div class="description">檢查 Firestore 資料庫連接</div>
+                    </div>
+                </div>
+                
+                <div class="test-item">
+                    <div class="status loading" id="status-3">⏳</div>
+                    <div class="content">
+                        <div class="title">寫入權限測試</div>
+                        <div class="description">測試寫入 Firestore 的權限</div>
+                    </div>
+                </div>
+                
+                <div class="test-item">
+                    <div class="status loading" id="status-4">⏳</div>
+                    <div class="content">
+                        <div class="title">讀取權限測試</div>
+                        <div class="description">測試從 Firestore 讀取的權限</div>
+                    </div>
+                </div>
+                
+                <div class="test-item">
+                    <div class="status loading" id="status-5">⏳</div>
+                    <div class="content">
+                        <div class="title">用戶註冊服務測試</div>
+                        <div class="description">測試用戶註冊 API 服務</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div style="text-align: center; margin-top: 20px;">
+                <button class="btn" onclick="runDiagnostics()" id="run-btn">開始診斷</button>
+                <button class="btn" onclick="clearResults()" id="clear-btn">清除結果</button>
+            </div>
+        </div>
+
+        <div class="diagnostic-section">
+            <h2>⚙️ Firebase 配置</h2>
+            <div class="config-display" id="config-display">
+                點擊「開始診斷」查看配置信息
+            </div>
+        </div>
+
+        <div class="diagnostic-section">
+            <h2>📊 診斷結果</h2>
+            <div id="diagnostic-results">
+                等待診斷開始...
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        // Firebase 配置
+        const firebaseConfig = {
+            apiKey: "AIzaSyBuWO8hFVjjTUe2tqJDrqdbeGTrp4PoT5Q",
+            authDomain: "progect-115a5.firebaseapp.com",
+            databaseURL: "https://progect-115a5-default-rtdb.firebaseio.com",
+            projectId: "progect-115a5",
+            storageBucket: "progect-115a5.firebasestorage.app",
+            messagingSenderId: "109099222287",
+            appId: "1:109099222287:web:4f7b56a1eebe5abbfaaa7a",
+            measurementId: "G-DZVNBQ3G6S"
+        };
+
+        // 更新測試狀態
+        function updateTestStatus(testId, status, message = '') {
+            const statusElement = document.getElementById(`status-${testId}`);
+            const testItem = statusElement.parentElement;
+            
+            statusElement.className = `status ${status}`;
+            
+            if (status === 'success') {
+                statusElement.textContent = '✅';
+            } else if (status === 'error') {
+                statusElement.textContent = '❌';
+            } else if (status === 'loading') {
+                statusElement.textContent = '⏳';
+            }
+            
+            if (message) {
+                const description = testItem.querySelector('.description');
+                description.textContent = message;
+            }
+        }
+
+        // 添加診斷結果
+        function addDiagnosticResult(type, title, content) {
+            const resultsDiv = document.getElementById('diagnostic-results');
+            const resultDiv = document.createElement('div');
+            resultDiv.className = type === 'error' ? 'error-details' : 'success-details';
+            resultDiv.innerHTML = `<strong>${title}</strong>\n${content}`;
+            resultsDiv.appendChild(resultDiv);
+        }
+
+        // 顯示配置信息
+        function displayConfig() {
+            const configDisplay = document.getElementById('config-display');
+            configDisplay.textContent = JSON.stringify(firebaseConfig, null, 2);
+        }
+
+        // 運行診斷
+        window.runDiagnostics = async function() {
+            const runBtn = document.getElementById('run-btn');
+            const clearBtn = document.getElementById('clear-btn');
+            
+            runBtn.disabled = true;
+            clearBtn.disabled = true;
+            
+            // 清除之前的結果
+            document.getElementById('diagnostic-results').innerHTML = '診斷進行中...';
+            
+            // 顯示配置
+            displayConfig();
+            
+            try {
+                // 測試 1: Firebase 初始化
+                updateTestStatus(1, 'loading', '正在初始化 Firebase...');
+                
+                const { initializeApp } = await import("https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js");
+                const app = initializeApp(firebaseConfig);
+                
+                updateTestStatus(1, 'success', 'Firebase 初始化成功');
+                addDiagnosticResult('success', 'Firebase 初始化', 'Firebase 應用程式已成功初始化');
+                
+                // 測試 2: Firestore 連接
+                updateTestStatus(2, 'loading', '正在連接 Firestore...');
+                
+                const { getFirestore } = await import("https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js");
+                const db = getFirestore(app);
+                
+                updateTestStatus(2, 'success', 'Firestore 連接成功');
+                addDiagnosticResult('success', 'Firestore 連接', 'Firestore 資料庫已成功連接');
+                
+                // 測試 3: 寫入權限
+                updateTestStatus(3, 'loading', '正在測試寫入權限...');
+                
+                const { doc, setDoc } = await import("https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js");
+                
+                const testData = {
+                    message: "診斷測試",
+                    timestamp: new Date().toISOString(),
+                    testId: Math.random().toString(36).substr(2, 9)
+                };
+                
+                await setDoc(doc(db, "diagnostic", "test"), testData);
+                
+                updateTestStatus(3, 'success', '寫入權限測試成功');
+                addDiagnosticResult('success', '寫入權限測試', `成功寫入測試數據: ${JSON.stringify(testData, null, 2)}`);
+                
+                // 測試 4: 讀取權限
+                updateTestStatus(4, 'loading', '正在測試讀取權限...');
+                
+                const { getDoc } = await import("https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js");
+                
+                const docSnap = await getDoc(doc(db, "diagnostic", "test"));
+                
+                if (docSnap.exists()) {
+                    const data = docSnap.data();
+                    updateTestStatus(4, 'success', '讀取權限測試成功');
+                    addDiagnosticResult('success', '讀取權限測試', `成功讀取數據: ${JSON.stringify(data, null, 2)}`);
+                } else {
+                    updateTestStatus(4, 'error', '讀取權限測試失敗 - 文檔不存在');
+                    addDiagnosticResult('error', '讀取權限測試', '無法讀取測試文檔');
+                }
+                
+                // 測試 5: 用戶註冊服務
+                updateTestStatus(5, 'loading', '正在測試用戶註冊服務...');
+                
+                try {
+                    const { userRegistrationService } = await import('./src/services/userRegistrationService.js');
+                    
+                    // 測試服務是否可用
+                    if (userRegistrationService && typeof userRegistrationService.registerUser === 'function') {
+                        updateTestStatus(5, 'success', '用戶註冊服務可用');
+                        addDiagnosticResult('success', '用戶註冊服務', '用戶註冊服務已成功載入並可用');
+                    } else {
+                        updateTestStatus(5, 'error', '用戶註冊服務不可用');
+                        addDiagnosticResult('error', '用戶註冊服務', '用戶註冊服務載入失敗或方法不存在');
+                    }
+                } catch (importError) {
+                    updateTestStatus(5, 'error', '用戶註冊服務載入失敗');
+                    addDiagnosticResult('error', '用戶註冊服務', `載入錯誤: ${importError.message}`);
+                }
+                
+                // 診斷完成
+                addDiagnosticResult('success', '診斷完成', '所有測試已完成，請檢查上述結果');
+                
+            } catch (error) {
+                console.error('診斷錯誤:', error);
+                addDiagnosticResult('error', '診斷錯誤', `錯誤信息: ${error.message}\n錯誤代碼: ${error.code || '未知'}\n完整錯誤: ${JSON.stringify(error, null, 2)}`);
+            } finally {
+                runBtn.disabled = false;
+                clearBtn.disabled = false;
+            }
+        };
+
+        // 清除結果
+        window.clearResults = function() {
+            document.getElementById('diagnostic-results').innerHTML = '等待診斷開始...';
+            document.getElementById('config-display').textContent = '點擊「開始診斷」查看配置信息';
+            
+            // 重置所有測試狀態
+            for (let i = 1; i <= 5; i++) {
+                updateTestStatus(i, 'loading', '等待測試...');
+            }
+        };
+
+        // 頁面載入完成後自動顯示配置
+        document.addEventListener('DOMContentLoaded', function() {
+            displayConfig();
+            console.log('🔧 Firebase 診斷頁面已載入');
+        });
+    </script>
+</body>
+</html>

@@ -1021,7 +1021,9 @@
     <script>
         // 測驗相關變數
         let allQuestions = [];
+        let allQuestionsBilingual = []; // 雙語言題目集合
         let selectedQuestions = [];
+        let selectedQuestionsBilingual = []; // 雙語言選中的題目集合
         let currentQuestionIndex = 0;
         let userAnswers = [];
         let quizStartTime;
@@ -1158,7 +1160,7 @@
         }
         
         // 語言切換後顯示下一題（用於已作答的情況）
-        async function displayNextQuestionAfterLanguageSwitch() {
+        function displayNextQuestionAfterLanguageSwitch() {
             try {
                 console.log('displayNextQuestionAfterLanguageSwitch: currentQuestionIndex =', currentQuestionIndex);
                 
@@ -1166,50 +1168,29 @@
                 currentQuestionIndex++;
                 console.log('Updated currentQuestionIndex to:', currentQuestionIndex);
                 
-                // 根據當前語言選擇題目文件
-                const currentLang = localStorage.getItem('pbls_language') || 'zh';
-                const questionFile = currentLang === 'en' ? 'data/questions_en.json' : 'data/questions.json';
-                
-                console.log('Loading question file:', questionFile);
-                
-                // 重新載入題目文件
-                const response = await fetch(questionFile);
-                const newQuestions = await response.json();
-                
-                // 重要：更新整個 selectedQuestions 數組，而不只是當前題目
-                // 這樣確保所有後續題目都使用新語言版本
-                const originalQuestionIds = selectedQuestions.map(q => q.id);
-                const updatedQuestions = [];
-                
-                // 根據原始題目ID從新語言文件中找到對應的題目
-                for (let i = 0; i < originalQuestionIds.length; i++) {
-                    const originalId = originalQuestionIds[i];
-                    const newQuestion = newQuestions.find(q => q.id === originalId);
-                    if (newQuestion) {
-                        // 確保新題目有正確的結構
-                        console.log(`Updating question ${originalId} with new language version`);
-                        console.log('New question options count:', newQuestion.options.length);
-                        console.log('New question options:', newQuestion.options);
-                        updatedQuestions.push(newQuestion);
-                    } else {
-                        // 如果找不到對應的題目，使用原始題目
-                        console.log(`Question ${originalId} not found in new language file, using original`);
-                        updatedQuestions.push(selectedQuestions[i]);
-                    }
+                // 檢查是否有雙語言題目集合
+                if (selectedQuestionsBilingual.length === 0) {
+                    console.warn('No bilingual questions available, cannot switch language');
+                    return;
                 }
                 
-                // 更新整個 selectedQuestions 數組
-                selectedQuestions = updatedQuestions;
+                // 根據當前語言更新所有選中的題目
+                const currentLang = localStorage.getItem('pbls_language') || 'zh';
                 
-                console.log('Updated entire selectedQuestions array with new language');
-                console.log('Next question:', selectedQuestions[currentQuestionIndex].question);
-                console.log('Next question options count:', selectedQuestions[currentQuestionIndex].options.length);
-                console.log('Next question options:', selectedQuestions[currentQuestionIndex].options);
+                console.log('Updating all selected questions with new language:', currentLang);
+                
+                // 更新整個 selectedQuestions 數組為新語言版本
+                selectedQuestions = selectedQuestionsBilingual.map(q => {
+                    return currentLang === 'en' ? q.en : q.zh;
+                });
+                
+                console.log('Updated all selected questions with new language version');
+                console.log('New current question:', selectedQuestions[currentQuestionIndex].question);
                 
                 // 使用專門的語言切換後顯示函數，直接顯示題目和選項並開始計時
                 displayQuestionAfterLanguageSwitch();
             } catch (error) {
-                console.error('載入新語言題目失敗:', error);
+                console.error('Failed to switch language for next question:', error);
                 // 如果失敗，繼續使用原題目
                 displayQuestion();
             }
@@ -1305,34 +1286,75 @@
         
         // 語言切換後只更新文字內容（保持當前顯示狀態和進度）
         function displayQuestionForLanguageSwitch() {
-            const question = selectedQuestions[currentQuestionIndex];
-            console.log('displayQuestionForLanguageSwitch: updating question text only, preserving current display state:', currentDisplayState);
-            
-            // 只更新題目文字，不改變任何其他狀態
-            document.getElementById('question-text').textContent = 
-                `${currentQuestionIndex + 1}. ${question.question}`;
-            
-            // 更新選項文字（如果已經顯示）
-            const optionsContainer = document.getElementById('options');
-            const existingOptions = optionsContainer.querySelectorAll('.option');
-            
-            if (existingOptions.length > 0 && question.shuffledOptions) {
-                console.log('Updating existing options with new language');
-                // 為選項添加A)、B)、C)、D)標記
-                const optionLabels = ['A)', 'B)', 'C)', 'D)', 'E)', 'F)', 'G)', 'H)'];
+            try {
+                console.log('displayQuestionForLanguageSwitch: switching to bilingual version');
                 
-                existingOptions.forEach((option, index) => {
-                    if (question.shuffledOptions[index]) {
-                        const label = optionLabels[index] || `${String.fromCharCode(65 + index)})`;
-                        option.textContent = `${label} ${question.shuffledOptions[index]}`;
-                    }
-                });
+                // 檢查是否有雙語言題目集合
+                if (selectedQuestionsBilingual.length === 0) {
+                    console.warn('No bilingual questions available, cannot switch language');
+                    return;
+                }
+                
+                // 根據當前語言切換到對應版本
+                const currentLang = localStorage.getItem('pbls_language') || 'zh';
+                const bilingualQuestion = selectedQuestionsBilingual[currentQuestionIndex];
+                
+                if (!bilingualQuestion) {
+                    console.error('Bilingual question not found for index:', currentQuestionIndex);
+                    return;
+                }
+                
+                // 更新當前題目為新語言版本
+                const newQuestion = currentLang === 'en' ? bilingualQuestion.en : bilingualQuestion.zh;
+                
+                // 保持原有的選項順序和狀態，只更新文字內容
+                selectedQuestions[currentQuestionIndex] = {
+                    ...newQuestion,
+                    shuffledOptions: newQuestion.options,
+                    correctAnswer: newQuestion.correctAnswer,
+                    currentCorrectIndex: selectedQuestions[currentQuestionIndex].currentCorrectIndex // 保持選項順序
+                };
+                
+                console.log('Updated current question with new language:', selectedQuestions[currentQuestionIndex].question);
+                
+                const question = selectedQuestions[currentQuestionIndex];
+                console.log('displayQuestionForLanguageSwitch: updating question text only, preserving current display state:', currentDisplayState);
+                
+                // 只更新題目文字，不改變任何其他狀態
+                document.getElementById('question-text').textContent = 
+                    `${currentQuestionIndex + 1}. ${question.question}`;
+                
+                // 更新選項文字（如果已經顯示）
+                const optionsContainer = document.getElementById('options');
+                const existingOptions = optionsContainer.querySelectorAll('.option');
+                
+                if (existingOptions.length > 0 && question.shuffledOptions) {
+                    console.log('Updating existing options with new language');
+                    // 為選項添加A)、B)、C)、D)標記
+                    const optionLabels = ['A)', 'B)', 'C)', 'D)', 'E)', 'F)', 'G)', 'H)'];
+                    
+                    existingOptions.forEach((option, index) => {
+                        if (question.shuffledOptions[index]) {
+                            const label = optionLabels[index] || `${String.fromCharCode(65 + index)})`;
+                            option.textContent = `${label} ${question.shuffledOptions[index]}`;
+                        }
+                    });
+                }
+                
+                // 更新測驗進度
+                updateQuizProgress();
+                
+                console.log('displayQuestionForLanguageSwitch: text updated, display state preserved');
+                
+            } catch (error) {
+                console.error('Failed to switch language:', error);
+                // 如果失敗，至少更新題目文字
+                const question = selectedQuestions[currentQuestionIndex];
+                if (question) {
+                    document.getElementById('question-text').textContent = 
+                        `${currentQuestionIndex + 1}. ${question.question}`;
+                }
             }
-            
-            // 更新測驗進度
-            updateQuizProgress();
-            
-            console.log('displayQuestionForLanguageSwitch: text updated, display state preserved');
         }
         
         // 將函數和變量暴露到全局作用域，供語言切換器使用
@@ -1538,15 +1560,56 @@
             // 用戶取消離開，繼續測驗（不需要做任何操作）
         }
 
+        // 創建雙語言題目集合
+        function createBilingualQuestionSet(chineseQuestions, englishQuestions) {
+            console.log('Creating bilingual question set');
+            
+            // 根據題目ID匹配中文和英文版本
+            const bilingualQuestions = chineseQuestions.map(chineseQ => {
+                const englishQ = englishQuestions.find(eq => eq.id === chineseQ.id);
+                
+                if (!englishQ) {
+                    console.warn(`No English version found for question ID: ${chineseQ.id}`);
+                    return {
+                        id: chineseQ.id,
+                        zh: chineseQ,
+                        en: chineseQ // 如果沒有英文版本，使用中文版本
+                    };
+                }
+                
+                return {
+                    id: chineseQ.id,
+                    zh: chineseQ,
+                    en: englishQ
+                };
+            });
+            
+            console.log('Created bilingual question set with', bilingualQuestions.length, 'questions');
+            return bilingualQuestions;
+        }
+
         // 載入問題數據
         async function loadQuestions() {
             try {
-                // 根據當前語言選擇題目文件
-                const currentLang = localStorage.getItem('pbls_language') || 'zh';
-                const questionFile = currentLang === 'en' ? 'data/questions_en.json' : 'data/questions.json';
+                console.log('loadQuestions: Loading both Chinese and English question sets');
                 
-                const response = await fetch(questionFile);
-                allQuestions = await response.json();
+                // 同時載入中文和英文版本的題目
+                const [chineseResponse, englishResponse] = await Promise.all([
+                    fetch('data/questions.json'),
+                    fetch('data/questions_en.json')
+                ]);
+                
+                const chineseQuestions = await chineseResponse.json();
+                const englishQuestions = await englishResponse.json();
+                
+                // 創建雙語言題目集合
+                allQuestionsBilingual = createBilingualQuestionSet(chineseQuestions, englishQuestions);
+                
+                console.log('Loaded bilingual questions:', allQuestionsBilingual.length);
+                
+                // 根據當前語言選擇使用的題目集合
+                const currentLang = localStorage.getItem('pbls_language') || 'zh';
+                allQuestions = currentLang === 'en' ? englishQuestions : chineseQuestions;
                 
                 // 更新測驗描述以反映實際題目數量
                 updateQuizDescriptionText();
@@ -1558,24 +1621,22 @@
                 startQuiz();
             } catch (error) {
                 console.error('載入問題失敗:', error);
-                // 如果英文題目載入失敗，嘗試載入中文題目
-                if (questionFile.includes('_en.json')) {
-                    try {
-                        const response = await fetch('data/questions.json');
-                        allQuestions = await response.json();
-                        
-                        // 更新測驗描述以反映實際題目數量
-                        updateQuizDescriptionText();
-                        
-                        // 隱藏測驗說明，顯示開始測驗按鈕
-                        hideQuizInfo();
-                        
-                        startQuiz();
-                    } catch (fallbackError) {
-                        console.error('載入中文問題也失敗:', fallbackError);
-                alert('載入測驗題目失敗，請重新整理頁面。');
-                    }
-                } else {
+                // 如果雙語言載入失敗，回退到單語言載入
+                try {
+                    const currentLang = localStorage.getItem('pbls_language') || 'zh';
+                    const questionFile = currentLang === 'en' ? 'data/questions_en.json' : 'data/questions.json';
+                    const response = await fetch(questionFile);
+                    allQuestions = await response.json();
+                    
+                    // 更新測驗描述以反映實際題目數量
+                    updateQuizDescriptionText();
+                    
+                    // 隱藏測驗說明，顯示開始測驗按鈕
+                    hideQuizInfo();
+                    
+                    startQuiz();
+                } catch (fallbackError) {
+                    console.error('載入中文問題也失敗:', fallbackError);
                     alert('載入測驗題目失敗，請重新整理頁面。');
                 }
             }
@@ -1585,9 +1646,20 @@
         function startQuiz() {
             // 檢查可用題目數量，動態決定測驗題目數量
             const maxQuestions = Math.min(20, allQuestions.length); // 最多20題，但不超過可用題目數
-            selectedQuestions = getRandomQuestions(maxQuestions);
             
-            console.log(`開始測驗：共 ${selectedQuestions.length} 題，來自 ${allQuestions.length} 題題庫`);
+            if (allQuestionsBilingual.length > 0) {
+                // 使用雙語言題目集合
+                selectedQuestionsBilingual = getRandomBilingualQuestions(maxQuestions);
+                selectedQuestions = selectedQuestionsBilingual.map(q => {
+                    const currentLang = localStorage.getItem('pbls_language') || 'zh';
+                    return currentLang === 'en' ? q.en : q.zh;
+                });
+                console.log(`開始測驗（雙語言）：共 ${selectedQuestions.length} 題，來自 ${allQuestionsBilingual.length} 題題庫`);
+            } else {
+                // 回退到單語言題目集合
+                selectedQuestions = getRandomQuestions(maxQuestions);
+                console.log(`開始測驗（單語言）：共 ${selectedQuestions.length} 題，來自 ${allQuestions.length} 題題庫`);
+            }
             
             currentQuestionIndex = 0;
             userAnswers = [];
@@ -1667,6 +1739,34 @@
         }
 
         // 隨機選擇問題（確保不重複）
+        function getRandomBilingualQuestions(count) {
+            // 如果要求的題目數量超過可用題目總數，則返回所有題目
+            if (count >= allQuestionsBilingual.length) {
+                console.log(`要求 ${count} 題，但只有 ${allQuestionsBilingual.length} 題可用，返回所有題目`);
+                return [...allQuestionsBilingual]; // 返回所有題目的副本
+            }
+            
+            // 使用 Fisher-Yates 洗牌算法確保真正的隨機性和不重複
+            const shuffled = [...allQuestionsBilingual];
+            for (let i = shuffled.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+            }
+            
+            // 返回前 count 個題目
+            const selected = shuffled.slice(0, count);
+            console.log(`從 ${allQuestionsBilingual.length} 題中隨機選擇了 ${selected.length} 題（雙語言版本）`);
+            
+            // 確保沒有重複的題目
+            const questionIds = selected.map(q => q.id);
+            const uniqueIds = [...new Set(questionIds)];
+            if (uniqueIds.length !== questionIds.length) {
+                console.warn('發現重複的題目ID，這不應該發生');
+            }
+            
+            return selected;
+        }
+
         function getRandomQuestions(count) {
             // 如果要求的題目數量超過可用題目總數，則返回所有題目
             if (count >= allQuestions.length) {
@@ -2032,13 +2132,17 @@
 
         // 選擇選項
         function selectOption(optionIndex) {
-            // 如果已經選擇過答案或正在轉換中，直接返回，防止重複點擊
-            if (isNextLocked || isTransitioning) {
+            try {
+                // 如果已經選擇過答案或正在轉換中，直接返回，防止重複點擊
+                if (isNextLocked || isTransitioning) {
+                    console.log('selectOption: ignoring click - already locked or transitioning');
                 return;
             }
-            
-            // 立即禁用所有按鈕（包括語言切換按鈕）
-            disableAllButtons();
+                
+                console.log('selectOption: processing option', optionIndex);
+                
+                // 立即禁用所有按鈕（包括語言切換按鈕）
+                disableAllButtons();
             
             // 設置鎖定，防止重複點擊
             isNextLocked = true;
@@ -2062,25 +2166,43 @@
             });
             
             // 標記選中的選項
-            document.querySelectorAll('.option')[optionIndex].classList.add('selected');
+                const selectedOption = document.querySelectorAll('.option')[optionIndex];
+                if (selectedOption) {
+                    selectedOption.classList.add('selected');
+                }
             
             // 立即處理答案並跳轉
             handleAnswerSelection(optionIndex);
+                
+            } catch (error) {
+                console.error('Error in selectOption:', error);
+                // 重置狀態以防止頁面當掉
+                isNextLocked = false;
+                isTransitioning = false;
+                enableAllButtons();
+            }
         }
 
         // 處理答案選擇
         function handleAnswerSelection(optionIndex) {
+            try {
             const question = selectedQuestions[currentQuestionIndex];
             const isCorrect = optionIndex === question.currentCorrectIndex;
+                
+                console.log('handleAnswerSelection: processing answer', optionIndex, 'isCorrect:', isCorrect);
             
             // 立即停止答題音效
+                if (window.quizSoundManager) {
             window.quizSoundManager.stopCurrentSound();
+                }
             
             // 播放對應音效
+                if (window.quizSoundManager) {
             if (isCorrect) {
                 window.quizSoundManager.playCorrect();
             } else {
                 window.quizSoundManager.playWrong();
+                    }
             }
             
             // 記錄用戶答案
@@ -2097,10 +2219,21 @@
             
             // 顯示解釋
             showExplanation(question, optionIndex, isCorrect);
+                
+            } catch (error) {
+                console.error('Error in handleAnswerSelection:', error);
+                // 重置狀態以防止頁面當掉
+                isNextLocked = false;
+                isTransitioning = false;
+                enableAllButtons();
+            }
         }
 
         // 顯示解釋
         function showExplanation(question, userAnswer, isCorrect) {
+            try {
+                console.log('showExplanation: showing explanation for question', currentQuestionIndex);
+                
             // 停止當前計時器
             if (timerInterval) {
                 clearInterval(timerInterval);
@@ -2115,23 +2248,66 @@
             });
             
             // 標記正確和錯誤的選項
+            console.log('showExplanation: marking options');
+            console.log('Question object:', question);
+            console.log('Correct answer index:', question.currentCorrectIndex);
+            console.log('User answer index:', userAnswer);
+            console.log('Is correct:', isCorrect);
+            console.log('Total options:', document.querySelectorAll('.option').length);
+            
             document.querySelectorAll('.option').forEach((option, index) => {
+                console.log(`Option ${index}:`, option.textContent);
                 if (index === question.currentCorrectIndex) {
+                    console.log(`✅ Marking option ${index} as CORRECT`);
                     option.classList.add('correct');
+                    console.log('Option classes after adding correct:', option.className);
                 } else if (index === userAnswer && !isCorrect) {
+                    console.log(`❌ Marking option ${index} as INCORRECT`);
                     option.classList.add('incorrect');
+                    console.log('Option classes after adding incorrect:', option.className);
                 }
             });
             
+            // 驗證標記結果
+            setTimeout(() => {
+                const correctOptions = document.querySelectorAll('.option.correct');
+                const incorrectOptions = document.querySelectorAll('.option.incorrect');
+                console.log('✅ Correct options found:', correctOptions.length);
+                console.log('❌ Incorrect options found:', incorrectOptions.length);
+                if (correctOptions.length > 0) {
+                    console.log('Correct option text:', correctOptions[0].textContent);
+                }
+            }, 100);
+            
+            console.log('showExplanation: marking completed');
+            
             // 自動跳轉到下一題或結束測驗
             setTimeout(() => {
+                    try {
                 if (currentQuestionIndex < selectedQuestions.length - 1) {
                     currentQuestionIndex++;
+                            console.log('Moving to next question:', currentQuestionIndex);
                     displayQuestionWithDelay();
                 } else {
+                            console.log('Ending quiz');
                     endQuiz();
+                        }
+                    } catch (error) {
+                        console.error('Error in showExplanation timeout:', error);
+                        // 重置狀態以防止頁面當掉
+                        isNextLocked = false;
+                        isTransitioning = false;
+                        enableAllButtons();
                 }
             }, 2000);
+                
+            } catch (error) {
+                console.error('Error in showExplanation:', error);
+                // 重置狀態以防止頁面當掉
+                isNextLocked = false;
+                isTransitioning = false;
+                enableAllButtons();
+            }
         }
 
         // 結束測驗
@@ -2307,6 +2483,37 @@
                 window.location.href = 'login.html';
             }
         }
+
+        // 語言切換處理函數 - 供語言切換器調用
+        function handleQuizLanguageSwitch() {
+            console.log('handleQuizLanguageSwitch called');
+            
+            // 檢查是否在轉換中，如果是則忽略語言切換請求
+            if (window.isTransitioning && window.isTransitioning()) {
+                console.log('Ignoring language switch request - currently transitioning');
+                return;
+            }
+            
+            // 檢查當前題目是否已作答
+            const isAnswered = window.isCurrentQuestionAnswered && window.isCurrentQuestionAnswered();
+            
+            if (isAnswered) {
+                console.log('Current question answered, moving to next question');
+                // 如果當前題目已作答，進入下一題
+                if (window.displayNextQuestionAfterLanguageSwitch) {
+                    window.displayNextQuestionAfterLanguageSwitch();
+                }
+            } else {
+                console.log('Current question not answered, staying on current question');
+                // 如果當前題目未作答，重新顯示當前題目
+                if (window.displayQuestionForLanguageSwitch) {
+                    window.displayQuestionForLanguageSwitch();
+                }
+            }
+        }
+
+        // 將函數暴露到全局作用域
+        window.handleQuizLanguageSwitch = handleQuizLanguageSwitch;
     </script>
     <script src="src/js/language-switcher.js"></script>
 </body>

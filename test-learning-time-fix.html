@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>學習時間修復測試</title>
+    <style>
+        body {
+            font-family: 'Microsoft JhengHei', sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .test-section {
+            background: #f8f9fa;
+            padding: 20px;
+            margin: 15px 0;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+        .data-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #eee;
+        }
+        .data-item:last-child {
+            border-bottom: none;
+        }
+        .data-label {
+            font-weight: 600;
+            color: #333;
+        }
+        .data-value {
+            color: #666;
+            font-family: monospace;
+        }
+        .btn {
+            background: #667eea;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        .btn:hover {
+            background: #5a6fd8;
+        }
+        .btn-success {
+            background: #28a745;
+        }
+        .btn-success:hover {
+            background: #218838;
+        }
+        .btn-warning {
+            background: #ffc107;
+            color: #212529;
+        }
+        .btn-warning:hover {
+            background: #e0a800;
+        }
+        .btn-danger {
+            background: #dc3545;
+        }
+        .btn-danger:hover {
+            background: #c82333;
+        }
+        .status {
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .status.warning {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+        .log {
+            background: #f1f1f1;
+            padding: 15px;
+            border-radius: 5px;
+            font-family: monospace;
+            font-size: 12px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .time-display {
+            font-size: 24px;
+            font-weight: bold;
+            color: #667eea;
+            text-align: center;
+            padding: 20px;
+            background: #f8f9ff;
+            border-radius: 8px;
+            margin: 10px 0;
+            border: 2px solid #667eea;
+        }
+        .time-info {
+            background: #e3f2fd;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+        }
+        .format-examples {
+            background: #f0f8ff;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>學習時間修復測試</h1>
+        
+        <div class="status" id="loginStatus">
+            <strong>登入狀態:</strong> <span id="loginStatusText">檢查中...</span>
+        </div>
+
+        <div class="test-section">
+            <h3>學習時間顯示</h3>
+            <div class="time-display">
+                總學習時間: <span id="total-time-spent">載入中...</span>
+            </div>
+            <div class="format-examples">
+                <p><strong>時間格式範例:</strong></p>
+                <p>• 3小時12分11秒 → <span style="font-family: monospace; color: #667eea;">3:12:11</span></p>
+                <p>• 1小時5分3秒 → <span style="font-family: monospace; color: #667eea;">1:05:03</span></p>
+                <p>• 0小時30分45秒 → <span style="font-family: monospace; color: #667eea;">0:30:45</span></p>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h3>時間資訊</h3>
+            <div class="time-info">
+                <div class="data-item">
+                    <span class="data-label">當前時間:</span>
+                    <span class="data-value" id="currentTime">-</span>
+                </div>
+                <div class="data-item">
+                    <span class="data-label">上次登入:</span>
+                    <span class="data-value" id="lastLogin">-</span>
+                </div>
+                <div class="data-item">
+                    <span class="data-label">時間差:</span>
+                    <span class="data-value" id="timeDiff">-</span>
+                </div>
+                <div class="data-item">
+                    <span class="data-label">Firebase totalTimeSpent:</span>
+                    <span class="data-value" id="firebaseTime">-</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h3>用戶資料</h3>
+            <div class="data-item">
+                <span class="data-label">用戶ID:</span>
+                <span class="data-value" id="userId">-</span>
+            </div>
+            <div class="data-item">
+                <span class="data-label">姓名:</span>
+                <span class="data-value" id="userName">-</span>
+            </div>
+            <div class="data-item">
+                <span class="data-label">學號:</span>
+                <span class="data-value" id="studentId">-</span>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h3>測試操作</h3>
+            <button class="btn" onclick="refreshTimeSpent()">重新整理學習時間</button>
+            <button class="btn btn-success" onclick="simulateLogin()">模擬登入</button>
+            <button class="btn btn-warning" onclick="testDisplayFunction()">測試顯示函數</button>
+            <button class="btn btn-warning" onclick="testFormatFunction()">測試格式化函數</button>
+            <button class="btn btn-danger" onclick="resetTimeSpent()">重置學習時間</button>
+            <button class="btn" onclick="clearLog()">清除日誌</button>
+        </div>
+
+        <div class="test-section">
+            <h3>操作日誌</h3>
+            <div id="log" class="log"></div>
+        </div>
+    </div>
+
+    <script type="module">
+        // Firebase 配置
+        const firebaseConfig = {
+            apiKey: "AIzaSyBuWO8hFVjjTUe2tqJDrqdbeGTrp4PoT5Q",
+            authDomain: "progect-115a5.firebaseapp.com",
+            projectId: "progect-115a5"
+        };
+
+        // 導入 Firebase 模組
+        const { initializeApp, getApps, getApp } = await import("https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js");
+        const app = getApps().length ? getApp() : initializeApp(firebaseConfig);
+
+        // 導入成績功能
+        const { displayTotalTimeSpent, updateTotalTimeSpent } = await import("./web/js/results.js");
+
+        // 日誌功能
+        function addLog(message, type = 'info') {
+            const log = document.getElementById('log');
+            const timestamp = new Date().toLocaleTimeString();
+            log.innerHTML += `[${timestamp}] ${message}\n`;
+            log.scrollTop = log.scrollHeight;
+        }
+
+        function clearLog() {
+            document.getElementById('log').innerHTML = '';
+        }
+
+        // 獲取當前用戶
+        function getCurrentUser() {
+            return JSON.parse(localStorage.getItem('pbls_user') || 'null');
+        }
+
+        // 更新登入狀態顯示
+        function updateLoginStatus() {
+            const user = getCurrentUser();
+            const statusElement = document.getElementById('loginStatus');
+            const statusTextElement = document.getElementById('loginStatusText');
+            
+            if (user && user.uid) {
+                statusElement.className = 'status success';
+                statusTextElement.textContent = '已登入';
+                addLog('用戶已登入', 'success');
+            } else {
+                statusElement.className = 'status error';
+                statusTextElement.textContent = '未登入';
+                addLog('用戶未登入', 'error');
+            }
+        }
+
+        // 更新用戶資料顯示
+        function updateUserDataDisplay() {
+            const user = getCurrentUser();
+            
+            if (user && user.uid) {
+                document.getElementById('userId').textContent = user.uid || '-';
+                document.getElementById('userName').textContent = user.name || user.displayName || '-';
+                document.getElementById('studentId').textContent = user.studentId || '-';
+                
+                addLog('用戶資料顯示已更新', 'success');
+            } else {
+                const elements = ['userId', 'userName', 'studentId'];
+                elements.forEach(id => {
+                    document.getElementById(id).textContent = '-';
+                });
+                addLog('用戶資料已清空', 'warning');
+            }
+        }
+
+        // 更新時間資訊顯示
+        function updateTimeInfo() {
+            const currentTime = new Date();
+            document.getElementById('currentTime').textContent = currentTime.toLocaleString('zh-TW');
+            
+            const user = getCurrentUser();
+            if (user && user.lastLogin) {
+                try {
+                    let lastLoginTime;
+                    if (user.lastLogin.toDate) {
+                        lastLoginTime = user.lastLogin.toDate();
+                    } else if (typeof user.lastLogin === 'string') {
+                        lastLoginTime = new Date(user.lastLogin);
+                    } else {
+                        lastLoginTime = new Date(user.lastLogin);
+                    }
+                    
+                    document.getElementById('lastLogin').textContent = lastLoginTime.toLocaleString('zh-TW');
+                    
+                    const timeDiff = (currentTime - lastLoginTime) / 1000; // 秒
+                    const hours = Math.floor(timeDiff / 3600);
+                    const minutes = Math.floor((timeDiff % 3600) / 60);
+                    const seconds = Math.floor(timeDiff % 60);
+                    
+                    document.getElementById('timeDiff').textContent = `${hours}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+                } catch (error) {
+                    document.getElementById('lastLogin').textContent = '無法解析';
+                    document.getElementById('timeDiff').textContent = '無法計算';
+                }
+            } else {
+                document.getElementById('lastLogin').textContent = '無記錄';
+                document.getElementById('timeDiff').textContent = '無記錄';
+            }
+        }
+
+        // 重新整理學習時間
+        async function refreshTimeSpent() {
+            const user = getCurrentUser();
+            if (!user || !user.uid) {
+                addLog('錯誤: 請先登入', 'error');
+                return;
+            }
+
+            try {
+                addLog('開始重新整理學習時間...', 'info');
+                await displayTotalTimeSpent(user.uid, 'total-time-spent');
+                addLog('學習時間重新整理完成', 'success');
+            } catch (error) {
+                addLog(`重新整理失敗: ${error.message}`, 'error');
+            }
+        }
+
+        // 模擬登入
+        async function simulateLogin() {
+            const user = getCurrentUser();
+            if (!user || !user.uid) {
+                addLog('錯誤: 請先登入', 'error');
+                return;
+            }
+
+            try {
+                addLog('開始模擬登入...', 'info');
+                
+                const timeSpent = await updateTotalTimeSpent(user.uid);
+                addLog(`模擬登入完成，本次學習時間: ${timeSpent} 秒`, 'success');
+                
+                // 更新顯示
+                setTimeout(refreshTimeSpent, 1000);
+                setTimeout(updateTimeInfo, 1000);
+            } catch (error) {
+                addLog(`模擬登入失敗: ${error.message}`, 'error');
+            }
+        }
+
+        // 測試顯示函數
+        async function testDisplayFunction() {
+            const user = getCurrentUser();
+            if (!user || !user.uid) {
+                addLog('錯誤: 請先登入', 'error');
+                return;
+            }
+
+            try {
+                addLog('測試 displayTotalTimeSpent 函數...', 'info');
+                
+                const timeSpent = await displayTotalTimeSpent(user.uid, 'total-time-spent');
+                addLog(`獲取到的學習時間: ${timeSpent} 秒`, 'success');
+                addLog('displayTotalTimeSpent 函數執行完成', 'success');
+            } catch (error) {
+                addLog(`測試失敗: ${error.message}`, 'error');
+            }
+        }
+
+        // 測試格式化函數
+        function testFormatFunction() {
+            addLog('測試時間格式化函數...', 'info');
+            
+            const testCases = [
+                { seconds: 0, expected: '0:00:00' },
+                { seconds: 30, expected: '0:00:30' },
+                { seconds: 65, expected: '0:01:05' },
+                { seconds: 3665, expected: '1:01:05' },
+                { seconds: 11531, expected: '3:12:11' }
+            ];
+            
+            testCases.forEach(testCase => {
+                const hours = Math.floor(testCase.seconds / 3600);
+                const minutes = Math.floor((testCase.seconds % 3600) / 60);
+                const seconds = Math.floor(testCase.seconds % 60);
+                const formatted = `${hours}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+                
+                const result = formatted === testCase.expected ? '✅' : '❌';
+                addLog(`${result} ${testCase.seconds}秒 → ${formatted} (期望: ${testCase.expected})`, 
+                       formatted === testCase.expected ? 'success' : 'error');
+            });
+        }
+
+        // 重置學習時間
+        async function resetTimeSpent() {
+            const user = getCurrentUser();
+            if (!user || !user.uid) {
+                addLog('錯誤: 請先登入', 'error');
+                return;
+            }
+
+            if (!confirm('確定要重置總學習時間為0嗎？')) {
+                return;
+            }
+
+            try {
+                const { getFirestore, doc, setDoc } = await import("https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js");
+                const db = getFirestore();
+                const userRef = doc(db, 'user', user.uid);
+                
+                await setDoc(userRef, {
+                    totalTimeSpent: 0
+                }, { merge: true });
+                
+                addLog('總學習時間已重置為0', 'success');
+                setTimeout(refreshTimeSpent, 1000);
+            } catch (error) {
+                addLog(`重置失敗: ${error.message}`, 'error');
+            }
+        }
+
+        // 頁面載入完成後初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            addLog('頁面載入完成');
+            updateLoginStatus();
+            updateUserDataDisplay();
+            updateTimeInfo();
+            
+            // 初始載入學習時間
+            setTimeout(refreshTimeSpent, 1000);
+            
+            // 定期更新時間資訊
+            setInterval(updateTimeInfo, 10000); // 每10秒更新一次
+        });
+
+        // 將函數暴露到全域
+        window.refreshTimeSpent = refreshTimeSpent;
+        window.simulateLogin = simulateLogin;
+        window.testDisplayFunction = testDisplayFunction;
+        window.testFormatFunction = testFormatFunction;
+        window.resetTimeSpent = resetTimeSpent;
+        window.clearLog = clearLog;
+    </script>
+</body>
+</html>

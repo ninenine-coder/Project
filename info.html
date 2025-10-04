@@ -543,7 +543,7 @@
             flex-wrap: wrap;
         }
 
-        .practice-btn, .exam-btn {
+        .practice-btn, .exam-btn, .history-btn {
             border: none;
             padding: 18px 35px;
             border-radius: 25px;
@@ -576,6 +576,18 @@
             transform: translateY(-3px);
             box-shadow: 0 12px 30px rgba(245, 158, 11, 0.4);
             background: linear-gradient(135deg, #d97706 0%, #b45309 100%);
+        }
+
+        .history-btn {
+            background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+            color: white;
+            box-shadow: 0 6px 20px rgba(139, 92, 246, 0.3);
+        }
+
+        .history-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 30px rgba(139, 92, 246, 0.4);
+            background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);
         }
 
         /* 彈出視窗樣式 */
@@ -755,7 +767,7 @@
                 gap: 20px;
             }
 
-            .practice-btn, .exam-btn {
+            .practice-btn, .exam-btn, .history-btn {
                 min-width: 250px;
             }
         }
@@ -763,6 +775,8 @@
     
     <!-- 語言切換功能 -->
     <script src="src/js/language-switcher.js"></script>
+    <!-- 用戶資料服務 -->
+    <script type="module" src="src/services/userDataService.js"></script>
 </head>
 <body>
     <!-- 側邊欄 -->
@@ -813,7 +827,7 @@
             <h1 class="header-title">歡迎使用PBLS教學平台</h1>
         </div>
         <div class="header-right">
-            <div class="user-info">CGU(長庚大學), Nursing</div>
+            <div class="user-info" id="user-info-display">載入中...</div>
             <div class="user-avatar" onclick="showUserProfile()">
                 <i class="fas fa-user"></i>
             </div>
@@ -949,6 +963,9 @@
                     <button class="exam-btn" onclick="goToExam()">
                         進入考試測驗
                     </button>
+                    <button class="history-btn" onclick="goToHistory()">
+                        歷史成績
+                    </button>
                 </div>
             </div>
         </div>
@@ -992,6 +1009,11 @@
         // 跳轉到考試專區
         function goToExam() {
             window.location.href = 'exam.html';
+        }
+
+        // 跳轉到歷史成績
+        function goToHistory() {
+            window.location.href = 'web/history.html';
         }
 
         // 處理措施資料
@@ -1103,7 +1125,50 @@
             
             // 初始化背景輪播
             initHeroBackground();
+            
+            // 檢查用戶登入狀態
+            checkUserAuth();
         });
+
+        // 檢查用戶認證狀態
+        function checkUserAuth() {
+            const currentUser = JSON.parse(localStorage.getItem('pbls_user') || 'null');
+            
+            if (!currentUser) {
+                // 用戶未登入，跳轉到登入頁面
+                alert('請先登入後再使用系統');
+                window.location.href = 'login.html';
+                return;
+            }
+            
+            // 顯示用戶信息
+            displayUserInfo(currentUser);
+            
+            // 使用用戶資料服務更新用戶資訊
+            setTimeout(() => {
+                updateUserInfoWithService();
+            }, 1000);
+        }
+
+        // 顯示用戶信息
+        function displayUserInfo(user) {
+            const userInfoDisplay = document.getElementById('user-info-display');
+            if (userInfoDisplay && user) {
+                const where = user.where || '未知單位';
+                const department = user.department || '未知部門';
+                userInfoDisplay.textContent = `${where}, ${department}`;
+            }
+        }
+
+        // 使用用戶資料服務更新用戶資訊顯示
+        function updateUserInfoWithService() {
+            if (window.userDataService && window.userDataService.isLoggedIn()) {
+                const userInfoDisplay = document.getElementById('user-info-display');
+                if (userInfoDisplay) {
+                    userInfoDisplay.textContent = window.userDataService.getUserInfo();
+                }
+            }
+        }
 
         // 初始化 Hero Section 背景輪播
         function initHeroBackground() {
@@ -1143,6 +1208,15 @@
 
         // 添加卡片懸停效果
         document.addEventListener('DOMContentLoaded', function() {
+            // 確保跑馬燈正常顯示
+            const marquee = document.querySelector('.marquee');
+            if (marquee) {
+                console.log('✅ 跑馬燈元素已找到');
+                marquee.style.display = 'flex';
+            } else {
+                console.error('❌ 找不到跑馬燈元素');
+            }
+            
             const scenarioCards = document.querySelectorAll('.scenario-card');
             
             scenarioCards.forEach(card => {
@@ -1156,7 +1230,7 @@
             });
 
             // 添加按鈕點擊動畫效果
-            const buttons = document.querySelectorAll('.learn-more-btn, .practice-btn, .exam-btn, .scenario-btn');
+            const buttons = document.querySelectorAll('.learn-more-btn, .practice-btn, .exam-btn, .history-btn, .scenario-btn');
             buttons.forEach(button => {
                 button.addEventListener('click', function() {
                     this.style.transform = 'scale(0.95)';
@@ -1178,6 +1252,7 @@
                 // 清除本地儲存
                 localStorage.removeItem('pbls_user');
                 localStorage.removeItem('pbls_user_profile');
+                localStorage.removeItem('pbls_remember_me');
                 
                 // 跳轉到登入頁面
                 window.location.href = 'login.html';

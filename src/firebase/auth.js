@@ -3,13 +3,9 @@ import {
   createUserWithEmailAndPassword,
   signOut,
   onAuthStateChanged,
-  GoogleAuthProvider,
   signInWithPopup
 } from 'firebase/auth'
-import { auth } from './config'
-
-// Google登入提供者
-const googleProvider = new GoogleAuthProvider()
+import { auth, googleProvider } from '../lib/firebase'
 
 // 電子郵件登入
 export const signInWithEmail = async (email, password) => {

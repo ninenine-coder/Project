@@ -1,58 +1,10 @@
 <!DOCTYPE html>
-<html lang="zh-TW">
+<html lang="zh-Hant">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>登入 - PBLS VR教學平台</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <!-- Firebase SDK -->
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js"></script>
-    <script>
-        // Firebase配置 - 請從Firebase Console獲取正確的配置
-        const firebaseConfig = {
-            apiKey: "AIzaSyBuWO8hFVjjTUe2tqJDrqdbeGTrp4PoT5Q",
-            authDomain: "progect-115a5.firebaseapp.com",
-            projectId: "progect-115a5",
-            storageBucket: "progect-115a5.appspot.com",
-            messagingSenderId: "109099222287",
-            appId: "1:109099222287:web:4f7b56a1eebe5abbfaaa7a" // 需要從Firebase Console獲取真實的App ID
-        };
-
-        // 初始化Firebase
-        let app, auth, db;
-        let isFirebaseReady = false;
-        
-        try {
-            // 檢查Firebase SDK是否載入
-            if (typeof firebase === 'undefined') {
-                throw new Error('Firebase SDK未載入');
-            }
-            
-            // 初始化Firebase
-            app = firebase.initializeApp(firebaseConfig);
-            auth = firebase.auth();
-            db = firebase.firestore();
-            isFirebaseReady = true;
-            console.log('Firebase初始化成功');
-            console.log('Firebase App:', app);
-            console.log('Firebase Auth:', auth);
-            console.log('Firebase Firestore:', db);
-        } catch (error) {
-            console.error('Firebase初始化失敗:', error);
-            isFirebaseReady = false;
-            
-            // 顯示詳細的錯誤信息
-            if (error.message.includes('Firebase SDK未載入')) {
-                console.error('請檢查Firebase SDK是否正確載入');
-            } else if (error.message.includes('Invalid app ID')) {
-                console.error('App ID無效，請從Firebase Console獲取正確的App ID');
-            } else if (error.message.includes('Invalid API key')) {
-                console.error('API Key無效，請檢查Firebase配置');
-            }
-        }
-    </script>
     <style>
         * {
             margin: 0;
@@ -61,759 +13,618 @@
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Microsoft JhengHei', sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
             display: flex;
-            align-items: center;
             justify-content: center;
-            position: relative;
-            overflow: hidden;
-        }
-
-        /* 用戶信息顯示 */
-        #user-info {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            display: none;
             align-items: center;
-            gap: 10px;
-            background: rgba(255, 255, 255, 0.9);
-            padding: 10px 15px;
-            border-radius: 25px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-            backdrop-filter: blur(10px);
-            z-index: 1000;
-        }
-
-        #user-info img {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            border: 2px solid #667eea;
-        }
-
-        #user-name {
-            font-weight: 500;
-            color: #333;
-            font-size: 14px;
-        }
-
-        @media (max-width: 480px) {
-            #user-info {
-                top: 10px;
-                right: 10px;
-                padding: 8px 12px;
-            }
-            #user-info img {
-                width: 30px;
-                height: 30px;
-            }
-            #user-name {
-                font-size: 12px;
-            }
+            padding: 20px;
         }
 
         .login-container {
             background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(20px);
-            border-radius: 20px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-            padding: 40px;
+            border-radius: 25px;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
+            padding: 50px;
             width: 100%;
-            max-width: 400px;
+            max-width: 450px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
             position: relative;
-            z-index: 10;
+            overflow: hidden;
+        }
+
+        .login-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: linear-gradient(90deg, #9c27b0, #673ab7, #3f51b5);
+            border-radius: 25px 25px 0 0;
         }
 
         .login-header {
             text-align: center;
-            margin-bottom: 30px;
+            margin-bottom: 40px;
         }
 
-        .login-header h1 {
-            color: #333;
-            font-size: 2.5rem;
-            margin-bottom: 10px;
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+        .login-header .logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
         }
 
-        .login-header p {
-            color: #666;
-            font-size: 1rem;
+        .login-header .logo img {
+            height: 60px;
+            width: auto;
+            margin-right: 15px;
+        }
+
+        .login-header .logo h1 {
+            font-size: 1.8rem;
+            margin: 0;
+            color: #4a148c;
+            font-weight: bold;
+            white-space: nowrap;
+        }
+
+        .subtitle {
+            color: #6a1b9a;
+            font-size: 1.1rem;
+            margin: 0;
         }
 
         .form-group {
-            margin-bottom: 20px;
+            margin-bottom: 25px;
+            position: relative;
         }
 
         .form-group label {
             display: block;
             margin-bottom: 8px;
-            color: #333;
-            font-weight: 500;
+            font-weight: 600;
+            color: #4a148c;
+            font-size: 14px;
         }
 
-        .form-control {
+        .input-wrapper {
+            position: relative;
+        }
+
+        .input-wrapper i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #9c27b0;
+            font-size: 16px;
+        }
+
+        .form-group input {
             width: 100%;
-            padding: 12px 16px;
-            border: 2px solid #e1e5e9;
-            border-radius: 10px;
+            padding: 15px 15px 15px 45px;
+            border: 2px solid #e1bee7;
+            border-radius: 12px;
             font-size: 16px;
             transition: all 0.3s ease;
-            background: rgba(255, 255, 255, 0.8);
+            box-sizing: border-box;
+            background: rgba(255, 255, 255, 0.9);
         }
 
-        .form-control:focus {
+        .form-group input:focus {
             outline: none;
-            border-color: #667eea;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            border-color: #9c27b0;
+            box-shadow: 0 0 0 3px rgba(156, 39, 176, 0.1);
+            background: white;
         }
 
-        /* 記住帳號樣式 */
-        .remember-group {
-            margin-bottom: 20px;
+        .form-group input.error {
+            border-color: #e91e63;
+            background: rgba(233, 30, 99, 0.05);
         }
 
-        .remember-label {
+        .form-group input.success {
+            border-color: #4caf50;
+            background: rgba(76, 175, 80, 0.05);
+        }
+
+        .remember-forgot {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .remember-me {
             display: flex;
             align-items: center;
-            cursor: pointer;
-            font-size: 14px;
-            color: #666;
-            user-select: none;
         }
 
-        .remember-checkbox {
-            display: none;
-        }
-
-        .checkmark {
-            position: relative;
-            display: inline-block;
-            width: 18px;
-            height: 18px;
-            background-color: #fff;
-            border: 2px solid #ddd;
-            border-radius: 3px;
+        .remember-me input[type="checkbox"] {
+            width: auto;
             margin-right: 8px;
-            transition: all 0.3s ease;
+            accent-color: #9c27b0;
         }
 
-        .remember-checkbox:checked + .checkmark {
-            background-color: #667eea;
-            border-color: #667eea;
+        .remember-me label {
+            font-size: 14px;
+            color: #6a1b9a;
+            cursor: pointer;
         }
 
-        .remember-checkbox:checked + .checkmark:after {
-            content: "";
-            position: absolute;
-            left: 5px;
-            top: 2px;
-            width: 4px;
-            height: 8px;
-            border: solid white;
-            border-width: 0 2px 2px 0;
-            transform: rotate(45deg);
+        .forgot-password {
+            color: #9c27b0;
+            text-decoration: none;
+            font-size: 14px;
+            transition: color 0.3s ease;
         }
 
-        .remember-label:hover .checkmark {
-            border-color: #667eea;
+        .forgot-password:hover {
+            color: #7b1fa2;
+            text-decoration: underline;
         }
 
-        .btn {
+        .login-btn {
             width: 100%;
-            padding: 12px;
+            padding: 15px;
+            background: linear-gradient(135deg, #9c27b0, #7b1fa2);
+            color: white;
             border: none;
-            border-radius: 10px;
+            border-radius: 12px;
             font-size: 16px;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-        }
-
-        .btn-primary {
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            color: white;
             margin-bottom: 20px;
-        }
-
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
-        }
-
-        .btn-google {
-            background: #fff;
-            color: #333;
-            border: 2px solid #e1e5e9;
-            pointer-events: auto;
-            z-index: 10;
             position: relative;
-        }
-
-        .btn-google:hover {
-            background: #f8f9fa;
-            border-color: #667eea;
-            cursor: pointer;
-        }
-
-        .btn-google:active {
-            transform: scale(0.98);
-        }
-
-        .divider {
-            text-align: center;
-            margin: 20px 0;
-            position: relative;
-        }
-
-        .divider::before {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 0;
-            right: 0;
-            height: 1px;
-            background: #e1e5e9;
-        }
-
-        .divider span {
-            background: rgba(255, 255, 255, 0.95);
-            padding: 0 20px;
-            color: #666;
-            font-size: 14px;
-        }
-
-        .login-footer {
-            text-align: center;
-            margin-top: 20px;
-        }
-
-        .login-footer a {
-            color: #667eea;
-            text-decoration: none;
-            margin: 0 10px;
-            font-size: 14px;
-        }
-
-        .login-footer a:hover {
-            text-decoration: underline;
-        }
-
-        /* 背景動畫 */
-        .bg-animation {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
             overflow: hidden;
-            z-index: 1;
         }
 
-        .bg-shape {
-            position: absolute;
+        .login-btn:hover {
+            background: linear-gradient(135deg, #7b1fa2, #6a1b9a);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(156, 39, 176, 0.3);
+        }
+
+        .login-btn:active {
+            transform: translateY(0);
+        }
+
+        .login-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .register-btn {
+            width: 100%;
+            padding: 15px;
+            background: transparent;
+            color: #9c27b0;
+            border: 2px solid #9c27b0;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 15px;
+        }
+
+        .register-btn:hover {
+            background: #9c27b0;
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(156, 39, 176, 0.2);
+        }
+
+        .message {
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            text-align: center;
+        }
+
+        .message.success {
+            background: #e8f5e8;
+            color: #2e7d32;
+            border: 1px solid #4caf50;
+        }
+
+        .message.error {
+            background: #ffebee;
+            color: #c62828;
+            border: 1px solid #f44336;
+        }
+
+        .message.info {
+            background: #e3f2fd;
+            color: #1565c0;
+            border: 1px solid #2196f3;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #9c27b0;
             border-radius: 50%;
-            background: rgba(255, 255, 255, 0.1);
-            animation: float 6s ease-in-out infinite;
+            animation: spin 1s linear infinite;
+            margin-right: 10px;
         }
 
-        .bg-shape:nth-child(1) {
-            width: 80px;
-            height: 80px;
-            top: 20%;
-            left: 10%;
-            animation-delay: 0s;
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
 
-        .bg-shape:nth-child(2) {
-            width: 120px;
-            height: 120px;
-            top: 60%;
-            right: 10%;
-            animation-delay: 2s;
-        }
-
-        .bg-shape:nth-child(3) {
-            width: 60px;
-            height: 60px;
-            bottom: 20%;
-            left: 20%;
-            animation-delay: 4s;
-        }
-
-        @keyframes float {
-            0%, 100% {
-                transform: translateY(0px) rotate(0deg);
-            }
-            50% {
-                transform: translateY(-20px) rotate(180deg);
-            }
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            color: #6a1b9a;
+            font-size: 12px;
         }
 
         /* 響應式設計 */
-        @media (max-width: 480px) {
+        @media (max-width: 768px) {
             .login-container {
-                margin: 20px;
                 padding: 30px 20px;
+                margin: 10px;
             }
             
-            .login-header h1 {
-                font-size: 2rem;
+            .login-header .logo h1 {
+                font-size: 1.5rem;
+            }
+            
+            .login-header .logo img {
+                height: 50px;
             }
         }
+
+        /* 動畫效果 */
+        .login-container {
+            animation: fadeInUp 0.6s ease-out;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .form-group {
+            animation: fadeInUp 0.6s ease-out;
+            animation-fill-mode: both;
+        }
+
+        .form-group:nth-child(1) { animation-delay: 0.1s; }
+        .form-group:nth-child(2) { animation-delay: 0.2s; }
+        .form-group:nth-child(3) { animation-delay: 0.3s; }
+        .form-group:nth-child(4) { animation-delay: 0.4s; }
+        .form-group:nth-child(5) { animation-delay: 0.5s; }
     </style>
 </head>
 <body>
-    <!-- 用戶信息顯示 -->
-    <div id="user-info">
-        <img id="user-photo" src="" alt="user photo" style="width:40px;height:40px;border-radius:50%;" />
-        <span id="user-name"></span>
-    </div>
-
-    <!-- 背景動畫 -->
-    <div class="bg-animation">
-        <div class="bg-shape"></div>
-        <div class="bg-shape"></div>
-        <div class="bg-shape"></div>
-    </div>
-
     <div class="login-container">
         <div class="login-header">
-            <h1>PBLS</h1>
-            <p>VR教學平台</p>
-        </div>
-
-        <form id="loginForm">
-            <div class="form-group">
-                <label for="email">電子郵件</label>
-                <input
-                    type="email"
-                    id="email"
-                    class="form-control"
-                    placeholder="請輸入您的電子郵件"
-                    required
-                />
+            <div class="logo">
+                <img src="./assets/logo.png" alt="PBLS VR教學平台 Logo">
+                <h1>PBLS VR教學平台</h1>
             </div>
+            <p class="subtitle">歡迎回來，請登入您的帳號</p>
+    </div>
+
+        <form id="login-form" autocomplete="off">
+            <!-- Autofill bait fields (攔截瀏覽器自動帶入) -->
+            <input type="text"  autocomplete="username"
+                   style="position:absolute;left:-10000px;top:-10000px;height:0;width:0;opacity:0;">
+            <input type="password" autocomplete="current-password"
+                   style="position:absolute;left:-10000px;top:-10000px;height:0;width:0;opacity:0;">
+            <div class="form-group">
+                <label for="account">帳號</label>
+                <div class="input-wrapper">
+                    <i class="fas fa-user"></i>
+                    <input
+                      type="text"
+                      id="account"
+                      name="login_account"
+                      placeholder="請輸入您的帳號"
+                      required
+                      autocomplete="off"
+                      inputmode="email"
+                      autocapitalize="none"
+                      autocorrect="off"
+                      spellcheck="false"
+                    />
+        </div>
+    </div>
 
             <div class="form-group">
                 <label for="password">密碼</label>
-                <input
-                    type="password"
-                    id="password"
-                    class="form-control"
-                    placeholder="請輸入您的密碼"
-                    required
-                />
+                <div class="input-wrapper">
+                    <i class="fas fa-lock"></i>
+                    <input
+                      type="password"
+                      id="password"
+                      name="login_password"
+                      placeholder="請輸入您的密碼"
+                      required
+                      autocomplete="new-password"
+                    />
+        </div>
+        </div>
+
+            <div class="remember-forgot">
+                <div class="remember-me">
+                    <input type="checkbox" id="remember" name="remember">
+                    <label for="remember">記住帳密</label>
+        </div>
+                <a href="#" class="forgot-password" onclick="showForgotPassword()">忘記密碼？</a>
             </div>
 
-            <div class="form-group remember-group">
-                <label class="remember-label">
-                    <input type="checkbox" id="rememberMe" class="remember-checkbox">
-                    <span class="checkmark"></span>
-                    記住帳號
-                </label>
-            </div>
+            <div id="message" class="message" style="display: none;"></div>
 
-            <button type="submit" class="btn btn-primary">
+            <button type="submit" class="login-btn" id="login-btn">
+                <i class="fas fa-sign-in-alt"></i>
                 登入
             </button>
-        </form>
 
-        <div class="divider">
-            <span>或</span>
-        </div>
+            <button type="button" class="register-btn" onclick="goToRegister()">
+                <i class="fas fa-user-plus"></i>
+                註冊帳號
+            </button>
+    </form>
 
-        <button class="btn btn-google" id="google-login-btn">
-            <i class="fab fa-google"></i>
-            用 Google 登入
-        </button>
+        <div class="footer">
+            <p>2025 PBLS VR教學平台 團隊著作權所有 請勿作不良用途</p>
+  </div>
+</div>
 
-        <div class="login-footer">
-            <a href="register.html" id="showSignUp">立即註冊</a>
-            <a href="#" id="forgotPassword">忘記密碼</a>
-        </div>
-    </div>
+<script type="module">
+        // Firebase 配置
+  const firebaseConfig = {
+    apiKey: "AIzaSyBuWO8hFVjjTUe2tqJDrqdbeGTrp4PoT5Q",
+    authDomain: "progect-115a5.firebaseapp.com",
+    databaseURL: "https://progect-115a5-default-rtdb.firebaseio.com",
+    projectId: "progect-115a5",
+    storageBucket: "progect-115a5.firebasestorage.app",
+    messagingSenderId: "109099222287",
+    appId: "1:109099222287:web:4f7b56a1eebe5abbfaaa7a",
+    measurementId: "G-DZVNBQ3G6S"
+  };
 
-    <script>
-        // 處理登入表單提交
-        async function handleLogin(event) {
-            event.preventDefault();
-            
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
-            const rememberMe = document.getElementById('rememberMe').checked;
-            
-            // 顯示載入狀態
-            const submitBtn = event.target.querySelector('button[type="submit"]');
-            const originalText = submitBtn.textContent;
-            submitBtn.textContent = '登入中...';
-            submitBtn.disabled = true;
-            
-            try {
-                if (isFirebaseReady && db) {
-                    // 使用Firebase驗證
-                    await loginWithFirebase(email, password, rememberMe);
-                } else {
-                    // 使用本地驗證（備用方案）
-                    await loginWithLocal(email, password, rememberMe);
-                }
-            } catch (error) {
-                console.error('登入失敗:', error);
-                alert('登入失敗：' + error.message);
-            } finally {
-                // 恢復按鈕狀態
-                submitBtn.textContent = originalText;
-                submitBtn.disabled = false;
-            }
+        // 初始化 Firebase
+        const { initializeApp } = await import("https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js");
+        const { getFirestore, collection, query, where, getDocs, updateDoc, doc, serverTimestamp } = await import("https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js");
+        
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // ===== Remember 管理器（本機記住帳密；不依賴瀏覽器密碼庫）=====
+        const REM_KEYS = {
+            flag: 'pbls_remember_flag',     // '1' or '0'
+            account: 'pbls_remember_account',
+            password: 'pbls_remember_password' // 這裡是純文字；要更安全可改成 WebCrypto 加密
+        };
+
+        function rememberSave(account, password) {
+            localStorage.setItem(REM_KEYS.flag, '1');
+            localStorage.setItem(REM_KEYS.account, account || '');
+            localStorage.setItem(REM_KEYS.password, password || '');
         }
 
-        // Firebase登入驗證
-        async function loginWithFirebase(email, password, rememberMe) {
-            try {
-                // 從Firestore查詢用戶
-                const userQuery = await db.collection('users').where('email', '==', email).get();
-                
-                if (userQuery.empty) {
-                    throw new Error('此電子郵件尚未註冊，請先註冊帳號！');
-                }
-                
-                const userDoc = userQuery.docs[0];
-                const userData = userDoc.data();
-                
-                // 驗證密碼
-                if (userData.password !== password) {
-                    throw new Error('密碼錯誤，請重新輸入！');
-                }
-                
-                // 登入成功
-                const loginUserData = {
-                    uid: userDoc.id,
-                    email: userData.email,
-                    name: userData.name,
-                    displayName: userData.name,
-                    photoURL: 'https://via.placeholder.com/40/17a2b8/ffffff?text=' + userData.name.charAt(0),
-                    loginTime: new Date().toISOString(),
-                    loginMethod: 'firebase',
-                    where: userData.where,
-                    department: userData.department,
-                    phone: userData.phone
-                };
-                
-                // 保存登入狀態
-                localStorage.setItem('pbls_user', JSON.stringify(loginUserData));
-                
-                // 處理「記住帳號」功能
-                if (rememberMe) {
-                    const rememberData = {
-                        email: email,
-                        password: password,
-                        rememberTime: new Date().toISOString()
-                    };
-                    localStorage.setItem('pbls_remember_me', JSON.stringify(rememberData));
-                    console.log('帳號信息已保存，下次自動填入');
-                } else {
-                    localStorage.removeItem('pbls_remember_me');
-                    console.log('記住帳號功能已關閉');
-                }
-                
-                // 更新最後登入時間
-                await db.collection('users').doc(userDoc.id).update({
-                    lastLogin: new Date().toISOString()
-                });
-                
-                alert('登入成功！歡迎回來！');
-                
-                // 跳轉到資訊頁面
-                setTimeout(() => {
-                    window.location.href = 'info.html';
-                }, 1000);
-                
-            } catch (error) {
-                throw error;
-            }
+        function rememberClear() {
+            localStorage.setItem(REM_KEYS.flag, '0');
+            localStorage.removeItem(REM_KEYS.account);
+            localStorage.removeItem(REM_KEYS.password);
         }
 
-        // 本地登入驗證（備用方案）
-        async function loginWithLocal(email, password, rememberMe) {
-            const registeredUser = localStorage.getItem('registered_user_' + email);
-            
-            if (!registeredUser) {
-                throw new Error('此電子郵件尚未註冊，請先註冊帳號！');
-            }
-            
-            const userData = JSON.parse(registeredUser);
-            
-            if (userData.password !== password) {
-                throw new Error('密碼錯誤，請重新輸入！');
-            }
-            
-            // 登入成功
-            const loginUserData = {
-                uid: 'user-' + Date.now(),
-                email: userData.email,
-                name: userData.name,
-                displayName: userData.name,
-                photoURL: 'https://via.placeholder.com/40/17a2b8/ffffff?text=' + userData.name.charAt(0),
-                loginTime: new Date().toISOString(),
-                loginMethod: 'local',
-                where: userData.where,
-                department: userData.department,
-                phone: userData.phone
-            };
-            
-            // 保存登入狀態
-            localStorage.setItem('pbls_user', JSON.stringify(loginUserData));
-            
-            // 處理「記住帳號」功能
-            if (rememberMe) {
-                const rememberData = {
-                    email: email,
-                    password: password,
-                    rememberTime: new Date().toISOString()
-                };
-                localStorage.setItem('pbls_remember_me', JSON.stringify(rememberData));
-                console.log('帳號信息已保存，下次自動填入');
+        function rememberLoad() {
+            const enabled = localStorage.getItem(REM_KEYS.flag) === '1';
+            const account = localStorage.getItem(REM_KEYS.account) || '';
+            const password = localStorage.getItem(REM_KEYS.password) || '';
+            return { enabled, account, password };
+        }
+
+        // ===== 防瀏覽器自動填＋載入時套用「本機記住」=====
+        function preventAutofillAndRestore() {
+            const accountEl  = document.getElementById('account');
+            const passwordEl = document.getElementById('password');
+            const rememberEl = document.getElementById('remember');
+            if (!accountEl || !passwordEl || !rememberEl) return;
+
+            const saved = rememberLoad();
+
+            if (saved.enabled) {
+                // 有啟用本機記住 → 直接填入並勾選
+                accountEl.removeAttribute('readonly');
+                passwordEl.removeAttribute('readonly');
+                accountEl.value  = saved.account;
+                passwordEl.value = saved.password;
+                rememberEl.checked = true;
             } else {
-                localStorage.removeItem('pbls_remember_me');
-                console.log('記住帳號功能已關閉');
-            }
-            
-            alert('登入成功！歡迎回來！');
-            
-            // 跳轉到資訊頁面
-            setTimeout(() => {
-                window.location.href = 'info.html';
-            }, 1000);
-        }
+                // 沒啟用 → 清空並加 readonly（使用者互動才解除）
+                accountEl.value = '';
+                passwordEl.value = '';
+                rememberEl.checked = false;
 
-        // 載入已保存的帳號信息
-        function loadRememberedAccount() {
-            const rememberedData = localStorage.getItem('pbls_remember_me');
-            if (rememberedData) {
-                try {
-                    const data = JSON.parse(rememberedData);
-                    document.getElementById('email').value = data.email;
-                    document.getElementById('password').value = data.password;
-                    document.getElementById('rememberMe').checked = true;
-                    console.log('已載入保存的帳號信息');
-                } catch (error) {
-                    console.error('載入保存的帳號信息失敗:', error);
-                }
-            }
-        }
-
-        // 等待DOM加載完成
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log('DOM已加載完成');
-            
-            // 載入已保存的帳號信息
-            loadRememberedAccount();
-            
-            // 綁定登入表單事件
-            const loginForm = document.getElementById('loginForm');
-            if (loginForm) {
-                loginForm.addEventListener('submit', handleLogin);
-            }
-            
-            // DOM元素
-            const googleBtn = document.getElementById("google-login-btn");
-            const userName = document.getElementById("user-name");
-            const userPhoto = document.getElementById("user-photo");
-
-            console.log('Google按鈕元素:', googleBtn);
-            console.log('用戶名元素:', userName);
-            console.log('用戶照片元素:', userPhoto);
-
-            // 檢查元素是否存在
-            if (!googleBtn) {
-                console.error('Google登入按鈕未找到');
-                return;
+                [accountEl, passwordEl].forEach(el => {
+                    el.setAttribute('readonly', 'true');
+                    const unlock = () => el.removeAttribute('readonly');
+                    el.addEventListener('focus', unlock, { once: true });
+                    el.addEventListener('input', unlock, { once: true });
+                });
             }
 
-            // 檢查Firebase是否可用
-            if (!auth) {
-                console.error('Firebase auth未初始化');
-                return;
-            }
-
-            console.log('開始綁定Google登入按鈕事件');
-
-            // 綁定 Google 登入按鈕，並強制每次選擇帳號
-            googleBtn.addEventListener("click", async (e) => {
-                e.preventDefault();
-                console.log('Google登入按鈕被點擊');
-                
-                // 顯示載入狀態
-                googleBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 登入中...';
-                googleBtn.disabled = true;
-                
-                try {
-                    // 檢查Firebase是否可用
-                    if (!isFirebaseReady || !firebase || !firebase.auth) {
-                        throw new Error('Firebase未正確配置，使用模擬登入');
-                    }
-                    
-                    console.log('Firebase可用，開始Google登入流程');
-                    
-                    const provider = new firebase.auth.GoogleAuthProvider();
-                    provider.setCustomParameters({ prompt: 'select_account' });
-                    
-                    console.log('Google Provider已創建');
-                    
-                    const result = await firebase.auth().signInWithPopup(provider);
-                    console.log('Google登入成功', result.user);
-                    
-                    const user = result.user;
-                    userName.textContent = user.displayName;
-                    userPhoto.src = user.photoURL;
-                    document.getElementById('user-info').style.display = 'flex';
-                    
-                    // 保存用戶信息到localStorage
-                    const userData = {
-                        uid: user.uid,
-                        email: user.email,
-                        name: user.displayName,
-                        photoURL: user.photoURL,
-                        loginTime: new Date().toISOString()
-                    };
-                    localStorage.setItem('pbls_user', JSON.stringify(userData));
-                    
-                    console.log('用戶信息已保存');
-                    
-                    // 登入成功後自動跳轉到資訊頁面
-                    setTimeout(() => {
-                        window.location.href = 'info.html';
-                    }, 1000);
-                    
-                } catch (error) {
-                    console.error('Google登入失敗:', error);
-                    
-                    // 如果Firebase配置有問題，使用模擬登入
-                    if (error.message.includes('Firebase未正確配置') || 
-                        error.message.includes('Firebase未正確載入') ||
-                        error.code === 'auth/invalid-api-key' ||
-                        error.code === 'auth/project-not-found') {
-                        
-                        console.log('使用模擬Google登入');
-                        
-                        // 模擬Google登入成功
-                        const mockUser = {
-                            uid: 'mock-user-' + Date.now(),
-                            email: 'demo@gmail.com',
-                            displayName: 'Demo用戶',
-                            photoURL: 'https://via.placeholder.com/40/667eea/ffffff?text=D'
-                        };
-                        
-                        userName.textContent = mockUser.displayName;
-                        userPhoto.src = mockUser.photoURL;
-                        document.getElementById('user-info').style.display = 'flex';
-                        
-                        // 保存模擬用戶信息
-                        const userData = {
-                            uid: mockUser.uid,
-                            email: mockUser.email,
-                            name: mockUser.displayName,
-                            photoURL: mockUser.photoURL,
-                            loginTime: new Date().toISOString()
-                        };
-                        localStorage.setItem('pbls_user', JSON.stringify(userData));
-                        
-                        console.log('模擬用戶信息已保存');
-                        
-                        // 顯示成功訊息
-                        alert('模擬登入成功！\n\n注意：這是模擬登入，請配置真實的Firebase App ID以使用完整的Google登入功能。');
-                        
-                        // 模擬登入成功後也跳轉到資訊頁面
-                        setTimeout(() => {
-                            window.location.href = 'info.html';
-                        }, 1000);
-                        
-                        return;
-                    }
-                    
-                    let errorMessage = 'Google登入失敗';
-                    if (error.code) {
-                        switch (error.code) {
-                            case 'auth/popup-closed-by-user':
-                                errorMessage = '登入視窗被關閉，請重試';
-                                break;
-                            case 'auth/popup-blocked':
-                                errorMessage = '彈出視窗被阻擋，請允許彈出視窗後重試';
-                                break;
-                            case 'auth/cancelled-popup-request':
-                                errorMessage = '登入請求被取消';
-                                break;
-                            case 'auth/network-request-failed':
-                                errorMessage = '網路連線失敗，請檢查網路連線';
-                                break;
-                            case 'auth/invalid-api-key':
-                                errorMessage = 'Firebase API Key 無效，請檢查配置';
-                                break;
-                            case 'auth/project-not-found':
-                                errorMessage = 'Firebase 專案未找到，請檢查配置';
-                                break;
-                            default:
-                                errorMessage = `Google登入失敗: ${error.message}`;
-                        }
-                    }
-                    
-                    alert(errorMessage);
-                } finally {
-                    // 恢復按鈕狀態
-                    googleBtn.innerHTML = '<i class="fab fa-google"></i> 用 Google 登入';
-                    googleBtn.disabled = false;
+            // 從其他頁返回（bfcache）時：若沒啟用記住就清空；有啟用就重新套用
+            window.addEventListener('pageshow', () => {
+                const savedNow = rememberLoad();
+                if (savedNow.enabled) {
+                    accountEl.value  = savedNow.account;
+                    passwordEl.value = savedNow.password;
+                    rememberEl.checked = true;
+                } else {
+                    accountEl.value = '';
+                    passwordEl.value = '';
+                    rememberEl.checked = false;
                 }
             });
 
-            console.log('Google登入按鈕事件已綁定');
+            // 勾選框即時存取
+            rememberEl.addEventListener('change', () => {
+                if (rememberEl.checked) {
+                    rememberSave(accountEl.value.trim(), passwordEl.value);
+                } else {
+                    rememberClear();
+                }
+            });
+        }
 
-            // 監聽登入狀態，自動顯示名字與頭像
-            if (isFirebaseReady && auth) {
-                auth.onAuthStateChanged((user) => {
-                    if (user) {
-                        console.log('用戶已登入', user);
-                        userName.textContent = user.displayName;
-                        userPhoto.src = user.photoURL;
-                        document.getElementById('user-info').style.display = 'flex';
-                        
-                        // 保存用戶信息到localStorage
-                        const userData = {
-                            uid: user.uid,
-                            email: user.email,
-                            name: user.displayName,
-                            photoURL: user.photoURL,
-                            loginTime: new Date().toISOString()
-                        };
-                        localStorage.setItem('pbls_user', JSON.stringify(userData));
-                        
-                        // 自動跳轉到資訊頁面
-                        setTimeout(() => {
-                            window.location.href = 'info.html';
-                        }, 1000);
-                        
+        // 讓它一定會執行（不會錯過 DOMContentLoaded）
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', preventAutofillAndRestore);
+        } else {
+            preventAutofillAndRestore();
+        }
+
+
+        // 顯示訊息
+        function showMessage(message, type = 'info') {
+            const messageDiv = document.getElementById('message');
+            messageDiv.textContent = message;
+            messageDiv.className = `message ${type}`;
+            messageDiv.style.display = 'block';
+
+            // 3秒後自動隱藏
+            setTimeout(() => {
+                messageDiv.style.display = 'none';
+            }, 3000);
+        }
+
+        // 登入處理
+        document.getElementById('login-form').addEventListener('submit', async function(e) {
+    e.preventDefault();
+            
+            const account = document.getElementById('account').value.trim();
+            const password = document.getElementById('password').value;
+            const remember = document.getElementById('remember').checked;
+            const loginBtn = document.getElementById('login-btn');
+
+            if (!account || !password) {
+                showMessage('請輸入帳號和密碼', 'error');
+        return;
+      }
+
+            // 顯示載入狀態
+            loginBtn.disabled = true;
+            loginBtn.innerHTML = '<span class="loading"></span>登入中...';
+
+            try {
+                // 查詢用戶
+      const q = query(
+        collection(db, "user"),
+        where("account", "==", account),
+        where("password", "==", password)
+      );
+                const querySnapshot = await getDocs(q);
+
+                if (!querySnapshot.empty) {
+                    const userDoc = querySnapshot.docs[0];
+                    const userData = userDoc.data();
+                    
+                    // 更新最後登入時間
+                    await updateDoc(doc(db, "user", userDoc.id), {
+                        lastLogin: serverTimestamp()
+                    });
+        
+        // 保存用戶資料到localStorage（包含從Firestore獲取的完整資料）
+            const loginUserData = {
+          uid: userDoc.id,
+          email: account,
+          name: userData["姓名"] || userData.name,
+          displayName: userData["姓名"] || userData.name,
+          photoURL: 'https://via.placeholder.com/40/17a2b8/ffffff?text=' + (userData["姓名"] || userData.name || 'U').charAt(0),
+                loginTime: new Date().toISOString(),
+          loginMethod: 'firebase',
+          where: userData["school/hospital"] || userData.school || userData.where,
+                department: userData.department,
+                phone: userData.phone,
+                // 從Firestore獲取的統計資料
+                totalTests: userData.totalTests || 0,
+                totalTimeSpent: userData.totalTimeSpent || 0,
+                studentId: userData.studentId,
+                createdAt: userData.createdAt,
+                lastLogin: userData.lastLogin,
+                isActive: userData.isActive
+            };
+            
+            localStorage.setItem('pbls_user', JSON.stringify(loginUserData));
+            
+            // 確保學習時間時鐘服務能正確載入總時間
+            console.log(`登入成功，用戶總學習時間: ${userData.totalTimeSpent || 0} 秒`);
+            
+                    // 登入成功後，學習時間時鐘服務會自動啟動
+                    console.log('✅ 學習時間時鐘服務將自動啟動');
+            
+                    // 登入成功後……
+                    if (remember) {
+                        rememberSave(account, password);       // ← 改用新的記住邏輯
+                        console.log('💾 已記住帳號密碼（本機）');
                     } else {
-                        console.log('用戶未登入');
-                        userName.textContent = "";
-                        userPhoto.src = "";
-                        document.getElementById('user-info').style.display = 'none';
+                        rememberClear();
+                        console.log('🗑️ 未記住帳號密碼（本機已清除）');
                     }
-                });
-            } else {
-                console.log('Firebase未就緒，跳過認證狀態監聽');
+
+                    showMessage('登入成功，正在跳轉...', 'success');
+                    
+                    // 跳轉到 info.html
+            setTimeout(() => {
+                        window.location.href = './info.html';
+            }, 1000);
+      } else {
+                    showMessage('帳號或密碼錯誤，請重新輸入', 'error');
+                }
+            } catch (error) {
+                console.error('登入錯誤:', error);
+                showMessage('登入失敗，請稍後再試', 'error');
+            } finally {
+                // 恢復按鈕狀態
+                loginBtn.disabled = false;
+                loginBtn.innerHTML = '<i class="fas fa-sign-in-alt"></i> 登入';
+            }
+        });
+
+        // 跳轉到註冊頁面
+        window.goToRegister = function() {
+            window.location.href = './register.html';
+        };
+
+        // 忘記密碼功能
+        window.showForgotPassword = function() {
+            const account = document.getElementById('account').value.trim();
+            
+            if (!account) {
+                showMessage('請先輸入您的帳號', 'error');
+                return;
             }
 
-            console.log('認證狀態監聽器已設置');
-        });
+            // 這裡可以實現忘記密碼的邏輯
+            // 例如：發送重置密碼的郵件或顯示安全問題
+            showMessage('忘記密碼功能開發中，請聯繫管理員', 'info');
+        };
+
+        console.log('✅ 登入頁面已載入');
     </script>
 </body>
 </html>

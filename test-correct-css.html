@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>正確選項CSS測試</title>
+    <style>
+        body {
+            font-family: 'Microsoft JhengHei', sans-serif;
+            background: white;
+            min-height: 100vh;
+            color: #333;
+            padding: 20px;
+        }
+        
+        .quiz-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+        }
+        
+        .question-text {
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 30px;
+            color: #2c3e50;
+            text-align: center;
+        }
+        
+        .options-container {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .option {
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 16px;
+            position: relative;
+        }
+        
+        .option:hover {
+            border-color: #3498db;
+            background: #e3f2fd;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(52, 152, 219, 0.2);
+        }
+        
+        .option.selected {
+            border-color: #3498db;
+            background: #e3f2fd;
+        }
+        
+        .option.correct {
+            border-color: #27ae60;
+            background: transparent;
+            color: #27ae60;
+            font-weight: bold;
+            position: relative;
+        }
+
+        .option.correct::after {
+            content: '✓';
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #27ae60;
+            font-size: 24px;
+            font-weight: bold;
+        }
+        
+        .option.incorrect {
+            border-color: #e74c3c;
+            background: #fdf2f2;
+            color: #e74c3c;
+        }
+        
+        .option.incorrect::after {
+            content: '✗';
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #e74c3c;
+            font-size: 24px;
+            font-weight: bold;
+        }
+        
+        .test-buttons {
+            margin-top: 30px;
+            text-align: center;
+        }
+        
+        .test-btn {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            margin: 0 10px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+        
+        .test-btn:hover {
+            background: #2980b9;
+            transform: translateY(-2px);
+        }
+        
+        .status {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: bold;
+        }
+        
+        .status.info {
+            background: #e3f2fd;
+            color: #1976d2;
+            border: 1px solid #bbdefb;
+        }
+        
+        .status.success {
+            background: #e8f5e8;
+            color: #2e7d32;
+            border: 1px solid #c8e6c9;
+        }
+    </style>
+</head>
+<body>
+    <div class="quiz-container">
+        <h1 style="text-align: center; color: #2c3e50; margin-bottom: 30px;">✅ 正確選項CSS測試</h1>
+        
+        <div class="question-text">
+            1. 在進行CPR時，正確的按壓深度應該是？
+        </div>
+        
+        <div class="options-container" id="optionsContainer">
+            <div class="option" data-index="0">A) 至少5公分</div>
+            <div class="option" data-index="1">B) 至少3公分</div>
+            <div class="option" data-index="2">C) 至少10公分</div>
+            <div class="option" data-index="3">D) 至少8公分</div>
+        </div>
+        
+        <div class="test-buttons">
+            <button class="test-btn" onclick="markCorrect()">✅ 標記正確選項</button>
+            <button class="test-btn" onclick="markIncorrect()">❌ 標記錯誤選項</button>
+            <button class="test-btn" onclick="clearMarks()">🔄 清除標記</button>
+            <button class="test-btn" onclick="simulateAnswer()">🎯 模擬答題</button>
+        </div>
+        
+        <div id="status" class="status info">
+            點擊按鈕測試正確選項的標記效果
+        </div>
+    </div>
+
+    <script>
+        let correctAnswer = 0; // 正確答案是A (索引0)
+        let userAnswer = -1;
+        
+        function markCorrect() {
+            clearMarks();
+            const options = document.querySelectorAll('.option');
+            options[correctAnswer].classList.add('correct');
+            
+            document.getElementById('status').innerHTML = 
+                '✅ 正確選項已標記 - 應該顯示綠色邊框和綠色勾勾';
+            document.getElementById('status').className = 'status success';
+        }
+        
+        function markIncorrect() {
+            clearMarks();
+            const options = document.querySelectorAll('.option');
+            options[1].classList.add('incorrect'); // 標記B選項為錯誤
+            
+            document.getElementById('status').innerHTML = 
+                '❌ 錯誤選項已標記 - 應該顯示紅色邊框和紅色叉叉';
+            document.getElementById('status').className = 'status success';
+        }
+        
+        function clearMarks() {
+            const options = document.querySelectorAll('.option');
+            options.forEach(option => {
+                option.classList.remove('correct', 'incorrect', 'selected');
+            });
+            
+            document.getElementById('status').innerHTML = 
+                '🔄 所有標記已清除';
+            document.getElementById('status').className = 'status info';
+        }
+        
+        function simulateAnswer() {
+            clearMarks();
+            
+            // 模擬用戶選擇錯誤答案
+            userAnswer = 1; // 選擇B選項
+            const options = document.querySelectorAll('.option');
+            
+            // 標記用戶選擇
+            options[userAnswer].classList.add('selected');
+            
+            // 顯示正確和錯誤標記
+            setTimeout(() => {
+                options[correctAnswer].classList.add('correct'); // 正確答案
+                options[userAnswer].classList.add('incorrect'); // 錯誤答案
+                
+                document.getElementById('status').innerHTML = 
+                    '🎯 模擬答題完成 - 正確選項應顯示綠色勾勾，錯誤選項應顯示紅色叉叉';
+                document.getElementById('status').className = 'status success';
+            }, 500);
+        }
+        
+        // 為選項添加點擊事件
+        document.querySelectorAll('.option').forEach((option, index) => {
+            option.addEventListener('click', () => {
+                if (!option.classList.contains('correct') && !option.classList.contains('incorrect')) {
+                    clearMarks();
+                    option.classList.add('selected');
+                    userAnswer = index;
+                    
+                    document.getElementById('status').innerHTML = 
+                        `您選擇了選項 ${String.fromCharCode(65 + index)}`;
+                    document.getElementById('status').className = 'status info';
+                }
+            });
+        });
+        
+        // 頁面載入時顯示說明
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('status').innerHTML = 
+                '💡 測試說明：點擊按鈕測試標記效果，或直接點擊選項進行互動測試';
+        });
+    </script>
+</body>
+</html>

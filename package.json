@@ -8,6 +8,7 @@
     "build": "vite build",
     "preview": "vite preview",
     "check-firebase": "node firebase-setup-check.js",
+    "setup-env": "node setup-env.js",
     "demo": "echo '開啟 demo.html 查看演示版本' && start demo.html"
   },
   "dependencies": {

@@ -430,6 +430,8 @@
     
     <!-- 語言切換功能 -->
     <script src="src/js/language-switcher.js"></script>
+    <!-- 用戶資料服務 -->
+    <script type="module" src="src/services/userDataService.js"></script>
 </head>
 <body>
     <!-- 側邊欄 -->
@@ -480,7 +482,7 @@
             <h1 class="header-title">歡迎使用PBLS教學平台</h1>
         </div>
         <div class="header-right">
-            <div class="user-info">CGU(長庚大學), Nursing</div>
+            <div class="user-info" id="user-info-display">載入中...</div>
             <div class="user-avatar" onclick="showUserProfile()">
                         <i class="fas fa-user"></i>
                     </div>
@@ -573,14 +575,46 @@
     </div>
 
     <script>
+        // 頁面載入時更新用戶資訊顯示
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(() => {
+                updateUserInfoDisplay();
+            }, 1000);
+            
+            // 確保跑馬燈正常顯示
+            const marquee = document.querySelector('.marquee');
+            if (marquee) {
+                console.log('✅ 跑馬燈元素已找到');
+                marquee.style.display = 'flex';
+            } else {
+                console.error('❌ 找不到跑馬燈元素');
+            }
+        });
+
+        // 更新用戶資訊顯示
+        function updateUserInfoDisplay() {
+            if (window.userDataService && window.userDataService.isLoggedIn()) {
+                const userInfoDisplay = document.getElementById('user-info-display');
+                if (userInfoDisplay) {
+                    userInfoDisplay.textContent = window.userDataService.getUserInfo();
+                }
+            }
+        }
+
         // 用戶頭像功能
         function showUserProfile() {
             alert('用戶資料功能開發中，敬請期待！');
         }
 
         // 登出功能
-        function logout() {
+        async function logout() {
             if (confirm('確定要登出嗎？')) {
+                // 保存學習時間到Firebase
+                if (window.learningTimeClockService) {
+                    await window.learningTimeClockService.saveTimeToFirebase();
+                    window.learningTimeClockService.stop();
+                }
+                
                 // 清除本地儲存
                 localStorage.removeItem('pbls_user');
                 localStorage.removeItem('pbls_user_profile');

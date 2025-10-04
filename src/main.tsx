@@ -1,7 +1,7 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { createRoot } from 'react-dom/client';
 import './lib/i18n'; // 引入 i18n 配置
-import PBLSKnowledgeBase from './components/PBLSKnowledgeBase';
+import AppRouter from './components/AppRouter';
 
 // 添加 FontAwesome 圖標
 const link = document.createElement('link');
@@ -37,11 +37,48 @@ style.textContent = `
 `;
 document.head.appendChild(style);
 
+// 主要應用組件
+const App: React.FC = () => {
+  const [currentPath, setCurrentPath] = useState(window.location.pathname);
+
+  useEffect(() => {
+    // 監聽路由變化
+    const handleRouteChange = () => {
+      setCurrentPath(window.location.pathname);
+    };
+
+    // 監聽瀏覽器前進/後退
+    window.addEventListener('popstate', handleRouteChange);
+
+    // 監聽點擊事件（處理內部連結）
+    const handleClick = (e: MouseEvent) => {
+      const target = e.target as HTMLElement;
+      const link = target.closest('a[href]') as HTMLAnchorElement;
+      
+      if (link && link.href.startsWith(window.location.origin)) {
+        e.preventDefault();
+        const path = new URL(link.href).pathname;
+        window.history.pushState({}, '', path);
+        setCurrentPath(path);
+      }
+    };
+
+    document.addEventListener('click', handleClick);
+
+    return () => {
+      window.removeEventListener('popstate', handleRouteChange);
+      document.removeEventListener('click', handleClick);
+    };
+  }, []);
+
+  return <AppRouter currentPath={currentPath} />;
+};
+
 // 渲染應用
 const container = document.getElementById('root');
 if (container) {
   const root = createRoot(container);
-  root.render(<PBLSKnowledgeBase />);
+  root.render(<App />);
 } else {
   console.error('Root element not found');
 }

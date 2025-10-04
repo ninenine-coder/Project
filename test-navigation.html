@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>頁面導航測試 - PBLS VR教學平台</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Microsoft JhengHei', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            color: #4a148c;
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: #6a1b9a;
+            font-size: 1.1rem;
+        }
+
+        .navigation-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .nav-card {
+            background: white;
+            border: 2px solid #e1bee7;
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .nav-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+            border-color: #9c27b0;
+        }
+
+        .nav-card h3 {
+            color: #4a148c;
+            margin-bottom: 15px;
+            font-size: 1.3rem;
+        }
+
+        .nav-card p {
+            color: #6a1b9a;
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+
+        .nav-card .features {
+            text-align: left;
+            margin-bottom: 20px;
+        }
+
+        .nav-card .features li {
+            color: #6a1b9a;
+            margin: 5px 0;
+            font-size: 14px;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #9c27b0, #7b1fa2);
+            color: white;
+            text-decoration: none;
+            border-radius: 25px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn:hover {
+            background: linear-gradient(135deg, #7b1fa2, #6a1b9a);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(156, 39, 176, 0.3);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #f3e5f5, #e1bee7);
+            color: #6a1b9a;
+        }
+
+        .btn-secondary:hover {
+            background: linear-gradient(135deg, #e1bee7, #ce93d8);
+        }
+
+        .test-section {
+            background: rgba(255, 255, 255, 0.8);
+            border: 2px solid #e1bee7;
+            border-radius: 15px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        .test-section h3 {
+            color: #4a148c;
+            margin-bottom: 15px;
+        }
+
+        .test-links {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .status {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: bold;
+            margin-left: 10px;
+        }
+
+        .status.ready {
+            background: #e8f5e8;
+            color: #2e7d32;
+        }
+
+        .status.testing {
+            background: #fff3e0;
+            color: #f57c00;
+        }
+
+        .info-box {
+            background: #e3f2fd;
+            border: 2px solid #2196f3;
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 20px;
+        }
+
+        .info-box h4 {
+            color: #1565c0;
+            margin-bottom: 10px;
+        }
+
+        .info-box p {
+            color: #1565c0;
+            line-height: 1.5;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🧭 頁面導航測試</h1>
+            <p>測試登入和註冊頁面之間的連結功能</p>
+        </div>
+
+        <div class="navigation-grid">
+            <!-- 登入頁面 -->
+            <div class="nav-card">
+                <h3>🔐 登入頁面</h3>
+                <p>包含登入功能和簡化版註冊表單</p>
+                <div class="features">
+                    <strong>功能特色：</strong>
+                    <ul>
+                        <li>✅ 用戶登入驗證</li>
+                        <li>✅ 簡化版註冊表單</li>
+                        <li>✅ Tab 切換介面</li>
+                        <li>✅ 連結到完整註冊頁面</li>
+                    </ul>
+                </div>
+                <a href="login.html" class="btn" target="_blank">
+                    前往登入頁面
+                </a>
+                <span class="status ready">已就緒</span>
+            </div>
+
+            <!-- 註冊頁面 -->
+            <div class="nav-card">
+                <h3>📝 完整註冊頁面</h3>
+                <p>專業的註冊表單，包含完整驗證功能</p>
+                <div class="features">
+                    <strong>功能特色：</strong>
+                    <ul>
+                        <li>✅ 完整數據驗證</li>
+                        <li>✅ 部門下拉選單</li>
+                        <li>✅ 即時錯誤提示</li>
+                        <li>✅ 返回登入頁面連結</li>
+                    </ul>
+                </div>
+                <a href="register.html" class="btn" target="_blank">
+                    前往註冊頁面
+                </a>
+                <span class="status ready">已就緒</span>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h3>🧪 導航測試</h3>
+            <p>點擊以下連結測試頁面間的導航功能：</p>
+            <div class="test-links">
+                <a href="login.html" class="btn btn-secondary" target="_blank">測試登入頁面</a>
+                <a href="register.html" class="btn btn-secondary" target="_blank">測試註冊頁面</a>
+                <a href="test-firestore-integration.html" class="btn btn-secondary" target="_blank">測試 Firestore 整合</a>
+            </div>
+        </div>
+
+        <div class="info-box">
+            <h4>💡 使用說明</h4>
+            <p>
+                <strong>登入頁面 (login.html)：</strong><br>
+                • 提供基本的登入和註冊功能<br>
+                • 註冊表單較為簡化，適合快速註冊<br>
+                • 包含連結到完整註冊頁面的選項<br><br>
+                
+                <strong>完整註冊頁面 (register.html)：</strong><br>
+                • 提供完整的註冊功能，包含詳細驗證<br>
+                • 支援部門下拉選單和即時驗證<br>
+                • 包含返回登入頁面的連結<br><br>
+                
+                <strong>兩個頁面都會將數據寫入同一個 Firestore 集合</strong>
+            </p>
+        </div>
+    </div>
+
+    <script>
+        // 檢查頁面連結是否正常
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🧭 頁面導航測試頁面已載入');
+            
+            // 檢查連結是否有效
+            const links = document.querySelectorAll('a[href]');
+            links.forEach(link => {
+                link.addEventListener('click', function() {
+                    console.log(`🔗 點擊連結: ${this.href}`);
+                });
+            });
+        });
+    </script>
+</body>
+</html>
