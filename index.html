@@ -460,10 +460,18 @@
             padding: 20px;
             text-align: center;
             transition: transform 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            min-height: 200px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            border: 2px solid transparent;
         }
 
         .virtual-human-card:hover {
             transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+            border-color: #3498db;
         }
 
         .virtual-human-card h3 {
@@ -475,6 +483,313 @@
             color: #7f8c8d;
             font-size: 14px;
             margin-bottom: 15px;
+            flex-grow: 1;
+        }
+
+        /* 練習選項卡片樣式 */
+        .practice-options {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            flex-wrap: wrap;
+            margin-top: 40px;
+        }
+
+        .practice-option-card {
+            background: white;
+            border-radius: 20px;
+            padding: 40px 30px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            width: 300px;
+            text-align: center;
+        }
+
+        .practice-option-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+        }
+
+        .practice-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px auto;
+        }
+
+        .practice-icon i {
+            font-size: 32px;
+            color: white;
+        }
+
+        .practice-option-card h3 {
+            font-size: 24px;
+            color: #2c3e50;
+            margin-bottom: 15px;
+        }
+
+        .practice-option-card p {
+            font-size: 16px;
+            color: #7f8c8d;
+            margin-bottom: 25px;
+            line-height: 1.5;
+        }
+
+        .practice-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 25px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .practice-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        /* 內容頁面樣式 */
+        .content-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .back-btn {
+            background: #6c757d;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 20px;
+        }
+
+        .back-btn:hover {
+            background: #5a6268;
+            transform: translateY(-2px);
+        }
+
+        .content-header h2 {
+            font-size: 28px;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+
+        .content-header p {
+            font-size: 16px;
+            color: #7f8c8d;
+        }
+
+        .content-footer {
+            text-align: center;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #e0e0e0;
+        }
+
+        /* 情境選擇下拉選單樣式 */
+        .scenario-selector {
+            max-width: 600px;
+            margin: 40px auto;
+            text-align: center;
+        }
+
+        .selector-container {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .selector-label {
+            display: block;
+            font-size: 18px;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 15px;
+        }
+
+        .scenario-select {
+            width: 100%;
+            max-width: 400px;
+            padding: 12px 20px;
+            border: 2px solid #e0e0e0;
+            border-radius: 25px;
+            font-size: 16px;
+            background: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .scenario-select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .scenario-select:hover {
+            border-color: #667eea;
+        }
+
+        /* 單一情境詳細內容樣式 */
+        .scenario-detail {
+            max-width: 800px;
+            margin: 40px auto;
+        }
+
+        .scenario-detail-content {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+            display: flex;
+            gap: 30px;
+            align-items: center;
+        }
+
+        .scenario-detail-image {
+            flex: 1;
+            max-width: 400px;
+        }
+
+        .scenario-detail-image img {
+            width: 100%;
+            height: 300px;
+            object-fit: cover;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .scenario-detail-image div {
+            width: 100%;
+            height: 300px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .scenario-detail-image div img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .scenario-detail-info {
+            flex: 1;
+        }
+
+        .scenario-detail-info h3 {
+            font-size: 28px;
+            color: #2c3e50;
+            margin-bottom: 20px;
+        }
+
+        .scenario-detail-info p {
+            font-size: 16px;
+            color: #7f8c8d;
+            line-height: 1.6;
+            margin-bottom: 30px;
+        }
+
+        .scenario-detail-actions {
+            text-align: center;
+        }
+
+        .start-scenario-btn {
+            background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 25px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(39, 174, 96, 0.3);
+        }
+
+        .start-scenario-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(39, 174, 96, 0.4);
+        }
+
+        .start-scenario-btn i {
+            margin-right: 10px;
+        }
+
+        .card-icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 50%;
+            margin: 0 auto 15px auto;
+            color: white;
+            font-size: 24px;
+        }
+
+        .scenario-image {
+            width: 100%;
+            height: 200px;
+            border-radius: 15px;
+            margin-bottom: 15px;
+            background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .scenario-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 15px;
+            transition: transform 0.3s ease;
+        }
+
+        .virtual-human-card:hover .scenario-image img {
+            transform: scale(1.05);
+        }
+
+        .scenario-btn {
+            background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 15px;
+            box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3);
+        }
+
+        .scenario-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(52, 152, 219, 0.4);
+        }
+
+        .scenario-btn:active {
+            transform: translateY(0);
         }
 
         /* 響應式設計 */
@@ -493,6 +808,60 @@
 
             .sidebar:hover ~ .main-content {
                 margin-left: 160px;
+            }
+
+            .virtual-human-grid {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+
+            .card-icon {
+                width: 50px;
+                height: 50px;
+                font-size: 20px;
+            }
+
+            .scenario-image {
+                height: 160px;
+            }
+
+            .scenario-btn {
+                font-size: 12px;
+                padding: 8px 16px;
+            }
+
+            .practice-options {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .practice-option-card {
+                width: 280px;
+            }
+
+            .scenario-detail-content {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .scenario-detail-image {
+                max-width: 100%;
+            }
+
+            .scenario-detail-image img {
+                height: 250px;
+            }
+
+            .scenario-detail-image div {
+                height: 250px;
+            }
+
+            .selector-container {
+                padding: 20px;
+            }
+
+            .scenario-select {
+                max-width: 100%;
             }
         }
     </style>
@@ -579,52 +948,110 @@
             <div class="main-content">
                 <!-- 練習專區首頁內容 -->
                 <div class="practice-homepage" id="practiceHomepage">
-            <h1>練習專區</h1>
-            <p>這裡提供 360° 實境教學影片與虛擬人互動學習。</p>
-            
-            <!-- 360實境教學影片區段 -->
-            <div class="vr-video-section">
-                <div class="vr-video-header">
-                    <div class="video-title">
+                    <h1>練習專區</h1>
+                    <p>選擇您要進行的練習類型</p>
+                    
+                    <!-- 練習選項按鈕 -->
+                    <div class="practice-options">
+                        <div class="practice-option-card">
+                            <div class="practice-icon">
                                 <i class="fas fa-play-circle"></i>
-                        <span>360實境教學影片</span>
                             </div>
-                    <p class="video-subtitle">沉浸式VR學習體驗,讓您身臨其境地學習急救技能</p>
+                            <h3>360實境教學影片</h3>
+                            <p>沉浸式VR學習體驗，讓您身臨其境地學習急救技能</p>
+                            <button class="practice-btn" onclick="enterPractice('vr-video')">
+                                進入360實境教學
+                            </button>
                         </div>
 
-                <div class="video-player-container">
-                    <div class="video-player" onclick="playVRVideo()">
-                        <div class="play-button-center">
-                                        <i class="fas fa-play"></i>
-                                    </div>
-                                        <div class="video-duration">15:30</div>
-                                    </div>
-                                </div>
-                                        </div>
-
-                    <!-- 虛擬人互動區段 -->
-            <div class="virtual-human-section">
-                        <div class="section-header">
-                            <h2><i class="fas fa-comment-dots"></i> 虛擬人互動</h2>
+                        <div class="practice-option-card">
+                            <div class="practice-icon">
+                                <i class="fas fa-comment-dots"></i>
+                            </div>
+                            <h3>虛擬人模擬</h3>
                             <p>與AI驅動的虛擬患者進行對話練習，提升溝通技巧</p>
+                            <button class="practice-btn" onclick="enterPractice('virtual-human')">
+                                進入虛擬人模擬
+                            </button>
                         </div>
-                            <div class="virtual-human-grid">
-                            <div class="virtual-human-card">
-                                    <h3>醫師對話練習</h3>
-                        <p>學習如何與患者進行專業的醫療對話，提升溝通技巧</p>
+                    </div>
+                </div>
+
+                <!-- 360實境教學影片內容 -->
+                <div class="vr-video-content" id="vrVideoContent" style="display: none;">
+                    <div class="content-header">
+                        <h2><i class="fas fa-play-circle"></i> 360實境教學影片</h2>
+                        <p>沉浸式VR學習體驗，讓您身臨其境地學習急救技能</p>
+                    </div>
+                    
+                    <div class="vr-video-section">
+                        <div class="video-player-container">
+                            <div class="video-player" onclick="playVRVideo()">
+                                <div class="play-button-center">
+                                    <i class="fas fa-play"></i>
+                                </div>
+                                <div class="video-duration">15:30</div>
                             </div>
-                            <div class="virtual-human-card">
-                                    <h3>團隊協作場景</h3>
-                        <p>模擬急救團隊協作情境，學習團隊溝通與協調</p>
+                        </div>
+                    </div>
+                    
+                    <div class="content-footer">
+                        <button class="back-btn" onclick="goBackToHomepage()">
+                            <i class="fas fa-arrow-left"></i> 返回練習專區
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 虛擬人模擬內容 -->
+                <div class="virtual-human-content" id="virtualHumanContent" style="display: none;">
+                    <div class="content-header">
+                        <h2><i class="fas fa-comment-dots"></i> 虛擬人模擬</h2>
+                        <p>與AI驅動的虛擬患者進行對話練習，提升溝通技巧</p>
+                    </div>
+                    
+                    <!-- 情境選擇下拉選單 -->
+                    <div class="scenario-selector">
+                        <div class="selector-container">
+                            <label for="scenarioSelect" class="selector-label">選擇情境模擬：</label>
+                            <select id="scenarioSelect" class="scenario-select" onchange="selectScenario()">
+                                <option value="">請選擇情境...</option>
+                                <option value="cardiac">心臟驟停</option>
+                                <option value="poisoning">食物中毒</option>
+                                <option value="drowning">溺水</option>
+                                <option value="fire">火災嗆傷</option>
+                                <option value="trauma">外傷</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <!-- 單一情境詳細內容 -->
+                    <div class="scenario-detail" id="scenarioDetail" style="display: none;">
+                        <div class="scenario-detail-content">
+                            <div class="scenario-detail-image">
+                                <img id="scenarioDetailImg" src="" alt="" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                                <div id="scenarioDetailIcon" style="display: none; align-items: center; justify-content: center; width: 100%; height: 100%;">
+                                    <i class="fas fa-heartbeat"></i>
+                                </div>
                             </div>
-                            <div class="virtual-human-card">
-                                    <h3>患者溝通訓練</h3>
-                        <p>練習如何安撫患者情緒，進行有效的醫療溝通</p>
-                                    </div>
+                            <div class="scenario-detail-info">
+                                <h3 id="scenarioDetailTitle">情境標題</h3>
+                                <p id="scenarioDetailDescription">情境描述</p>
+                                <div class="scenario-detail-actions">
+                                    <button class="start-scenario-btn" onclick="startScenario()">
+                                        <i class="fas fa-play"></i> 開始情境模擬
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="content-footer">
+                        <button class="back-btn" onclick="goBackToHomepage()">
+                            <i class="fas fa-arrow-left"></i> 返回練習專區
+                        </button>
+                    </div>
                 </div>
             </div>
-        </div>
-    </div>
 
     <script>
         // 頁面載入時檢查登入狀態
@@ -697,6 +1124,122 @@
         function playVRVideo() {
             console.log('播放360實境教學影片');
             alert('即將播放360實境教學影片！\n\n這將開啟沉浸式VR學習體驗，讓您身臨其境地學習急救技能。');
+        }
+
+        // 進入練習內容
+        function enterPractice(practiceType) {
+            const homepage = document.getElementById('practiceHomepage');
+            const vrVideoContent = document.getElementById('vrVideoContent');
+            const virtualHumanContent = document.getElementById('virtualHumanContent');
+            
+            // 隱藏首頁
+            homepage.style.display = 'none';
+            
+            // 根據類型顯示對應內容
+            if (practiceType === 'vr-video') {
+                vrVideoContent.style.display = 'block';
+            } else if (practiceType === 'virtual-human') {
+                virtualHumanContent.style.display = 'block';
+            }
+        }
+
+        // 返回首頁
+        function goBackToHomepage() {
+            const homepage = document.getElementById('practiceHomepage');
+            const vrVideoContent = document.getElementById('vrVideoContent');
+            const virtualHumanContent = document.getElementById('virtualHumanContent');
+            
+            // 隱藏所有內容頁面
+            vrVideoContent.style.display = 'none';
+            virtualHumanContent.style.display = 'none';
+            
+            // 顯示首頁
+            homepage.style.display = 'block';
+        }
+
+        // 情境資料
+        const scenarioData = {
+            'cardiac': {
+                name: '心臟驟停',
+                image: 'assets/心臟驟停情境.png',
+                iconImage: 'assets/心臟驟停情境.png',
+                description: '傍晚18點30分，客廳忽然安靜下來，一位5歲、110公分、18公斤的男童倒地，毫無反應。現場做了急救措施，患者OHCA，家屬在外等待。你只需要說出「下一步要做什麼」處理方式，系統就會即時呈現團隊/旁人依你指令採取的處置與生理變化；你的目標，是把時間贏回來。'
+            },
+            'poisoning': {
+                name: '食物中毒',
+                image: 'assets/食物中毒情境.png',
+                iconImage: 'assets/食物中毒情境.png',
+                description: '下午16點12分，5歲小孩（103公分／25公斤）在餐桌旁突然倒下，四周留有嘔吐物與食物殘渣。家人驚慌失措，患者OHCA，家屬在外等待。你只需要說出「下一步要做什麼」處理措施，系統就會即時呈現團隊/旁人依你指令採取的處置與生理變化；你的目標，是把時間贏回來。'
+            },
+            'drowning': {
+                name: '溺水',
+                image: 'assets/溺水情境.png',
+                iconImage: 'assets/溺水情境.png',
+                description: '下午3點20分的游泳池旁傳來呼喊——5歲小孩（105公分／20公斤）被拉上岸時已無反應。患者OHCA，家屬在外等待。你只需要說出「下一步要做什麼」的處理措施，系統就會即時呈現團隊/旁人依你指令採取的處置與生理變化；你的目標，是把時間贏回來。'
+            },
+            'fire': {
+                name: '火災嗆傷',
+                image: 'assets/火災嗆傷情境.png',
+                iconImage: 'assets/火災嗆傷情境.png',
+                description: '文化三路住宅區發生一起火災，現場一位8歲兒童（125公分／27公斤）被推進急診，患者OHCA。你只需要說出「下一步要做什麼」的處理措施，系統就會即時呈現團隊/旁人依你指令採取的處置與生理變化；你的目標，是把時間贏回來。'
+            },
+            'trauma': {
+                name: '外傷',
+                image: 'assets/外傷情境.png',
+                iconImage: 'assets/外傷情境.png',
+                description: '下午16點12分，一位6歲男童（100公分／22公斤）因打碎玻璃造成明顯撕裂傷，血迅速滲透衣物；他意識模糊、哭喊聲微弱、四肢冰冷，經家人發現後急救並送往醫院。患者OHCA。你只需要說出「下一步要做什麼」處理措施，系統就會即時呈現團隊/旁人依你指令採取的處置與生理變化；你的目標，是把時間贏回來！'
+            }
+        };
+
+        // 選擇情境
+        function selectScenario() {
+            const select = document.getElementById('scenarioSelect');
+            const scenarioType = select.value;
+            const scenarioDetail = document.getElementById('scenarioDetail');
+            
+            if (scenarioType) {
+                const scenario = scenarioData[scenarioType];
+                
+                // 更新情境詳細內容
+                document.getElementById('scenarioDetailTitle').textContent = scenario.name;
+                document.getElementById('scenarioDetailDescription').textContent = scenario.description;
+                document.getElementById('scenarioDetailImg').src = scenario.image;
+                document.getElementById('scenarioDetailImg').alt = scenario.name;
+                
+                // 更新圖標為圖片
+                const iconElement = document.getElementById('scenarioDetailIcon');
+                iconElement.innerHTML = `<img src="${scenario.iconImage}" alt="${scenario.name}圖示" onerror="this.style.display='none'; this.parentElement.innerHTML='<i class=\'fas fa-heartbeat\'></i>';">`;
+                
+                // 顯示情境詳細內容
+                scenarioDetail.style.display = 'block';
+            } else {
+                // 隱藏情境詳細內容
+                scenarioDetail.style.display = 'none';
+            }
+        }
+
+        // 開始情境模擬
+        function startScenario() {
+            const select = document.getElementById('scenarioSelect');
+            const scenarioType = select.value;
+            const scenario = scenarioData[scenarioType];
+            
+            if (scenario) {
+                // 顯示載入動畫
+                const button = event.target;
+                const originalText = button.innerHTML;
+                button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 載入中...';
+                button.disabled = true;
+                
+                // 模擬載入過程
+                setTimeout(() => {
+                    alert(`${scenario.name}情境模擬功能開發中，敬請期待！\n\n這將是一個AI驅動的虛擬情境模擬，讓您能夠：\n• 與虛擬患者進行真實對話\n• 練習醫療溝通技巧\n• 獲得即時反饋和建議\n• 提升專業溝通能力`);
+                    
+                    // 恢復按鈕狀態
+                    button.innerHTML = originalText;
+                    button.disabled = false;
+                }, 1000);
+            }
         }
 
         // 用戶頭像功能
