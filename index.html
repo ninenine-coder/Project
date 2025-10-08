@@ -731,6 +731,31 @@
             margin-right: 10px;
         }
 
+        /* YouTube 360度影片樣式 */
+        .yt-wrap {
+            position: relative;
+            padding-top: 56.25%;
+            max-width: 1200px;
+            margin: 12px auto;
+        }
+
+        .yt-wrap iframe {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            border: 0;
+            border-radius: 12px;
+        }
+
+        .youtube-360-note {
+            font-size: 12px;
+            color: #666;
+            margin-top: 8px;
+            text-align: center;
+            line-height: 1.4;
+        }
+
         .card-icon {
             display: flex;
             align-items: center;
@@ -863,6 +888,19 @@
             .scenario-select {
                 max-width: 100%;
             }
+
+            .yt-wrap {
+                margin: 15px auto;
+            }
+
+            .yt-wrap iframe {
+                border-radius: 8px;
+            }
+
+            .youtube-360-note {
+                font-size: 11px;
+                margin-top: 6px;
+            }
         }
     </style>
     
@@ -948,7 +986,7 @@
             <div class="main-content">
                 <!-- 練習專區首頁內容 -->
                 <div class="practice-homepage" id="practiceHomepage">
-                    <h1>練習專區</h1>
+            <h1>練習專區</h1>
                     <p>選擇您要進行的練習類型</p>
                     
                     <!-- 練習選項按鈕 -->
@@ -967,15 +1005,15 @@
                         <div class="practice-option-card">
                             <div class="practice-icon">
                                 <i class="fas fa-comment-dots"></i>
-                            </div>
+                                    </div>
                             <h3>虛擬人模擬</h3>
                             <p>與AI驅動的虛擬患者進行對話練習，提升溝通技巧</p>
                             <button class="practice-btn" onclick="enterPractice('virtual-human')">
                                 進入虛擬人模擬
                             </button>
-                        </div>
-                    </div>
-                </div>
+                                    </div>
+                                </div>
+                                        </div>
 
                 <!-- 360實境教學影片內容 -->
                 <div class="vr-video-content" id="vrVideoContent" style="display: none;">
@@ -985,14 +1023,20 @@
                     </div>
                     
                     <div class="vr-video-section">
-                        <div class="video-player-container">
-                            <div class="video-player" onclick="playVRVideo()">
-                                <div class="play-button-center">
-                                    <i class="fas fa-play"></i>
-                                </div>
-                                <div class="video-duration">15:30</div>
-                            </div>
+                        <div class="yt-wrap">
+                            <iframe
+                                src="https://www.youtube.com/embed/cmB1iCKigWg?rel=0&modestbranding=1&playsinline=1&iv_load_policy=3&fs=1&controls=1"
+                                title="360 video"
+                                frameborder="0"
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                                allowfullscreen
+                                loading="lazy"
+                                referrerpolicy="origin-when-cross-origin">
+                            </iframe>
                         </div>
+                        <p class="youtube-360-note">
+                            支援滑鼠拖曳與手機陀螺儀（影片需為 360 equirectangular 2:1 並含 360 metadata）。
+                        </p>
                     </div>
                     
                     <div class="content-footer">
@@ -1006,8 +1050,8 @@
                 <div class="virtual-human-content" id="virtualHumanContent" style="display: none;">
                     <div class="content-header">
                         <h2><i class="fas fa-comment-dots"></i> 虛擬人模擬</h2>
-                        <p>與AI驅動的虛擬患者進行對話練習，提升溝通技巧</p>
-                    </div>
+                            <p>與AI驅動的虛擬患者進行對話練習，提升溝通技巧</p>
+                        </div>
                     
                     <!-- 情境選擇下拉選單 -->
                     <div class="scenario-selector">
@@ -1021,8 +1065,8 @@
                                 <option value="fire">火災嗆傷</option>
                                 <option value="trauma">外傷</option>
                             </select>
-                        </div>
-                    </div>
+                            </div>
+                            </div>
                     
                     <!-- 單一情境詳細內容 -->
                     <div class="scenario-detail" id="scenarioDetail" style="display: none;">
@@ -1031,8 +1075,8 @@
                                 <img id="scenarioDetailImg" src="" alt="" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
                                 <div id="scenarioDetailIcon" style="display: none; align-items: center; justify-content: center; width: 100%; height: 100%;">
                                     <i class="fas fa-heartbeat"></i>
-                                </div>
-                            </div>
+                                    </div>
+                </div>
                             <div class="scenario-detail-info">
                                 <h3 id="scenarioDetailTitle">情境標題</h3>
                                 <p id="scenarioDetailDescription">情境描述</p>
@@ -1049,9 +1093,9 @@
                         <button class="back-btn" onclick="goBackToHomepage()">
                             <i class="fas fa-arrow-left"></i> 返回練習專區
                         </button>
-                    </div>
-                </div>
             </div>
+        </div>
+    </div>
 
     <script>
         // 頁面載入時檢查登入狀態
@@ -1120,11 +1164,7 @@
 
         // 語言切換功能已移至 language-switcher.js
 
-        // 播放VR影片
-        function playVRVideo() {
-            console.log('播放360實境教學影片');
-            alert('即將播放360實境教學影片！\n\n這將開啟沉浸式VR學習體驗，讓您身臨其境地學習急救技能。');
-        }
+        // YouTube 360度影片已直接嵌入，無需額外播放函數
 
         // 進入練習內容
         function enterPractice(practiceType) {
@@ -1163,31 +1203,31 @@
                 name: '心臟驟停',
                 image: 'assets/心臟驟停情境.png',
                 iconImage: 'assets/心臟驟停情境.png',
-                description: '傍晚18點30分，客廳忽然安靜下來，一位5歲、110公分、18公斤的男童倒地，毫無反應。現場做了急救措施，患者OHCA，家屬在外等待。你只需要說出「下一步要做什麼」處理方式，系統就會即時呈現團隊/旁人依你指令採取的處置與生理變化；你的目標，是把時間贏回來。'
+                description: '傍晚18點30分，客廳忽然安靜下來，一位5歲、110公分、18公斤的男童倒地，毫無反應。現場做了急救措施，患者OHCA，家屬在外等待。你只需要說出「下一步要做什麼」處理方式，系統就會即時呈現團隊/旁人依你指令採取的處置與生理變化；你的目標，是把時間贏回來!'
             },
             'poisoning': {
                 name: '食物中毒',
                 image: 'assets/食物中毒情境.png',
                 iconImage: 'assets/食物中毒情境.png',
-                description: '下午16點12分，5歲小孩（103公分／25公斤）在餐桌旁突然倒下，四周留有嘔吐物與食物殘渣。家人驚慌失措，患者OHCA，家屬在外等待。你只需要說出「下一步要做什麼」處理措施，系統就會即時呈現團隊/旁人依你指令採取的處置與生理變化；你的目標，是把時間贏回來。'
+                description: '下午16點12分，5歲小孩（103公分／25公斤）在餐桌旁突然倒下，四周留有嘔吐物與食物殘渣。家人驚慌失措，患者OHCA，家屬在外等待。你只需要說出「下一步要做什麼」處理措施，系統就會即時呈現團隊/旁人依你指令採取的處置與生理變化；你的目標，是把時間贏回來!'
             },
             'drowning': {
                 name: '溺水',
                 image: 'assets/溺水情境.png',
                 iconImage: 'assets/溺水情境.png',
-                description: '下午3點20分的游泳池旁傳來呼喊——5歲小孩（105公分／20公斤）被拉上岸時已無反應。患者OHCA，家屬在外等待。你只需要說出「下一步要做什麼」的處理措施，系統就會即時呈現團隊/旁人依你指令採取的處置與生理變化；你的目標，是把時間贏回來。'
+                description: '下午3點20分的游泳池旁傳來呼喊——5歲小孩（105公分／20公斤）被拉上岸時已無反應。患者OHCA，家屬在外等待。你只需要說出「下一步要做什麼」的處理措施，系統就會即時呈現團隊/旁人依你指令採取的處置與生理變化；你的目標，是把時間贏回來!'
             },
             'fire': {
                 name: '火災嗆傷',
                 image: 'assets/火災嗆傷情境.png',
                 iconImage: 'assets/火災嗆傷情境.png',
-                description: '文化三路住宅區發生一起火災，現場一位8歲兒童（125公分／27公斤）被推進急診，患者OHCA。你只需要說出「下一步要做什麼」的處理措施，系統就會即時呈現團隊/旁人依你指令採取的處置與生理變化；你的目標，是把時間贏回來。'
+                description: '文化三路住宅區發生一起火災，現場一位8歲兒童（125公分／27公斤）被推進急診，患者OHCA。你只需要說出「下一步要做什麼」的處理措施，系統就會即時呈現團隊/旁人依你指令採取的處置與生理變化；你的目標，是把時間贏回來!'
             },
             'trauma': {
                 name: '外傷',
                 image: 'assets/外傷情境.png',
                 iconImage: 'assets/外傷情境.png',
-                description: '下午16點12分，一位6歲男童（100公分／22公斤）因打碎玻璃造成明顯撕裂傷，血迅速滲透衣物；他意識模糊、哭喊聲微弱、四肢冰冷，經家人發現後急救並送往醫院。患者OHCA。你只需要說出「下一步要做什麼」處理措施，系統就會即時呈現團隊/旁人依你指令採取的處置與生理變化；你的目標，是把時間贏回來！'
+                description: '下午16點12分，一位6歲男童（100公分／22公斤）因打碎玻璃造成明顯撕裂傷，血迅速滲透衣物；他意識模糊、哭喊聲微弱、四肢冰冷，經家人發現後急救並送往醫院。患者OHCA。你只需要說出「下一步要做什麼」處理措施，系統就會即時呈現團隊/旁人依你指令採取的處置與生理變化；你的目標，是把時間贏回來！!'
             }
         };
 
