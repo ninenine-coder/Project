@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>用戶數據遷移管理工具 - PBLS VR教學平台</title>
+    <style>
+        body {
+            font-family: 'Microsoft JhengHei', sans-serif;
+            margin: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #667eea;
+        }
+        .header h1 {
+            color: #667eea;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        .section {
+            margin: 30px 0;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            background: #f9f9f9;
+        }
+        .section h2 {
+            color: #667eea;
+            margin-bottom: 15px;
+            font-size: 1.5em;
+        }
+        .btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        .btn:hover {
+            background: #5a6fd8;
+        }
+        .btn.success {
+            background: #10b981;
+        }
+        .btn.warning {
+            background: #f59e0b;
+        }
+        .btn.danger {
+            background: #ef4444;
+        }
+        .result {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 5px;
+            padding: 15px;
+            margin: 10px 0;
+            font-family: monospace;
+            white-space: pre-wrap;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .error {
+            background: #f8d7da;
+            border-color: #f5c6cb;
+            color: #721c24;
+        }
+        .success {
+            background: #d4edda;
+            border-color: #c3e6cb;
+            color: #155724;
+        }
+        .info {
+            background: #d1ecf1;
+            border-color: #bee5eb;
+            color: #0c5460;
+        }
+        .warning {
+            background: #fff3cd;
+            border-color: #ffeaa7;
+            color: #856404;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #495057;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        .stat-card {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .stat-card h3 {
+            margin: 0 0 10px 0;
+            color: #667eea;
+            font-size: 1.2em;
+        }
+        .stat-card .value {
+            font-size: 2em;
+            font-weight: bold;
+            color: #333;
+        }
+        .progress-bar {
+            width: 100%;
+            height: 20px;
+            background: #e9ecef;
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            transition: width 0.3s ease;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>用戶數據遷移管理工具</h1>
+            <p>管理 Firebase 用戶字段的遷移和升級</p>
+        </div>
+
+        <div class="section">
+            <h2>📊 字段統計信息</h2>
+            <div class="stats-grid" id="statsGrid">
+                <div class="stat-card">
+                    <h3>總用戶數</h3>
+                    <div class="value" id="totalUsers">-</div>
+                </div>
+                <div class="stat-card">
+                    <h3>完整用戶數</h3>
+                    <div class="value" id="completeUsers">-</div>
+                </div>
+                <div class="stat-card">
+                    <h3>需要遷移</h3>
+                    <div class="value" id="needsMigration">-</div>
+                </div>
+                <div class="stat-card">
+                    <h3>完成率</h3>
+                    <div class="value" id="completionRate">-</div>
+                </div>
+            </div>
+            <button class="btn" onclick="getFieldStatistics()">刷新統計</button>
+        </div>
+
+        <div class="section">
+            <h2>🔍 單個用戶檢查</h2>
+            <div class="form-group">
+                <label for="userId">用戶 ID:</label>
+                <input type="text" id="userId" placeholder="輸入用戶 ID">
+            </div>
+            <button class="btn" onclick="checkSingleUser()">檢查用戶</button>
+            <button class="btn warning" onclick="migrateSingleUser()">遷移用戶</button>
+        </div>
+
+        <div class="section">
+            <h2>🚀 批量遷移操作</h2>
+            <p><strong>注意：</strong>批量遷移會影響所有用戶，請謹慎操作。</p>
+            <button class="btn danger" onclick="executeFullMigration()">執行完整遷移</button>
+            <button class="btn warning" onclick="previewMigration()">預覽遷移</button>
+        </div>
+
+        <div class="section">
+            <h2>📋 字段管理</h2>
+            <button class="btn" onclick="showFieldSchema()">查看字段結構</button>
+            <button class="btn" onclick="exportMigrationReport()">導出遷移報告</button>
+            <button class="btn" onclick="clearMigrationLog()">清除日誌</button>
+        </div>
+
+        <div id="result" class="result">點擊上方按鈕開始操作...</div>
+    </div>
+
+    <!-- 載入必要的服務 -->
+    <script type="module">
+        import './src/services/userFieldManager.js';
+        import './src/scripts/userMigrationScript.js';
+    </script>
+
+    <script>
+        let currentStats = null;
+        let migrationReport = null;
+
+        function showResult(message, type = "") {
+            const resultDiv = document.getElementById('result');
+            resultDiv.textContent = message;
+            resultDiv.className = `result ${type}`;
+            console.log(message);
+        }
+
+        // 獲取字段統計信息
+        window.getFieldStatistics = async function() {
+            try {
+                showResult('正在獲取字段統計信息...', 'info');
+                
+                if (!window.userFieldManager) {
+                    throw new Error('用戶字段管理器未初始化');
+                }
+
+                await window.userFieldManager.initialize();
+                const stats = await window.userFieldManager.getFieldStatistics();
+                
+                if (stats) {
+                    currentStats = stats;
+                    updateStatsDisplay(stats);
+                    showResult(`✅ 字段統計獲取成功\n\n${JSON.stringify(stats, null, 2)}`, 'success');
+                } else {
+                    showResult('❌ 無法獲取字段統計', 'error');
+                }
+            } catch (error) {
+                console.error('獲取字段統計失敗:', error);
+                showResult('❌ 獲取字段統計失敗: ' + error.message, 'error');
+            }
+        };
+
+        // 更新統計顯示
+        function updateStatsDisplay(stats) {
+            document.getElementById('totalUsers').textContent = stats.totalUsers;
+            
+            // 計算完整用戶數（所有字段都存在的用戶）
+            let completeUsers = 0;
+            Object.keys(stats.fieldStats).forEach(fieldName => {
+                if (stats.fieldStats[fieldName].percentage === 100) {
+                    completeUsers++;
+                }
+            });
+            
+            document.getElementById('completeUsers').textContent = completeUsers;
+            document.getElementById('needsMigration').textContent = stats.totalUsers - completeUsers;
+            
+            const completionRate = stats.totalUsers > 0 ? 
+                Math.round((completeUsers / Object.keys(stats.fieldStats).length) * 100) : 0;
+            document.getElementById('completionRate').textContent = completionRate + '%';
+        }
+
+        // 檢查單個用戶
+        window.checkSingleUser = async function() {
+            try {
+                const userId = document.getElementById('userId').value.trim();
+                if (!userId) {
+                    showResult('❌ 請輸入用戶 ID', 'error');
+                    return;
+                }
+
+                showResult(`正在檢查用戶 ${userId}...`, 'info');
+                
+                if (!window.userMigrationScript) {
+                    throw new Error('遷移腳本未初始化');
+                }
+
+                const migrationInfo = await window.userMigrationScript.checkUserMigration(userId);
+                
+                if (migrationInfo.needsMigration) {
+                    showResult(`⚠️ 用戶需要遷移\n\n${JSON.stringify(migrationInfo, null, 2)}`, 'warning');
+                } else {
+                    showResult(`✅ 用戶無需遷移\n\n${JSON.stringify(migrationInfo, null, 2)}`, 'success');
+                }
+            } catch (error) {
+                console.error('檢查用戶失敗:', error);
+                showResult('❌ 檢查用戶失敗: ' + error.message, 'error');
+            }
+        };
+
+        // 遷移單個用戶
+        window.migrateSingleUser = async function() {
+            try {
+                const userId = document.getElementById('userId').value.trim();
+                if (!userId) {
+                    showResult('❌ 請輸入用戶 ID', 'error');
+                    return;
+                }
+
+                if (!confirm(`確定要遷移用戶 ${userId} 嗎？`)) {
+                    return;
+                }
+
+                showResult(`正在遷移用戶 ${userId}...`, 'info');
+                
+                if (!window.userMigrationScript) {
+                    throw new Error('遷移腳本未初始化');
+                }
+
+                const result = await window.userMigrationScript.migrateSingleUser(userId);
+                
+                if (result.success) {
+                    showResult(`✅ 用戶遷移成功\n\n${JSON.stringify(result, null, 2)}`, 'success');
+                } else {
+                    showResult(`❌ 用戶遷移失敗\n\n${JSON.stringify(result, null, 2)}`, 'error');
+                }
+            } catch (error) {
+                console.error('遷移用戶失敗:', error);
+                showResult('❌ 遷移用戶失敗: ' + error.message, 'error');
+            }
+        };
+
+        // 執行完整遷移
+        window.executeFullMigration = async function() {
+            if (!confirm('確定要執行完整遷移嗎？這將影響所有用戶數據。')) {
+                return;
+            }
+
+            try {
+                showResult('正在執行完整遷移...', 'info');
+                
+                if (!window.userMigrationScript) {
+                    throw new Error('遷移腳本未初始化');
+                }
+
+                const result = await window.userMigrationScript.executeMigration();
+                
+                if (result.success) {
+                    migrationReport = result.report;
+                    showResult(`✅ 完整遷移成功\n\n${JSON.stringify(result.report, null, 2)}`, 'success');
+                    
+                    // 刷新統計
+                    setTimeout(() => {
+                        getFieldStatistics();
+                    }, 1000);
+                } else {
+                    showResult(`❌ 完整遷移失敗\n\n${JSON.stringify(result, null, 2)}`, 'error');
+                }
+            } catch (error) {
+                console.error('執行完整遷移失敗:', error);
+                showResult('❌ 執行完整遷移失敗: ' + error.message, 'error');
+            }
+        };
+
+        // 預覽遷移
+        window.previewMigration = async function() {
+            try {
+                showResult('正在預覽遷移...', 'info');
+                
+                if (!window.userFieldManager) {
+                    throw new Error('用戶字段管理器未初始化');
+                }
+
+                await window.userFieldManager.initialize();
+                const stats = await window.userFieldManager.getFieldStatistics();
+                
+                if (stats) {
+                    const preview = {
+                        totalUsers: stats.totalUsers,
+                        fieldAnalysis: {}
+                    };
+
+                    Object.keys(stats.fieldStats).forEach(fieldName => {
+                        const fieldStat = stats.fieldStats[fieldName];
+                        preview.fieldAnalysis[fieldName] = {
+                            currentPercentage: fieldStat.percentage,
+                            missingUsers: fieldStat.missing,
+                            willBeAdded: fieldStat.missing
+                        };
+                    });
+
+                    showResult(`📋 遷移預覽\n\n${JSON.stringify(preview, null, 2)}`, 'info');
+                } else {
+                    showResult('❌ 無法獲取遷移預覽', 'error');
+                }
+            } catch (error) {
+                console.error('預覽遷移失敗:', error);
+                showResult('❌ 預覽遷移失敗: ' + error.message, 'error');
+            }
+        };
+
+        // 顯示字段結構
+        window.showFieldSchema = function() {
+            try {
+                // 這裡可以顯示字段結構，但需要導入 schema
+                showResult('📋 字段結構信息\n\n請查看 src/schemas/userSchema.js 文件了解完整的字段結構定義。', 'info');
+            } catch (error) {
+                showResult('❌ 顯示字段結構失敗: ' + error.message, 'error');
+            }
+        };
+
+        // 導出遷移報告
+        window.exportMigrationReport = function() {
+            if (!migrationReport) {
+                showResult('❌ 沒有可導出的遷移報告', 'error');
+                return;
+            }
+
+            try {
+                const jsonReport = JSON.stringify(migrationReport, null, 2);
+                const blob = new Blob([jsonReport], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `migration-report-${new Date().toISOString().split('T')[0]}.json`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                
+                showResult('✅ 遷移報告已導出', 'success');
+            } catch (error) {
+                showResult('❌ 導出遷移報告失敗: ' + error.message, 'error');
+            }
+        };
+
+        // 清除遷移日誌
+        window.clearMigrationLog = function() {
+            if (window.userMigrationScript) {
+                window.userMigrationScript.clearMigrationLog();
+                showResult('✅ 遷移日誌已清除', 'success');
+            } else {
+                showResult('❌ 遷移腳本未初始化', 'error');
+            }
+        };
+
+        // 頁面載入時初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            showResult('🎯 用戶數據遷移管理工具已準備就緒\n\n請先點擊「刷新統計」查看當前字段狀態', 'info');
+        });
+    </script>
+</body>
+</html>

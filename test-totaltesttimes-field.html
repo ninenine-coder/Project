@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>totaltesttimes 字段測試 - PBLS VR教學平台</title>
+    <style>
+        body {
+            font-family: 'Microsoft JhengHei', sans-serif;
+            margin: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        .btn:hover {
+            background: #5a6fd8;
+        }
+        .result {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 5px;
+            padding: 15px;
+            margin: 10px 0;
+            font-family: monospace;
+            white-space: pre-wrap;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .error {
+            background: #f8d7da;
+            border-color: #f5c6cb;
+            color: #721c24;
+        }
+        .success {
+            background: #d4edda;
+            border-color: #c3e6cb;
+            color: #155724;
+        }
+        .info {
+            background: #d1ecf1;
+            border-color: #bee5eb;
+            color: #0c5460;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>totaltesttimes 字段測試工具</h1>
+        <p>專門測試新的 <code>totaltesttimes</code> 字段的保存和更新功能。</p>
+        
+        <div>
+            <button class="btn" onclick="checkUserLogin()">檢查用戶登入</button>
+            <button class="btn" onclick="checkCurrentField()">檢查當前字段值</button>
+            <button class="btn" onclick="initializeField()">初始化 totaltesttimes 字段</button>
+            <button class="btn" onclick="incrementField()">增加 totaltesttimes (+1)</button>
+            <button class="btn" onclick="simulateQuizCompletion()">模擬完成 20 題測驗</button>
+        </div>
+        
+        <div id="result" class="result">點擊上方按鈕開始測試...</div>
+    </div>
+
+    <script type="module">
+        // Firebase 配置
+        const firebaseConfig = {
+            apiKey: "AIzaSyBuWO8hFVjjTUe2tqJDrqdbeGTrp4PoT5Q",
+            authDomain: "progect-115a5.firebaseapp.com",
+            projectId: "progect-115a5",
+            storageBucket: "progect-115a5.appspot.com",
+            messagingSenderId: "123456789",
+            appId: "1:123456789:web:abcdef123456"
+        };
+
+        let db = null;
+        let currentUser = null;
+
+        // 初始化 Firebase
+        async function initFirebase() {
+            try {
+                const { initializeApp } = await import("https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js");
+                const { getFirestore } = await import("https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js");
+                
+                const app = initializeApp(firebaseConfig);
+                db = getFirestore(app);
+                
+                showResult("✅ Firebase 初始化成功", "success");
+                return true;
+            } catch (error) {
+                showResult("❌ Firebase 初始化失敗: " + error.message, "error");
+                return false;
+            }
+        }
+
+        function showResult(message, type = "") {
+            const resultDiv = document.getElementById('result');
+            resultDiv.textContent = message;
+            resultDiv.className = `result ${type}`;
+            console.log(message);
+        }
+
+        // 檢查用戶登入狀態
+        window.checkUserLogin = function() {
+            try {
+                const userData = localStorage.getItem('pbls_user');
+                if (!userData) {
+                    showResult("❌ 用戶未登入\n請先登入系統", "error");
+                    return;
+                }
+
+                currentUser = JSON.parse(userData);
+                if (!currentUser.uid) {
+                    showResult("❌ 用戶數據不完整\n缺少用戶 ID", "error");
+                    return;
+                }
+
+                showResult(`✅ 用戶已登入\n用戶 ID: ${currentUser.uid}\n姓名: ${currentUser.name || '未設定'}\n電子郵件: ${currentUser.email || '未設定'}`, "success");
+            } catch (error) {
+                showResult("❌ 檢查用戶登入失敗: " + error.message, "error");
+            }
+        };
+
+        // 檢查當前字段值
+        window.checkCurrentField = async function() {
+            if (!currentUser) {
+                showResult("❌ 請先檢查用戶登入狀態", "error");
+                return;
+            }
+
+            if (!db) {
+                const initialized = await initFirebase();
+                if (!initialized) return;
+            }
+
+            try {
+                const { doc, getDoc } = await import("https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js");
+                
+                const userRef = doc(db, 'user', currentUser.uid);
+                const userSnap = await getDoc(userRef);
+
+                if (userSnap.exists()) {
+                    const userData = userSnap.data();
+                    const totaltesttimes = userData.totaltesttimes || 0;
+                    const totalTimeSpent = userData.totalTimeSpent || 0;
+                    
+                    showResult(`✅ 當前字段值\n\ntotaltesttimes: ${totaltesttimes}\ntotalTimeSpent: ${totalTimeSpent} 秒\n\n完整用戶數據:\n${JSON.stringify(userData, null, 2)}`, "success");
+                } else {
+                    showResult(`❌ 用戶文檔不存在\n用戶 ID: ${currentUser.uid}\n\n請先初始化用戶文檔`, "error");
+                }
+            } catch (error) {
+                showResult("❌ 檢查字段值失敗: " + error.message, "error");
+            }
+        };
+
+        // 初始化 totaltesttimes 字段
+        window.initializeField = async function() {
+            if (!currentUser) {
+                showResult("❌ 請先檢查用戶登入狀態", "error");
+                return;
+            }
+
+            if (!db) {
+                const initialized = await initFirebase();
+                if (!initialized) return;
+            }
+
+            try {
+                const { doc, setDoc, serverTimestamp } = await import("https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js");
+                
+                const userRef = doc(db, 'user', currentUser.uid);
+                
+                // 設置初始值
+                await setDoc(userRef, {
+                    totaltesttimes: 0,
+                    totalTimeSpent: 0,
+                    initializedAt: serverTimestamp(),
+                    updatedAt: serverTimestamp()
+                }, { merge: true });
+
+                showResult(`✅ totaltesttimes 字段已初始化為 0\n\n用戶 ID: ${currentUser.uid}\n字段值: totaltesttimes = 0`, "success");
+            } catch (error) {
+                showResult("❌ 初始化字段失敗: " + error.message, "error");
+            }
+        };
+
+        // 增加 totaltesttimes 字段
+        window.incrementField = async function() {
+            if (!currentUser) {
+                showResult("❌ 請先檢查用戶登入狀態", "error");
+                return;
+            }
+
+            if (!db) {
+                const initialized = await initFirebase();
+                if (!initialized) return;
+            }
+
+            try {
+                const { doc, updateDoc, increment, serverTimestamp, getDoc } = await import("https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js");
+                
+                const userRef = doc(db, 'user', currentUser.uid);
+                
+                // 先讀取當前值
+                const beforeSnap = await getDoc(userRef);
+                const beforeData = beforeSnap.exists() ? beforeSnap.data() : {};
+                const beforeValue = beforeData.totaltesttimes || 0;
+                
+                // 增加字段值
+                await updateDoc(userRef, {
+                    totaltesttimes: increment(1),
+                    updatedAt: serverTimestamp()
+                });
+
+                // 讀取更新後的值
+                const afterSnap = await getDoc(userRef);
+                const afterData = afterSnap.data();
+                const afterValue = afterData.totaltesttimes;
+
+                showResult(`✅ totaltesttimes 字段已增加\n\n更新前: ${beforeValue}\n更新後: ${afterValue}\n\n完整用戶數據:\n${JSON.stringify(afterData, null, 2)}`, "success");
+            } catch (error) {
+                showResult("❌ 增加字段值失敗: " + error.message, "error");
+            }
+        };
+
+        // 模擬完成 20 題測驗
+        window.simulateQuizCompletion = async function() {
+            if (!currentUser) {
+                showResult("❌ 請先檢查用戶登入狀態", "error");
+                return;
+            }
+
+            if (!db) {
+                const initialized = await initFirebase();
+                if (!initialized) return;
+            }
+
+            try {
+                const { doc, updateDoc, increment, serverTimestamp, collection, addDoc, getDoc } = await import("https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js");
+                
+                const userRef = doc(db, 'user', currentUser.uid);
+                
+                // 模擬 20 題測驗結果
+                const quizResult = {
+                    score: 85,
+                    correctAnswers: 17,
+                    totalQuestions: 20,
+                    totalTime: 209,
+                    date: new Date().toISOString(),
+                    answers: Array.from({length: 20}, (_, i) => ({
+                        questionId: `q${i + 1}`,
+                        question: `問題 ${i + 1}`,
+                        userAnswer: Math.floor(Math.random() * 4) + 1,
+                        correctAnswer: Math.floor(Math.random() * 4) + 1,
+                        isCorrect: i < 17, // 前 17 題答對
+                        explanation: `問題 ${i + 1} 的解釋`
+                    }))
+                };
+
+                // 讀取更新前的數據
+                const beforeSnap = await getDoc(userRef);
+                const beforeData = beforeSnap.exists() ? beforeSnap.data() : {};
+                const beforeTests = beforeData.totaltesttimes || 0;
+                const beforeTime = beforeData.totalTimeSpent || 0;
+
+                // 更新用戶統計（模擬完成 20 題測驗後的 +1 更新）
+                await updateDoc(userRef, {
+                    totaltesttimes: increment(1), // 總測驗次數 +1
+                    totalTimeSpent: increment(quizResult.totalTime), // 總用時增加
+                    lastQuizDate: serverTimestamp(),
+                    updatedAt: serverTimestamp()
+                });
+
+                // 保存詳細結果到子集合
+                const quizResultsRef = collection(db, 'user', currentUser.uid, 'quizResults');
+                await addDoc(quizResultsRef, {
+                    ...quizResult,
+                    createdAt: serverTimestamp()
+                });
+
+                // 讀取更新後的數據
+                const afterSnap = await getDoc(userRef);
+                const afterData = afterSnap.data();
+
+                showResult(`✅ 20 題測驗完成，totaltesttimes 已更新\n\n測驗結果:\n分數: ${quizResult.score}分\n答對: ${quizResult.correctAnswers}/20\n用時: ${quizResult.totalTime}秒\n\n統計更新:\ntotaltesttimes: ${beforeTests} → ${afterData.totaltesttimes}\ntotalTimeSpent: ${beforeTime} → ${afterData.totalTimeSpent} 秒\n\n詳細結果已保存到子集合`, "success");
+            } catch (error) {
+                showResult("❌ 模擬測驗完成失敗: " + error.message, "error");
+            }
+        };
+
+        // 頁面載入時初始化
+        document.addEventListener('DOMContentLoaded', async function() {
+            await initFirebase();
+            showResult("🎯 totaltesttimes 字段測試工具已準備就緒\n\n請按照以下順序測試:\n1. 檢查用戶登入\n2. 檢查當前字段值\n3. 初始化字段（如果需要）\n4. 模擬完成 20 題測驗", "info");
+        });
+    </script>
+</body>
+</html>

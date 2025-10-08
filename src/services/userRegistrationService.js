@@ -19,6 +19,7 @@ import {
   updateDoc
 } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
 import { ValidationUtils, ErrorHandler } from '../utils/validationUtils.js';
+import { applyDefaults, getAllDefaults } from '../schemas/userSchema.js';
 
 // Firebase 配置
 const firebaseConfig = {
@@ -55,18 +56,28 @@ export class UserRegistrationData {
 
   // 轉換為Firestore格式
   toFirestore() {
-    return {
+    // 基本用戶數據
+    const userData = {
+      uid: this.studentId,
+      email: this.account,
+      name: this.name,
+      displayName: this.name,
       account: this.account,
       password: this.password,
       "姓名": this.name,
       studentId: this.studentId,
       department: this.department,
       phone: this.phone || null,
+      where: this.school,
+      school: this.school,
       "school/hospital": this.school,
       createdAt: this.createdAt,
       isActive: this.isActive,
       lastLogin: this.lastLogin
     };
+
+    // 應用所有預設值
+    return applyDefaults(userData);
   }
 
   // 驗證數據完整性 - 使用統一的驗證工具

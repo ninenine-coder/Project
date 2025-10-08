@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Firebase 測驗結果診斷工具 - PBLS VR教學平台</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Microsoft JhengHei', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #667eea;
+        }
+
+        .header h1 {
+            color: #667eea;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .diagnostic-section {
+            margin: 30px 0;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            background: #f9f9f9;
+        }
+
+        .diagnostic-section h2 {
+            color: #667eea;
+            margin-bottom: 15px;
+            font-size: 1.5em;
+        }
+
+        .test-controls {
+            display: flex;
+            gap: 15px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+
+        .test-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .test-btn:hover {
+            background: #5a6fd8;
+            transform: translateY(-2px);
+        }
+
+        .test-btn.success {
+            background: #10b981;
+        }
+
+        .test-btn.error {
+            background: #ef4444;
+        }
+
+        .test-btn.warning {
+            background: #f59e0b;
+        }
+
+        .status {
+            text-align: center;
+            margin: 20px 0;
+            padding: 15px;
+            border-radius: 10px;
+            font-weight: bold;
+        }
+
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .status.info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+
+        .status.warning {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+
+        .debug-info {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 5px;
+            padding: 15px;
+            margin: 20px 0;
+            font-family: monospace;
+            font-size: 14px;
+        }
+
+        .debug-info h4 {
+            color: #495057;
+            margin-bottom: 10px;
+        }
+
+        .debug-info pre {
+            background: #e9ecef;
+            padding: 10px;
+            border-radius: 3px;
+            overflow-x: auto;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .firebase-config {
+            background: #e3f2fd;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+
+        .firebase-config h3 {
+            color: #1976d2;
+            margin-bottom: 10px;
+        }
+
+        .firebase-config p {
+            margin: 5px 0;
+            color: #424242;
+        }
+
+        .user-info {
+            background: #e8f5e8;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+
+        .user-info h3 {
+            color: #2e7d32;
+            margin-bottom: 10px;
+        }
+
+        .user-info p {
+            margin: 5px 0;
+            color: #424242;
+        }
+
+        .firestore-data {
+            background: #fff3e0;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+
+        .firestore-data h3 {
+            color: #f57c00;
+            margin-bottom: 10px;
+        }
+
+        .firestore-data pre {
+            background: #f5f5f5;
+            padding: 10px;
+            border-radius: 5px;
+            overflow-x: auto;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Firebase 測驗結果診斷工具</h1>
+            <p>診斷為什麼 Firebase 中沒有看到"總測驗次數"</p>
+        </div>
+
+        <div class="status info" id="status">
+            正在初始化診斷工具...
+        </div>
+
+        <div class="firebase-config" id="firebaseConfig">
+            <h3>Firebase 配置信息</h3>
+            <p id="configStatus">正在檢查配置...</p>
+        </div>
+
+        <div class="user-info" id="userInfo">
+            <h3>用戶登入狀態</h3>
+            <p id="userStatus">正在檢查用戶狀態...</p>
+        </div>
+
+        <div class="firestore-data" id="firestoreData">
+            <h3>Firestore 數據檢查</h3>
+            <p id="firestoreStatus">點擊下方按鈕檢查 Firestore 數據</p>
+        </div>
+
+        <div class="diagnostic-section">
+            <h2>診斷測試</h2>
+            <div class="test-controls">
+                <button class="test-btn" onclick="checkFirebaseConfig()">
+                    <i class="fas fa-cog"></i> 檢查 Firebase 配置
+                </button>
+                <button class="test-btn" onclick="checkUserLogin()">
+                    <i class="fas fa-user"></i> 檢查用戶登入
+                </button>
+                <button class="test-btn" onclick="checkFirestoreConnection()">
+                    <i class="fas fa-database"></i> 檢查 Firestore 連接
+                </button>
+                <button class="test-btn" onclick="checkUserDocument()">
+                    <i class="fas fa-file-alt"></i> 檢查用戶文檔
+                </button>
+                <button class="test-btn" onclick="testWritePermission()">
+                    <i class="fas fa-edit"></i> 測試寫入權限
+                </button>
+                <button class="test-btn warning" onclick="simulateQuizSave()">
+                    <i class="fas fa-play"></i> 模擬測驗保存
+                </button>
+            </div>
+        </div>
+
+        <div class="diagnostic-section">
+            <h2>Firebase 控制台檢查指南</h2>
+            <p>請按照以下步驟檢查 Firebase 控制台：</p>
+            <ol>
+                <li><strong>項目選擇</strong>：確認您在 Firebase 控制台中選擇了正確的項目 <code>progect-115a5</code></li>
+                <li><strong>Firestore Database</strong>：點擊左側選單的 "Firestore Database"</li>
+                <li><strong>數據查看</strong>：查看是否有 <code>user</code> 集合</li>
+                <li><strong>用戶文檔</strong>：在 <code>user</code 集合中查找您的用戶 ID 文檔</li>
+                <li><strong>字段檢查</strong>：檢查文檔中是否有 <code>totalTests</code> 字段</li>
+            </ol>
+        </div>
+
+        <div class="debug-info">
+            <h4>詳細診斷信息</h4>
+            <pre id="debug-output">正在載入...</pre>
+        </div>
+    </div>
+
+    <!-- 載入必要的服務 -->
+    <script type="module">
+        import './src/services/quizResultService.js';
+        import './src/services/userDataService.js';
+    </script>
+
+    <script>
+        let diagnosticInfo = {
+            timestamp: new Date().toISOString(),
+            firebaseConfig: null,
+            userStatus: null,
+            firestoreConnection: null,
+            userDocument: null,
+            writePermission: null
+        };
+
+        function updateStatus(message, type) {
+            const statusElement = document.getElementById('status');
+            statusElement.textContent = message;
+            statusElement.className = `status ${type}`;
+        }
+
+        function updateDebugInfo() {
+            const debugOutput = document.getElementById('debug-output');
+            debugOutput.textContent = JSON.stringify(diagnosticInfo, null, 2);
+        }
+
+        function checkFirebaseConfig() {
+            try {
+                updateStatus('正在檢查 Firebase 配置...', 'info');
+                
+                const config = {
+                    apiKey: "AIzaSyBuWO8hFVjjTUe2tqJDrqdbeGTrp4PoT5Q",
+                    authDomain: "progect-115a5.firebaseapp.com",
+                    projectId: "progect-115a5"
+                };
+
+                diagnosticInfo.firebaseConfig = {
+                    status: 'found',
+                    config: config,
+                    timestamp: new Date().toISOString()
+                };
+
+                document.getElementById('configStatus').innerHTML = `
+                    <p><strong>項目 ID:</strong> ${config.projectId}</p>
+                    <p><strong>認證域名:</strong> ${config.authDomain}</p>
+                    <p><strong>API 金鑰:</strong> ${config.apiKey.substring(0, 20)}...</p>
+                `;
+
+                updateStatus('✅ Firebase 配置檢查完成', 'success');
+                updateDebugInfo();
+            } catch (error) {
+                console.error('Firebase 配置檢查失敗:', error);
+                updateStatus('❌ Firebase 配置檢查失敗: ' + error.message, 'error');
+                diagnosticInfo.firebaseConfig = {
+                    status: 'error',
+                    error: error.message,
+                    timestamp: new Date().toISOString()
+                };
+                updateDebugInfo();
+            }
+        }
+
+        function checkUserLogin() {
+            try {
+                updateStatus('正在檢查用戶登入狀態...', 'info');
+                
+                const userData = localStorage.getItem('pbls_user');
+                let user = null;
+                
+                if (userData) {
+                    try {
+                        user = JSON.parse(userData);
+                    } catch (e) {
+                        console.error('解析用戶數據失敗:', e);
+                    }
+                }
+
+                diagnosticInfo.userStatus = {
+                    hasLocalStorage: !!userData,
+                    userData: user,
+                    timestamp: new Date().toISOString()
+                };
+
+                if (user && user.uid) {
+                    document.getElementById('userStatus').innerHTML = `
+                        <p><strong>狀態:</strong> ✅ 已登入</p>
+                        <p><strong>用戶 ID:</strong> ${user.uid}</p>
+                        <p><strong>姓名:</strong> ${user.name || user.displayName || '未設定'}</p>
+                        <p><strong>電子郵件:</strong> ${user.email || '未設定'}</p>
+                    `;
+                    updateStatus('✅ 用戶已登入', 'success');
+                } else {
+                    document.getElementById('userStatus').innerHTML = `
+                        <p><strong>狀態:</strong> ❌ 未登入</p>
+                        <p>請先登入系統以測試 Firebase 功能</p>
+                    `;
+                    updateStatus('❌ 用戶未登入', 'error');
+                }
+                
+                updateDebugInfo();
+            } catch (error) {
+                console.error('用戶登入檢查失敗:', error);
+                updateStatus('❌ 用戶登入檢查失敗: ' + error.message, 'error');
+                diagnosticInfo.userStatus = {
+                    status: 'error',
+                    error: error.message,
+                    timestamp: new Date().toISOString()
+                };
+                updateDebugInfo();
+            }
+        }
+
+        async function checkFirestoreConnection() {
+            try {
+                updateStatus('正在檢查 Firestore 連接...', 'info');
+                
+                if (!window.quizResultService) {
+                    throw new Error('測驗結果服務未初始化');
+                }
+
+                // 嘗試初始化服務
+                await window.quizResultService.initialize();
+                
+                diagnosticInfo.firestoreConnection = {
+                    status: 'connected',
+                    serviceInitialized: window.quizResultService.isInitialized,
+                    timestamp: new Date().toISOString()
+                };
+
+                updateStatus('✅ Firestore 連接檢查完成', 'success');
+                updateDebugInfo();
+            } catch (error) {
+                console.error('Firestore 連接檢查失敗:', error);
+                updateStatus('❌ Firestore 連接檢查失敗: ' + error.message, 'error');
+                diagnosticInfo.firestoreConnection = {
+                    status: 'error',
+                    error: error.message,
+                    timestamp: new Date().toISOString()
+                };
+                updateDebugInfo();
+            }
+        }
+
+        async function checkUserDocument() {
+            try {
+                updateStatus('正在檢查用戶文檔...', 'info');
+                
+                const userData = localStorage.getItem('pbls_user');
+                if (!userData) {
+                    throw new Error('用戶未登入');
+                }
+
+                const user = JSON.parse(userData);
+                if (!user.uid) {
+                    throw new Error('用戶 ID 不存在');
+                }
+
+                // 嘗試讀取用戶文檔
+                const { initializeApp } = await import("https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js");
+                const { getFirestore, doc, getDoc } = await import("https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js");
+                
+                const firebaseConfig = {
+                    apiKey: "AIzaSyBuWO8hFVjjTUe2tqJDrqdbeGTrp4PoT5Q",
+                    authDomain: "progect-115a5.firebaseapp.com",
+                    projectId: "progect-115a5"
+                };
+
+                const app = initializeApp(firebaseConfig);
+                const db = getFirestore(app);
+                
+                const userRef = doc(db, 'user', user.uid);
+                const userSnap = await getDoc(userRef);
+
+                if (userSnap.exists()) {
+                    const userDocData = userSnap.data();
+                    diagnosticInfo.userDocument = {
+                        status: 'exists',
+                        userId: user.uid,
+                        data: userDocData,
+                        totaltesttimes: userDocData.totaltesttimes || 0,
+                        timestamp: new Date().toISOString()
+                    };
+
+                    document.getElementById('firestoreStatus').innerHTML = `
+                        <p><strong>狀態:</strong> ✅ 用戶文檔存在</p>
+                        <p><strong>用戶 ID:</strong> ${user.uid}</p>
+                        <p><strong>總測驗次數:</strong> ${userDocData.totaltesttimes || 0}</p>
+                        <p><strong>總用時:</strong> ${userDocData.totalTimeSpent || 0} 秒</p>
+                        <pre>${JSON.stringify(userDocData, null, 2)}</pre>
+                    `;
+                    updateStatus('✅ 用戶文檔檢查完成', 'success');
+                } else {
+                    diagnosticInfo.userDocument = {
+                        status: 'not_exists',
+                        userId: user.uid,
+                        timestamp: new Date().toISOString()
+                    };
+
+                    document.getElementById('firestoreStatus').innerHTML = `
+                        <p><strong>狀態:</strong> ❌ 用戶文檔不存在</p>
+                        <p><strong>用戶 ID:</strong> ${user.uid}</p>
+                        <p>這可能是問題的原因！用戶文檔不存在，需要先創建。</p>
+                    `;
+                    updateStatus('❌ 用戶文檔不存在', 'error');
+                }
+                
+                updateDebugInfo();
+            } catch (error) {
+                console.error('用戶文檔檢查失敗:', error);
+                updateStatus('❌ 用戶文檔檢查失敗: ' + error.message, 'error');
+                diagnosticInfo.userDocument = {
+                    status: 'error',
+                    error: error.message,
+                    timestamp: new Date().toISOString()
+                };
+                updateDebugInfo();
+            }
+        }
+
+        async function testWritePermission() {
+            try {
+                updateStatus('正在測試寫入權限...', 'info');
+                
+                const userData = localStorage.getItem('pbls_user');
+                if (!userData) {
+                    throw new Error('用戶未登入');
+                }
+
+                const user = JSON.parse(userData);
+                if (!user.uid) {
+                    throw new Error('用戶 ID 不存在');
+                }
+
+                // 嘗試寫入測試數據
+                const { initializeApp } = await import("https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js");
+                const { getFirestore, doc, updateDoc, serverTimestamp } = await import("https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js");
+                
+                const firebaseConfig = {
+                    apiKey: "AIzaSyBuWO8hFVjjTUe2tqJDrqdbeGTrp4PoT5Q",
+                    authDomain: "progect-115a5.firebaseapp.com",
+                    projectId: "progect-115a5"
+                };
+
+                const app = initializeApp(firebaseConfig);
+                const db = getFirestore(app);
+                
+                const userRef = doc(db, 'user', user.uid);
+                
+                // 嘗試更新一個測試字段
+                await updateDoc(userRef, {
+                    lastDiagnosticTest: serverTimestamp(),
+                    diagnosticTestCount: (await getDoc(userRef)).data()?.diagnosticTestCount + 1 || 1
+                });
+
+                diagnosticInfo.writePermission = {
+                    status: 'success',
+                    userId: user.uid,
+                    timestamp: new Date().toISOString()
+                };
+
+                updateStatus('✅ 寫入權限測試成功', 'success');
+                updateDebugInfo();
+            } catch (error) {
+                console.error('寫入權限測試失敗:', error);
+                updateStatus('❌ 寫入權限測試失敗: ' + error.message, 'error');
+                diagnosticInfo.writePermission = {
+                    status: 'error',
+                    error: error.message,
+                    timestamp: new Date().toISOString()
+                };
+                updateDebugInfo();
+            }
+        }
+
+        async function simulateQuizSave() {
+            try {
+                updateStatus('正在模擬測驗保存...', 'info');
+                
+                if (!window.quizResultService) {
+                    throw new Error('測驗結果服務未初始化');
+                }
+
+                const testQuizResult = {
+                    score: 85,
+                    correctAnswers: 17,
+                    totalQuestions: 20,
+                    totalTime: 209,
+                    answers: [
+                        {
+                            questionId: 'test_q1',
+                            question: '測試問題 1',
+                            userAnswer: 1,
+                            correctAnswer: 1,
+                            isCorrect: true,
+                            explanation: '測試解釋'
+                        }
+                    ]
+                };
+
+                const success = await window.quizResultService.saveQuizResult(testQuizResult);
+                
+                if (success) {
+                    updateStatus('✅ 模擬測驗保存成功', 'success');
+                    // 重新檢查用戶文檔
+                    setTimeout(() => {
+                        checkUserDocument();
+                    }, 1000);
+                } else {
+                    updateStatus('❌ 模擬測驗保存失敗', 'error');
+                }
+                
+                updateDebugInfo();
+            } catch (error) {
+                console.error('模擬測驗保存失敗:', error);
+                updateStatus('❌ 模擬測驗保存失敗: ' + error.message, 'error');
+                updateDebugInfo();
+            }
+        }
+
+        // 頁面載入完成後的初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            updateStatus('診斷工具已準備就緒', 'info');
+            
+            // 自動執行基本檢查
+            setTimeout(() => {
+                checkFirebaseConfig();
+                checkUserLogin();
+            }, 1000);
+            
+            // 定期更新調試信息
+            setInterval(updateDebugInfo, 2000);
+        });
+    </script>
+</body>
+</html>

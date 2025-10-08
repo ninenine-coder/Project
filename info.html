@@ -559,7 +559,7 @@
             flex-wrap: wrap;
         }
 
-        .practice-btn, .exam-btn, .history-btn {
+        .practice-btn, .exam-btn {
             border: none;
             padding: 18px 35px;
             border-radius: 25px;
@@ -594,17 +594,6 @@
             background: linear-gradient(135deg, #d97706 0%, #b45309 100%);
         }
 
-        .history-btn {
-            background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
-            color: white;
-            box-shadow: 0 6px 20px rgba(139, 92, 246, 0.3);
-        }
-
-        .history-btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 12px 30px rgba(139, 92, 246, 0.4);
-            background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);
-        }
 
         /* 彈出視窗樣式 */
         .modal-overlay {
@@ -783,7 +772,7 @@
                 gap: 20px;
             }
 
-            .practice-btn, .exam-btn, .history-btn {
+            .practice-btn, .exam-btn {
                 min-width: 250px;
             }
         }
@@ -979,9 +968,6 @@
                     <button class="exam-btn" onclick="goToExam()">
                         進入考試測驗
                     </button>
-                    <button class="history-btn" onclick="goToHistory()">
-                        歷史成績
-                    </button>
                 </div>
             </div>
         </div>
@@ -1027,10 +1013,6 @@
             window.location.href = 'exam.html';
         }
 
-        // 跳轉到歷史成績
-        function goToHistory() {
-            window.location.href = 'web/history.html';
-        }
 
         // 處理措施資料
         const treatmentData = {
@@ -1246,7 +1228,7 @@
             });
 
             // 添加按鈕點擊動畫效果
-            const buttons = document.querySelectorAll('.learn-more-btn, .practice-btn, .exam-btn, .history-btn, .scenario-btn');
+            const buttons = document.querySelectorAll('.learn-more-btn, .practice-btn, .exam-btn, .scenario-btn');
             buttons.forEach(button => {
                 button.addEventListener('click', function() {
                     this.style.transform = 'scale(0.95)';

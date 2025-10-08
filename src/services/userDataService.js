@@ -3,11 +3,16 @@
  * 用於管理用戶資料的獲取、更新和顯示
  */
 
+import { applyDefaults } from '../schemas/userSchema.js';
+
 // Firebase 配置
 const firebaseConfig = {
     apiKey: "AIzaSyBuWO8hFVjjTUe2tqJDrqdbeGTrp4PoT5Q",
     authDomain: "progect-115a5.firebaseapp.com",
-    projectId: "progect-115a5"
+    projectId: "progect-115a5",
+    storageBucket: "progect-115a5.appspot.com",
+    messagingSenderId: "123456789",
+    appId: "1:123456789:web:abcdef123456"
 };
 
 class UserDataService {
@@ -57,29 +62,22 @@ class UserDataService {
             if (userSnap.exists()) {
                 const userData = userSnap.data();
                 
-                // 更新本地用戶資料
+                // 應用預設值並更新本地用戶資料
+                const userDataWithDefaults = applyDefaults(userData);
+                
                 this.currentUser = {
                     ...this.currentUser,
-                    // 基本資料
-                    name: userData["姓名"] || userData.name,
-                    displayName: userData["姓名"] || userData.name,
-                    department: userData.department,
-                    phone: userData.phone,
-                    studentId: userData.studentId,
-                    where: userData["school/hospital"] || userData.school || userData.where,
-                    // 統計資料
-                    totalTests: userData.totalTests || 0,
-                    totalTimeSpent: userData.totalTimeSpent || 0,
-                    // 系統資料
-                    createdAt: userData.createdAt,
-                    lastLogin: userData.lastLogin,
-                    isActive: userData.isActive
+                    ...userDataWithDefaults,
+                    // 確保兼容性字段
+                    name: userDataWithDefaults["姓名"] || userDataWithDefaults.name,
+                    displayName: userDataWithDefaults["姓名"] || userDataWithDefaults.name,
+                    where: userDataWithDefaults["school/hospital"] || userDataWithDefaults.school || userDataWithDefaults.where
                 };
                 
                 // 更新localStorage
                 localStorage.setItem('pbls_user', JSON.stringify(this.currentUser));
                 
-                console.log('用戶資料已更新');
+                console.log('用戶資料已更新（包含預設值）');
                 return this.currentUser;
             }
         } catch (error) {
@@ -119,7 +117,7 @@ class UserDataService {
      * 獲取總測驗次數
      */
     getTotalExamCount() {
-        return this.currentUser?.totalTests || 0;
+        return this.currentUser?.totaltesttimes || 0;
     }
 
     /**

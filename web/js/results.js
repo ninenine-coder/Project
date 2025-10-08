@@ -82,16 +82,16 @@ async function incrementTestCount(userId) {
     if (userSnap.exists()) {
       const userData = userSnap.data();
 
-      // 如果 'totalTests' 欄位不存在，設定為 1
-      if (userData.totalTests === undefined) {
+      // 如果 'totaltesttimes' 欄位不存在，設定為 1
+      if (userData.totaltesttimes === undefined) {
         await updateDoc(userRef, {
-          totalTests: 1 // 設定初始值為 1
+          totaltesttimes: 1 // 設定初始值為 1
         });
         console.log(`用戶 ${userId} 的總測驗次數已設定為 1`);
       } else {
-        // 每次測驗結束後將 'totalTests' 欄位加 1
+        // 每次測驗結束後將 'totaltesttimes' 欄位加 1
         await updateDoc(userRef, {
-          totalTests: increment(1)
+          totaltesttimes: increment(1)
         });
         console.log(`用戶 ${userId} 的總測驗次數已增加 1`);
       }
@@ -146,7 +146,7 @@ export async function getUserExamCount(uid) {
     
     if (userSnap.exists()) {
       const userData = userSnap.data();
-      return userData.totalTests || 0;
+      return userData.totaltesttimes || 0;
     }
     return 0;
   } catch (error) {
@@ -170,10 +170,10 @@ export async function displayTestCount(userId, elementId = 'total-tests') {
       const userData = userSnap.data();
 
       // 顯示總測驗次數
-      const totalTests = userData.totalTests || 0;
+      const totalTests = userData.totaltesttimes || 0;
       const element = document.getElementById(elementId);
       if (element) {
-        element.textContent = `${totalTests} 次`;
+        element.textContent = totalTests; // 只顯示數字，不顯示 "次"
       }
       
       return totalTests;
@@ -181,7 +181,7 @@ export async function displayTestCount(userId, elementId = 'total-tests') {
       console.log('用戶資料未找到');
       const element = document.getElementById(elementId);
       if (element) {
-        element.textContent = '0 次';
+        element.textContent = '0';
       }
       return 0;
     }
@@ -189,7 +189,7 @@ export async function displayTestCount(userId, elementId = 'total-tests') {
     console.error('顯示總測驗次數失敗:', error);
     const element = document.getElementById(elementId);
     if (element) {
-      element.textContent = '0 次';
+      element.textContent = '0';
     }
     return 0;
   }

@@ -357,13 +357,85 @@
             margin-bottom: 20px;
             text-align: center;
             line-height: 1.4;
-            padding: 20px;
+            padding: 20px 120px 20px 20px; /* 右側留出空間給難度圖標 */
             background: rgba(255, 255, 255, 0.9);
             border-radius: 15px;
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
             opacity: 0;
             transform: translateY(-20px);
             animation: questionAppear 0.8s ease forwards;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* 難度圖標容器 */
+        .difficulty-container {
+            position: absolute;
+            top: 50%;
+            right: 20px;
+            transform: translateY(-50%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 3px;
+            z-index: 10;
+            animation: difficultyAppear 0.6s ease forwards;
+            opacity: 0;
+        }
+
+        /* 難度圖標樣式 */
+        .difficulty-badge {
+            width: 70px;
+            height: 70px;
+            filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+            transition: all 0.3s ease;
+        }
+
+        .difficulty-container:hover .difficulty-badge {
+            transform: scale(1.1);
+            filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
+        }
+
+        /* 難度文字標籤 */
+        .difficulty-label {
+            font-size: 16px;
+            font-weight: bold;
+            color: #2c3e50;
+            text-shadow: 0 1px 2px rgba(255, 255, 255, 0.8);
+            padding: 4px 12px;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.9);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .difficulty-container:hover .difficulty-label {
+            transform: scale(1.05);
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.15);
+        }
+
+        /* 不同難度的文字顏色 */
+        .difficulty-label.easy {
+            color: #27ae60;
+            border: 2px solid #27ae60;
+        }
+
+        .difficulty-label.medium {
+            color: #f39c12;
+            border: 2px solid #f39c12;
+        }
+
+        .difficulty-label.hard {
+            color: #e74c3c;
+            border: 2px solid #e74c3c;
+        }
+
+        @keyframes difficultyAppear {
+            to {
+                opacity: 1;
+            }
         }
 
         #quiz-interface #options-container {
@@ -903,6 +975,50 @@
             .sidebar:hover ~ .main-content {
                 margin-left: 160px;
             }
+
+            /* 小屏幕下調整題目容器 */
+            #quiz-interface #question-text {
+                padding: 15px 100px 15px 15px;
+                font-size: 20px;
+            }
+
+            /* 小屏幕下縮小難度圖標 */
+            .difficulty-badge {
+                width: 50px;
+                height: 50px;
+            }
+
+            .difficulty-container {
+                right: 10px;
+                gap: 2px;
+            }
+
+            .difficulty-label {
+                font-size: 14px;
+                padding: 3px 10px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            /* 超小屏幕下進一步調整 */
+            #quiz-interface #question-text {
+                padding: 10px 80px 10px 10px;
+                font-size: 18px;
+            }
+
+            .difficulty-badge {
+                width: 40px;
+                height: 40px;
+            }
+
+            .difficulty-container {
+                gap: 2px;
+            }
+
+            .difficulty-label {
+                font-size: 12px;
+                padding: 2px 8px;
+            }
         }
     </style>
 </head>
@@ -1221,6 +1337,11 @@
             document.getElementById('question-text').textContent = 
                 `${currentQuestionIndex + 1}. ${question.question}`;
             
+            // 顯示難度圖標
+            if (question.difficulty) {
+                displayDifficultyBadge(question.difficulty);
+            }
+            
             // 清空選項容器
             const optionsContainer = document.getElementById('options');
             optionsContainer.innerHTML = '';
@@ -1327,6 +1448,11 @@
                 document.getElementById('question-text').textContent = 
                     `${currentQuestionIndex + 1}. ${question.question}`;
                 
+                // 顯示難度圖標
+                if (question.difficulty) {
+                    displayDifficultyBadge(question.difficulty);
+                }
+                
                 // 更新選項文字（如果已經顯示）
                 const optionsContainer = document.getElementById('options');
                 const existingOptions = optionsContainer.querySelectorAll('.option');
@@ -1360,6 +1486,60 @@
             }
         }
         
+        // 根據難度獲取對應的圖標路徑
+        function getDifficultyIcon(difficulty) {
+            const difficultyMap = {
+                'easy': 'assets/難易度 易.png',
+                'medium': 'assets/難易度 中.png',
+                'hard': 'assets/難易度 難.png'
+            };
+            return difficultyMap[difficulty] || 'assets/難易度 中.png'; // 默認中等難度
+        }
+
+        // 根據難度獲取對應的中文標籤
+        function getDifficultyLabel(difficulty) {
+            const labelMap = {
+                'easy': '易',
+                'medium': '中',
+                'hard': '難'
+            };
+            return labelMap[difficulty] || '中'; // 默認中等難度
+        }
+
+        // 顯示難度圖標和文字標籤
+        function displayDifficultyBadge(difficulty) {
+            const questionText = document.getElementById('question-text');
+            
+            // 移除舊的難度容器（如果存在）
+            const oldContainer = questionText.querySelector('.difficulty-container');
+            if (oldContainer) {
+                oldContainer.remove();
+            }
+            
+            // 創建難度容器
+            const container = document.createElement('div');
+            container.className = 'difficulty-container';
+            
+            // 創建難度圖標
+            const badge = document.createElement('img');
+            badge.className = 'difficulty-badge';
+            badge.src = getDifficultyIcon(difficulty);
+            badge.alt = `難度: ${getDifficultyLabel(difficulty)}`;
+            badge.title = `難度: ${getDifficultyLabel(difficulty)}`;
+            
+            // 創建難度文字標籤
+            const label = document.createElement('div');
+            label.className = `difficulty-label ${difficulty}`;
+            label.textContent = getDifficultyLabel(difficulty);
+            
+            // 將圖標和標籤添加到容器
+            container.appendChild(badge);
+            container.appendChild(label);
+            
+            // 將容器添加到題目區域
+            questionText.appendChild(container);
+        }
+
         // 將函數和變量暴露到全局作用域，供語言切換器使用
         window.isCurrentQuestionAnswered = isCurrentQuestionAnswered;
         window.displayQuestion = displayQuestion;
@@ -1380,6 +1560,9 @@
         window.getCurrentDisplayState = () => currentDisplayState;
         window.getQuestionDisplayStartTime = () => questionDisplayStartTime;
         window.getOptionsDisplayStartTime = () => optionsDisplayStartTime;
+        window.getDifficultyIcon = getDifficultyIcon;
+        window.getDifficultyLabel = getDifficultyLabel;
+        window.displayDifficultyBadge = displayDifficultyBadge;
 
         // 頁面載入時初始化測驗
         document.addEventListener('DOMContentLoaded', async function() {
@@ -1974,6 +2157,11 @@
             document.getElementById('question-text').textContent = 
                 `${currentQuestionIndex + 1}. ${question.question}`;
             
+            // 顯示難度圖標
+            if (question.difficulty) {
+                displayDifficultyBadge(question.difficulty);
+            }
+            
             // 記錄題目顯示狀態和時間
             currentDisplayState = 'question';
             questionDisplayStartTime = Date.now();
@@ -2079,6 +2267,11 @@
             
             document.getElementById('question-text').textContent = 
                 `${currentQuestionIndex + 1}. ${question.question}`;
+            
+            // 顯示難度圖標
+            if (question.difficulty) {
+                displayDifficultyBadge(question.difficulty);
+            }
             
             // 清空選項
             const optionsContainer = document.getElementById('options');
@@ -2314,7 +2507,7 @@
         }
 
         // 結束測驗
-        function endQuiz() {
+        async function endQuiz() {
             if (timerInterval) {
                 clearInterval(timerInterval);
                 timerInterval = null;
@@ -2332,15 +2525,15 @@
             const correctAnswers = userAnswers.filter(answer => answer.isCorrect).length;
             const score = Math.round((correctAnswers / userAnswers.length) * 100);
             
-            // 保存結果到LocalStorage
-            saveQuizResults(score, correctAnswers, userAnswers.length, totalTime);
+            // 保存結果到LocalStorage和Firebase
+            await saveQuizResults(score, correctAnswers, userAnswers.length, totalTime);
             
             // 顯示測驗結果
             showQuizResults(score, correctAnswers, userAnswers.length, totalTime);
         }
 
-        // 保存測驗結果到LocalStorage
-        function saveQuizResults(score, correctAnswers, totalQuestions, totalTime) {
+        // 保存測驗結果到LocalStorage和Firebase
+        async function saveQuizResults(score, correctAnswers, totalQuestions, totalTime) {
             const quizResult = {
                 date: new Date().toISOString(),
                 score: score,
@@ -2350,14 +2543,33 @@
                 answers: userAnswers
             };
             
-            // 獲取現有的測驗歷史
+            // 保存到LocalStorage（保持向後兼容性）
             let examHistory = JSON.parse(localStorage.getItem('examHistory') || '[]');
-            
-            // 添加新的測驗結果
             examHistory.push(quizResult);
-            
-            // 保存到LocalStorage
             localStorage.setItem('examHistory', JSON.stringify(examHistory));
+            
+            // 保存到Firebase並更新總測驗次數
+            try {
+                if (window.quizResultService) {
+                    console.log('正在保存測驗結果到Firebase...');
+                    const success = await window.quizResultService.saveQuizResult(quizResult);
+                    if (success) {
+                        console.log('✅ 測驗結果已成功保存到Firebase，總測驗次數已更新');
+                        
+                        // 更新用戶數據服務中的本地數據
+                        if (window.userDataService) {
+                            await window.userDataService.refreshUserData();
+                        }
+                    } else {
+                        console.warn('⚠️ 保存到Firebase失敗，但本地數據已保存');
+                    }
+                } else {
+                    console.warn('⚠️ 測驗結果服務未初始化，僅保存到本地存儲');
+                }
+            } catch (error) {
+                console.error('❌ 保存測驗結果到Firebase時發生錯誤:', error);
+                // 不阻止測驗完成，因為本地數據已經保存
+            }
         }
 
         // 顯示測驗結果
@@ -2518,9 +2730,10 @@
         // 將函數暴露到全局作用域
         window.handleQuizLanguageSwitch = handleQuizLanguageSwitch;
     </script>
-    <!-- 載入增強的語言管理器 -->
+    <!-- 載入增強的語言管理器和測驗結果服務 -->
     <script type="module">
         import './src/js/enhanced-language-manager.js';
+        import './src/services/quizResultService.js';
     </script>
 </body>
 </html>

@@ -4,12 +4,13 @@
     "question": "在進行CPR時，正確的按壓深度應該是？",
     "options": [
       "至少5公分",
-      "至少3公分", 
+      "至少3公分",
       "至少7公分",
       "至少10公分"
     ],
     "correct": 0,
-    "explanation": "根據最新CPR指南，成人CPR的按壓深度應至少5公分，但不超過6公分。"
+    "explanation": "根據最新CPR指南，成人CPR的按壓深度應至少5公分，但不超過6公分。",
+    "difficulty": "easy"
   },
   {
     "id": 2,
@@ -21,7 +22,8 @@
       "10:2"
     ],
     "correct": 0,
-    "explanation": "成人CPR的標準比例是30次按壓配2次人工呼吸。"
+    "explanation": "成人CPR的標準比例是30次按壓配2次人工呼吸。",
+    "difficulty": "easy"
   },
   {
     "id": 3,
@@ -33,7 +35,8 @@
       "左右胸部對稱位置"
     ],
     "correct": 0,
-    "explanation": "AED電擊板應貼在右上胸部（鎖骨下方）和左下胸部（心尖部），形成電流通路。"
+    "explanation": "AED電擊板應貼在右上胸部（鎖骨下方）和左下胸部（心尖部），形成電流通路。",
+    "difficulty": "easy"
   },
   {
     "id": 4,
@@ -45,7 +48,8 @@
       "檢查呼吸"
     ],
     "correct": 0,
-    "explanation": "急救的首要原則是確保環境安全，避免自己成為下一個受害者。"
+    "explanation": "急救的首要原則是確保環境安全，避免自己成為下一個受害者。",
+    "difficulty": "easy"
   },
   {
     "id": 5,
@@ -57,7 +61,8 @@
       "60-80次"
     ],
     "correct": 0,
-    "explanation": "成人CPR的按壓頻率應維持在每分鐘100-120次，相當於每秒約2次。"
+    "explanation": "成人CPR的按壓頻率應維持在每分鐘100-120次，相當於每秒約2次。",
+    "difficulty": "easy"
   },
   {
     "id": 6,
@@ -69,7 +74,8 @@
       "0.5秒"
     ],
     "correct": 0,
-    "explanation": "人工呼吸時每次吹氣應持續約1秒，看到胸部有起伏即可。"
+    "explanation": "人工呼吸時每次吹氣應持續約1秒，看到胸部有起伏即可。",
+    "difficulty": "easy"
   },
   {
     "id": 7,
@@ -81,7 +87,8 @@
       "按壓15分鐘後"
     ],
     "correct": 0,
-    "explanation": "CPR應持續進行直到患者恢復意識、有明顯生命跡象，或專業醫療人員接手。"
+    "explanation": "CPR應持續進行直到患者恢復意識、有明顯生命跡象，或專業醫療人員接手。",
+    "difficulty": "easy"
   },
   {
     "id": 8,
@@ -93,7 +100,8 @@
       "用濕毛巾擦拭"
     ],
     "correct": 0,
-    "explanation": "胸毛會影響電擊效果，應使用AED包中的剃刀剃除胸毛後再貼電擊板。"
+    "explanation": "胸毛會影響電擊效果，應使用AED包中的剃刀剃除胸毛後再貼電擊板。",
+    "difficulty": "easy"
   },
   {
     "id": 9,
@@ -105,7 +113,8 @@
       "肋骨下方"
     ],
     "correct": 0,
-    "explanation": "CPR按壓位置應在胸骨下半部，即兩乳頭連線中點下方。"
+    "explanation": "CPR按壓位置應在胸骨下半部，即兩乳頭連線中點下方。",
+    "difficulty": "easy"
   },
   {
     "id": 10,
@@ -117,7 +126,8 @@
       "跪在患者側面"
     ],
     "correct": 0,
-    "explanation": "CPR按壓時應雙臂伸直，垂直於患者胸部，利用身體重量進行按壓。"
+    "explanation": "CPR按壓時應雙臂伸直，垂直於患者胸部，利用身體重量進行按壓。",
+    "difficulty": "easy"
   },
   {
     "id": 11,
@@ -129,7 +139,8 @@
       "移動患者"
     ],
     "correct": 0,
-    "explanation": "AED分析心律時必須停止CPR且不要觸碰患者，避免干擾心律分析。"
+    "explanation": "AED分析心律時必須停止CPR且不要觸碰患者，避免干擾心律分析。",
+    "difficulty": "easy"
   },
   {
     "id": 12,
@@ -141,7 +152,8 @@
       "手指交叉"
     ],
     "correct": 0,
-    "explanation": "CPR按壓時應一手掌根置於胸骨，另一手重疊其上，手指交扣。"
+    "explanation": "CPR按壓時應一手掌根置於胸骨，另一手重疊其上，手指交扣。",
+    "difficulty": "easy"
   },
   {
     "id": 13,
@@ -153,7 +165,8 @@
       "不需要檢查"
     ],
     "correct": 0,
-    "explanation": "CPR過程中每2分鐘應檢查一次脈搏，同時檢查呼吸。"
+    "explanation": "CPR過程中每2分鐘應檢查一次脈搏，同時檢查呼吸。",
+    "difficulty": "easy"
   },
   {
     "id": 14,
@@ -165,7 +178,8 @@
       "調整假牙位置"
     ],
     "correct": 0,
-    "explanation": "如果假牙固定良好，應保持原位；如果鬆動可能阻塞呼吸道，則應移除。"
+    "explanation": "如果假牙固定良好，應保持原位；如果鬆動可能阻塞呼吸道，則應移除。",
+    "difficulty": "easy"
   },
   {
     "id": 15,
@@ -177,7 +191,8 @@
       "胸廓回彈"
     ],
     "correct": 0,
-    "explanation": "CPR品質指標包括深度、頻率、胸廓回彈和減少中斷，速度不是主要指標。"
+    "explanation": "CPR品質指標包括深度、頻率、胸廓回彈和減少中斷，速度不是主要指標。",
+    "difficulty": "easy"
   },
   {
     "id": 16,
@@ -189,7 +204,8 @@
       "不需要換手"
     ],
     "correct": 0,
-    "explanation": "多人CPR時應每2分鐘或按壓者疲累時換手，以維持按壓品質。"
+    "explanation": "多人CPR時應每2分鐘或按壓者疲累時換手，以維持按壓品質。",
+    "difficulty": "easy"
   },
   {
     "id": 17,
@@ -201,7 +217,8 @@
       "檢查呼吸"
     ],
     "correct": 0,
-    "explanation": "AED電擊後應立即恢復CPR，從按壓開始，不要檢查脈搏。"
+    "explanation": "AED電擊後應立即恢復CPR，從按壓開始，不要檢查脈搏。",
+    "difficulty": "easy"
   },
   {
     "id": 18,
@@ -213,7 +230,8 @@
       "快速回彈"
     ],
     "correct": 0,
-    "explanation": "CPR按壓後應讓胸廓完全回彈，不施加任何壓力，以利血液回流心臟。"
+    "explanation": "CPR按壓後應讓胸廓完全回彈，不施加任何壓力，以利血液回流心臟。",
+    "difficulty": "easy"
   },
   {
     "id": 19,
@@ -225,7 +243,8 @@
       "改變按壓位置"
     ],
     "correct": 0,
-    "explanation": "如果患者開始有反應（如咳嗽、移動、睜眼），應停止CPR並檢查生命跡象。"
+    "explanation": "如果患者開始有反應（如咳嗽、移動、睜眼），應停止CPR並檢查生命跡象。",
+    "difficulty": "easy"
   },
   {
     "id": 20,
@@ -237,6 +256,2348 @@
       "8-10分鐘"
     ],
     "correct": 0,
-    "explanation": "心臟停止後4-6分鐘是CPR的黃金時間，超過此時間腦部可能受到不可逆損傷。"
+    "explanation": "心臟停止後4-6分鐘是CPR的黃金時間，超過此時間腦部可能受到不可逆損傷。",
+    "difficulty": "easy"
+  },
+  {
+    "id": 21,
+    "question": "兒童（1歲到青春期）CPR按壓深度建議為？",
+    "options": [
+      "約胸厚的1/3（約5公分）",
+      "至少6公分",
+      "約2公分",
+      "不需特別深度"
+    ],
+    "correct": 0,
+    "explanation": "PBLS建議兒童按壓深度約胸厚的1/3，約5公分。",
+    "difficulty": "medium"
+  },
+  {
+    "id": 22,
+    "question": "嬰兒（<1歲）CPR按壓深度建議為？",
+    "options": [
+      "約胸厚的1/3（約4公分）",
+      "至少5公分",
+      "約2公分",
+      "不需特別深度"
+    ],
+    "correct": 0,
+    "explanation": "PBLS建議嬰兒按壓深度約胸厚的1/3，約4公分。",
+    "difficulty": "medium"
+  },
+  {
+    "id": 23,
+    "question": "單人施救兒童心跳停止時，按壓與通氣比例為？",
+    "options": [
+      "30:2",
+      "15:2",
+      "5:1",
+      "30:1"
+    ],
+    "correct": 0,
+    "explanation": "單人施救兒童/嬰兒CPR比例為30:2；雙人施救則為15:2。",
+    "difficulty": "medium"
+  },
+  {
+    "id": 24,
+    "question": "雙人施救嬰兒CPR時，按壓與通氣比例為？",
+    "options": [
+      "15:2",
+      "30:2",
+      "3:1",
+      "10:2"
+    ],
+    "correct": 0,
+    "explanation": "雙人施救兒童/嬰兒CPR比例為15:2。",
+    "difficulty": "medium"
+  },
+  {
+    "id": 25,
+    "question": "嬰兒CPR按壓手法優先為？",
+    "options": [
+      "雙拇指環抱式胸廓按壓",
+      "兩指按壓法",
+      "單手掌根按壓",
+      "肋間按壓"
+    ],
+    "correct": 0,
+    "explanation": "有兩名施救者時，雙拇指環抱式能提供更佳深度與品質。",
+    "difficulty": "medium"
+  },
+  {
+    "id": 26,
+    "question": "嬰兒脈搏檢查部位為？",
+    "options": [
+      "肱動脈",
+      "頸動脈",
+      "股動脈",
+      "橈動脈"
+    ],
+    "correct": 0,
+    "explanation": "PBLS建議檢查嬰兒肱動脈脈搏，時間不超過10秒。",
+    "difficulty": "easy"
+  },
+  {
+    "id": 27,
+    "question": "兒童使用AED時，若有兒童電極與減弱器，應使用的年齡/體重是？",
+    "options": [
+      "1–8歲或體重<25公斤",
+      "僅<1歲",
+      "任何年齡皆須兒童電極",
+      "僅>8歲"
+    ],
+    "correct": 0,
+    "explanation": "1–8歲或<25公斤建議使用兒童減弱器；若無可用成人電極，避免電極相互接觸。",
+    "difficulty": "medium"
+  },
+  {
+    "id": 28,
+    "question": "發現無反應之兒童且為未目擊倒地且單人施救，正確流程是？",
+    "options": [
+      "先施行約2分鐘CPR，再去求援並取AED",
+      "立刻離開去求援取AED",
+      "先檢查傷口再CPR",
+      "先給氧再CPR"
+    ],
+    "correct": 0,
+    "explanation": "未目擊之兒童心因性外之倒地，建議先CPR約2分鐘再離開求援取AED。",
+    "difficulty": "hard"
+  },
+  {
+    "id": 29,
+    "question": "小兒異物梗塞，意識清楚且無效咳嗽，應優先？",
+    "options": [
+      "拍背與胸推（嬰兒）或腹部壓迫（兒童）",
+      "立刻口中盲探",
+      "給水喝",
+      "拍頭頂"
+    ],
+    "correct": 0,
+    "explanation": "嬰兒：拍背+胸推；兒童：哈姆立克腹部壓迫。避免盲探造成更深阻塞。",
+    "difficulty": "medium"
+  },
+  {
+    "id": 30,
+    "question": "疑似溺水兒童優先步驟為？",
+    "options": [
+      "先給予5次起始吹氣後再進行CPR",
+      "先使用AED",
+      "先固定頸椎",
+      "先止血"
+    ],
+    "correct": 0,
+    "explanation": "溺水首先考量缺氧，PBLS建議先給5次有效起始吹氣。",
+    "difficulty": "hard"
+  },
+  {
+    "id": 31,
+    "question": "救護車上常備的輸氧裝置不包含？",
+    "options": [
+      "口咽呼吸道（OPA）",
+      "鼻咽呼吸道（NPA）",
+      "高流量鼻導管機（HFNC）",
+      "非再呼吸面罩（NRM）"
+    ],
+    "correct": 2,
+    "explanation": "一般基礎救護車未必標配HFNC；常見有OPA、NPA、簡易面罩與NRM。",
+    "difficulty": "medium"
+  },
+  {
+    "id": 32,
+    "question": "常見救護車藥品，下列哪一項最常用於嚴重過敏性反應急救？",
+    "options": [
+      "腎上腺素（Epinephrine）",
+      "硝酸甘油（Nitroglycerin）",
+      "阿托品（Atropine）",
+      "胺碘酮（Amiodarone）"
+    ],
+    "correct": 0,
+    "explanation": "嚴重過敏性反應首選肌注腎上腺素。",
+    "difficulty": "easy"
+  },
+  {
+    "id": 33,
+    "question": "疑似心肌梗塞，院前常見首要給藥為？",
+    "options": [
+      "咀嚼阿斯匹靈",
+      "先靜注葡萄糖",
+      "肌注腎上腺素",
+      "口服抗生素"
+    ],
+    "correct": 0,
+    "explanation": "阿斯匹靈160–325 mg咀嚼，除非禁忌。",
+    "difficulty": "easy"
+  },
+  {
+    "id": 34,
+    "question": "嚴重出血首要處置？",
+    "options": [
+      "直接壓迫止血",
+      "先輸液",
+      "先拍片",
+      "立刻搬運不處置"
+    ],
+    "correct": 0,
+    "explanation": "大量出血首要直接壓迫，必要時止血帶與止血紗。",
+    "difficulty": "easy"
+  },
+  {
+    "id": 35,
+    "question": "使用止血帶的原則哪項正確？",
+    "options": [
+      "盡量靠近傷口近心端、記錄時間",
+      "放在關節上",
+      "每5分鐘鬆開一次",
+      "放在遠心端"
+    ],
+    "correct": 0,
+    "explanation": "應置於傷口近心端、遠離關節並記錄時間，不應定時鬆開。",
+    "difficulty": "medium"
+  },
+  {
+    "id": 36,
+    "question": "疑似脊椎外傷之搬運首要是？",
+    "options": [
+      "維持頸椎中立固定",
+      "先大幅度移動肢體",
+      "先量血糖",
+      "先熱敷"
+    ],
+    "correct": 0,
+    "explanation": "維持頸椎中立位與軸向固定，避免二次傷害。",
+    "difficulty": "easy"
+  },
+  {
+    "id": 37,
+    "question": "低血糖成人現場最可能的立即處置是？",
+    "options": [
+      "可吞嚥者給口服葡萄糖膠",
+      "立刻靜注腎上腺素",
+      "先大量飲水",
+      "立刻電擊"
+    ],
+    "correct": 0,
+    "explanation": "能吞嚥且清醒者可給口服葡萄糖；昏迷則IV D50或IM葡萄糖胺劑。",
+    "difficulty": "medium"
+  },
+  {
+    "id": 38,
+    "question": "疑似中風的快速評估法為？",
+    "options": [
+      "FAST（臉、手、語言、時間）",
+      "APGAR",
+      "GCS眼反應",
+      "AVPU"
+    ],
+    "correct": 0,
+    "explanation": "院前中風篩檢常用FAST。",
+    "difficulty": "easy"
+  },
+  {
+    "id": 39,
+    "question": "過敏性休克首選腎上腺素途徑與部位為？",
+    "options": [
+      "肌注外側大腿",
+      "皮下注射上臂",
+      "靜脈推注手背",
+      "口服"
+    ],
+    "correct": 0,
+    "explanation": "IM外側大腿吸收快且安全。",
+    "difficulty": "medium"
+  },
+  {
+    "id": 40,
+    "question": "成人心肺停止電擊不可電擊之心律？",
+    "options": [
+      "心靜止（Asystole）",
+      "心室顫動（VF）",
+      "無脈性心室速（pVT）",
+      "多形性VT"
+    ],
+    "correct": 0,
+    "explanation": "Asystole與PEA均不可電擊，VF/pVT為可電擊節律。",
+    "difficulty": "medium"
+  },
+  {
+    "id": 41,
+    "question": "檢查呼吸與脈搏的時間上限為？",
+    "options": [
+      "不超過10秒",
+      "不超過20秒",
+      "不超過30秒",
+      "不超過5秒"
+    ],
+    "correct": 0,
+    "explanation": "避免延誤高品質按壓，檢查不超過10秒。",
+    "difficulty": "easy"
+  },
+  {
+    "id": 42,
+    "question": "使用球囊面罩（BVM）通氣時，成人建議每次吹氣量？",
+    "options": [
+      "只以看到胸部起伏為準",
+      "至少1000 mL",
+      "需完全擠壓球囊",
+      "每次2–3秒"
+    ],
+    "correct": 0,
+    "explanation": "避免過度通氣；只以胸部起伏為目標。",
+    "difficulty": "medium"
+  },
+  {
+    "id": 43,
+    "question": "有高級呼吸道（插管）時，CPR通氣頻率建議？",
+    "options": [
+      "每6秒一次（約10次/分）",
+      "每3秒一次",
+      "與按壓同步30:2",
+      "暫停按壓通氣"
+    ],
+    "correct": 0,
+    "explanation": "持續按壓100–120/分，通氣每6秒一次。",
+    "difficulty": "medium"
+  },
+  {
+    "id": 44,
+    "question": "成人異物梗塞意識清醒且無效咳嗽，首選？",
+    "options": [
+      "腹部壓迫（哈姆立克）",
+      "立刻拍頭",
+      "盲探口腔",
+      "背部拍打120下"
+    ],
+    "correct": 0,
+    "explanation": "意識清醒成人：腹部壓迫；孕婦/肥胖者改胸推。",
+    "difficulty": "easy"
+  },
+  {
+    "id": 45,
+    "question": "嬰兒異物梗塞首選處置？",
+    "options": [
+      "拍背5下、翻身胸推5下交替",
+      "哈姆立克",
+      "夾舌",
+      "口塞手指探入"
+    ],
+    "correct": 0,
+    "explanation": "嬰兒不做腹部壓迫；以拍背與胸推交替。",
+    "difficulty": "medium"
+  },
+  {
+    "id": 46,
+    "question": "口咽呼吸道（OPA）適應症為？",
+    "options": [
+      "無意識且無吞嚥反射",
+      "清醒可配合者",
+      "有嚴重鼻出血者",
+      "張口困難者"
+    ],
+    "correct": 0,
+    "explanation": "OPA會誘發嘔吐反射，僅用於無意識無反射者。",
+    "difficulty": "medium"
+  },
+  {
+    "id": 47,
+    "question": "鼻咽呼吸道（NPA）禁忌為？",
+    "options": [
+      "疑顱底骨折或嚴重顏面外傷",
+      "牙齦出血",
+      "舌頭腫脹",
+      "鼻塞"
+    ],
+    "correct": 0,
+    "explanation": "顱底骨折風險避免NPA。",
+    "difficulty": "hard"
+  },
+  {
+    "id": 48,
+    "question": "鼻導管（NC）常見流量範圍與FiO2？",
+    "options": [
+      "1–6 L/分，約24–44%",
+      "6–10 L/分，約40–60%",
+      "10–15 L/分，>90%",
+      "2–4 L/分，100%"
+    ],
+    "correct": 0,
+    "explanation": "NC提供低至中等濃度氧。",
+    "difficulty": "easy"
+  },
+  {
+    "id": 49,
+    "question": "非再呼吸面罩（NRM）常見流量設定？",
+    "options": [
+      "10–15 L/分",
+      "2–4 L/分",
+      "1–2 L/分",
+      ">20 L/分"
+    ],
+    "correct": 0,
+    "explanation": "NRM需10–15 L/分以維持儲氣袋膨脹。",
+    "difficulty": "easy"
+  },
+  {
+    "id": 50,
+    "question": "脈搏血氧（SpO2）正常值多為？",
+    "options": [
+      "≥94%",
+      "≥80%",
+      "≥88%",
+      "≥90%"
+    ],
+    "correct": 0,
+    "explanation": "多數情境下SpO2≥94%較為理想。",
+    "difficulty": "easy"
+  },
+  {
+    "id": 51,
+    "question": "大量出血且無法控制時，下一步？",
+    "options": [
+      "使用止血帶或止血紗",
+      "先量血糖",
+      "先量血壓",
+      "先搬運"
+    ],
+    "correct": 0,
+    "explanation": "直接壓迫若無效，及時使用止血帶/止血紗。",
+    "difficulty": "easy"
+  },
+  {
+    "id": 52,
+    "question": "疑似張力性氣胸的臨床表徵不包括？",
+    "options": [
+      "高血壓",
+      "氣管偏移",
+      "單側呼吸音減弱",
+      "頸靜脈怒張"
+    ],
+    "correct": 0,
+    "explanation": "張力性氣胸多表現低血壓、呼吸困難等；高血壓不典型。",
+    "difficulty": "hard"
+  },
+  {
+    "id": 53,
+    "question": "START檢傷，呼吸頻率>30/分則分類為？",
+    "options": [
+      "紅色（立即）",
+      "黃色（延遲）",
+      "綠色（輕傷）",
+      "黑色（死亡/不可救）"
+    ],
+    "correct": 0,
+    "explanation": "START規則之一：RR>30為紅。",
+    "difficulty": "medium"
+  },
+  {
+    "id": 54,
+    "question": "燒傷成人九分法，單側上肢約占體表面積？",
+    "options": [
+      "9%",
+      "18%",
+      "4.5%",
+      "14%"
+    ],
+    "correct": 0,
+    "explanation": "每側上肢約9%。",
+    "difficulty": "medium"
+  },
+  {
+    "id": 55,
+    "question": "疑似心肌梗塞最典型的胸痛描述？",
+    "options": [
+      "壓迫感、悶痛向左臂或下顎放射",
+      "銳痛定位於一點",
+      "隨體位改變緩解",
+      "吸氣時短暫刺痛"
+    ],
+    "correct": 0,
+    "explanation": "典型心絞痛/梗塞為壓迫悶痛並可放射。",
+    "difficulty": "medium"
+  },
+  {
+    "id": 56,
+    "question": "癲癇發作現場處置，下列何者正確？",
+    "options": [
+      "保護頭部、移開危險物、勿塞物入口中",
+      "強行壓制四肢",
+      "立即口服藥物",
+      "大量餵水"
+    ],
+    "correct": 0,
+    "explanation": "避免二次傷害，不要把東西塞入口中。",
+    "difficulty": "easy"
+  },
+  {
+    "id": 57,
+    "question": "哮喘急性發作第一線自我處置？",
+    "options": [
+      "短效β2吸入劑（SABA）",
+      "口服抗生素",
+      "靜脈類固醇立刻",
+      "鎮靜劑"
+    ],
+    "correct": 0,
+    "explanation": "SABA為第一線緩解藥。",
+    "difficulty": "easy"
+  },
+  {
+    "id": 58,
+    "question": "疑似敗血症的早期指標常見不含？",
+    "options": [
+      "嚴重低血糖為唯一指標",
+      "呼吸速率上升",
+      "精神狀態改變",
+      "血壓下降"
+    ],
+    "correct": 0,
+    "explanation": "敗血症以生命徵象改變與器官灌流不良為要；低血糖非唯一指標。",
+    "difficulty": "hard"
+  },
+  {
+    "id": 59,
+    "question": "你在公園遇見一名8歲孩童倒地、無反應、喘息音消失，你單獨一人。最正確的下一步？",
+    "options": [
+      "先CPR約2分鐘再去取AED與求援",
+      "立刻離開去找人",
+      "先量血糖",
+      "先拍醒5分鐘"
+    ],
+    "correct": 0,
+    "explanation": "未目擊兒童倒地，單人先CPR 2分鐘再取AED。",
+    "difficulty": "hard"
+  },
+  {
+    "id": 60,
+    "question": "餐廳內成人捂住喉嚨無法發聲但有意識，首要處置？",
+    "options": [
+      "腹部壓迫（哈姆立克）",
+      "拍頭",
+      "喝水",
+      "仰頭抬下巴通氣"
+    ],
+    "correct": 0,
+    "explanation": "典型氣道梗塞：腹部壓迫。",
+    "difficulty": "easy"
+  },
+  {
+    "id": 61,
+    "question": "山路車禍成人疑似骨盆骨折且低血壓，首要現場處置？",
+    "options": [
+      "骨盆綁帶/收束並快速運送",
+      "先量血壓3次",
+      "先給大量口服水",
+      "徒手牽引下肢"
+    ],
+    "correct": 0,
+    "explanation": "骨盆收束可減少出血，並迅速轉運。",
+    "difficulty": "hard"
+  },
+  {
+    "id": 62,
+    "question": "新生兒常見的『正常生命徵象』範圍為？",
+    "options": [
+      "呼吸 30–60/分；心率 100–160/分",
+      "呼吸 12–20/分；心率 60–100/分",
+      "呼吸 8–12/分；心率 40–60/分",
+      "呼吸 20–30/分；心率 60–80/分"
+    ],
+    "correct": 0,
+    "explanation": "新生兒基礎生命徵象較高。",
+    "difficulty": "medium"
+  },
+  {
+    "id": 63,
+    "question": "嬰兒常見的『正常生命徵象』範圍為？",
+    "options": [
+      "呼吸 30–53/分；心率 100–160/分",
+      "呼吸 12–20/分；心率 60–100/分",
+      "呼吸 8–12/分；心率 40–60/分",
+      "呼吸 20–30/分；心率 60–80/分"
+    ],
+    "correct": 0,
+    "explanation": "嬰兒呼吸與心率高於成人。",
+    "difficulty": "hard"
+  },
+  {
+    "id": 64,
+    "question": "學齡兒童常見的『正常生命徵象』範圍為？",
+    "options": [
+      "呼吸 18–30/分；心率 70–120/分",
+      "呼吸 10–14/分；心率 50–70/分",
+      "呼吸 30–60/分；心率 120–160/分",
+      "呼吸 12–20/分；心率 60–100/分"
+    ],
+    "correct": 0,
+    "explanation": "兒童生命徵象隨年齡漸趨成人。",
+    "difficulty": "medium"
+  },
+  {
+    "id": 65,
+    "question": "成人常見的『正常生命徵象』範圍為？",
+    "options": [
+      "呼吸 12–20/分；心率 60–100/分",
+      "呼吸 20–30/分；心率 100–140/分",
+      "呼吸 8–12/分；心率 40–60/分",
+      "呼吸 30–40/分；心率 120–160/分"
+    ],
+    "correct": 0,
+    "explanation": "成人平靜呼吸與心率範圍。",
+    "difficulty": "easy"
+  },
+  {
+    "id": 66,
+    "question": "簡易面罩（Simple Mask）典型流量？",
+    "options": [
+      "6–10 L/分",
+      "1–6 L/分",
+      "10–15 L/分",
+      ">20 L/分"
+    ],
+    "correct": 0,
+    "explanation": "簡易面罩需至少6 L/分避免CO2再吸入。",
+    "difficulty": "easy"
+  },
+  {
+    "id": 67,
+    "question": "文丘里面罩（Venturi）特色是？",
+    "options": [
+      "可提供可預測FiO2",
+      "提供最高FiO2",
+      "完全不需氣源",
+      "只適合兒童"
+    ],
+    "correct": 0,
+    "explanation": "Venturi利用可變孔口提供穩定FiO2。",
+    "difficulty": "medium"
+  },
+  {
+    "id": 68,
+    "question": "BVM配合口罩密合技巧優先？",
+    "options": [
+      "EC夾持法確保密合",
+      "兩指抬下巴即可",
+      "只要擠壓球囊就好",
+      "讓病人自行握面罩"
+    ],
+    "correct": 0,
+    "explanation": "EC夾持法提升密合度與通氣品質。",
+    "difficulty": "medium"
+  },
+  {
+    "id": 69,
+    "question": "兒童使用成人AED電極過大時，應如何貼附？",
+    "options": [
+      "前後貼法（胸前+背部）避免相互接觸",
+      "照樣左右貼緊密相貼",
+      "改貼在腹部",
+      "放棄使用AED"
+    ],
+    "correct": 0,
+    "explanation": "確保電極不相互接觸，必要時採前後貼法。",
+    "difficulty": "hard"
+  },
+  {
+    "id": 70,
+    "question": "孕婦噎到且清醒無效咳嗽首要？",
+    "options": [
+      "胸推",
+      "腹部壓迫",
+      "拍背",
+      "仰頭抬下巴"
+    ],
+    "correct": 0,
+    "explanation": "孕婦或肥胖者以胸推取代腹部壓迫。",
+    "difficulty": "medium"
+  },
+  {
+    "id": 71,
+    "question": "成人噎到後失去意識，下一步？",
+    "options": [
+      "開始CPR並每次開氣道時檢查口腔",
+      "持續腹部壓迫",
+      "立刻口中盲探",
+      "只拍背"
+    ],
+    "correct": 0,
+    "explanation": "失去意識改為CPR，嘗試清除可見異物。",
+    "difficulty": "medium"
+  },
+  {
+    "id": 72,
+    "question": "疑似急性冠症狀群（ACS）下列何者不是常見處置？",
+    "options": [
+      "大量飲水降溫",
+      "監測生命徵象",
+      "給予阿斯匹靈（無禁忌）",
+      "補充氧氣（低氧時）"
+    ],
+    "correct": 0,
+    "explanation": "大量飲水非標準處置。",
+    "difficulty": "medium"
+  },
+  {
+    "id": 73,
+    "question": "FAST評估中『A』代表？",
+    "options": [
+      "手臂無力（Arm）",
+      "氣道（Airway）",
+      "評估（Assess）",
+      "警覺度（Alert）"
+    ],
+    "correct": 0,
+    "explanation": "FAST為Face, Arm, Speech, Time。",
+    "difficulty": "easy"
+  },
+  {
+    "id": 74,
+    "question": "敗血性休克的首要液體治療通常為？",
+    "options": [
+      "等張晶體液快速輸注",
+      "高張鹽水",
+      "僅口服補水",
+      "立即輸血不補液"
+    ],
+    "correct": 0,
+    "explanation": "等張晶體液為初期復甦首選。",
+    "difficulty": "hard"
+  },
+  {
+    "id": 75,
+    "question": "過敏性休克除了腎上腺素，常見的輔助用藥不含？",
+    "options": [
+      "廣效抗生素立即靜注",
+      "抗組織胺",
+      "類固醇",
+      "霧化支氣管擴張劑"
+    ],
+    "correct": 0,
+    "explanation": "抗生素非過敏性休克標準急救藥。",
+    "difficulty": "hard"
+  },
+  {
+    "id": 76,
+    "question": "成人低血糖意識不清首選院前處置？",
+    "options": [
+      "IV D50或IM/IN葡萄糖類藥物",
+      "先餵甜飲",
+      "只等待",
+      "立刻電擊"
+    ],
+    "correct": 0,
+    "explanation": "無保護性呼吸道時避免口服；給靜脈或肌噴劑型。",
+    "difficulty": "medium"
+  },
+  {
+    "id": 77,
+    "question": "熱中暑關鍵指標為？",
+    "options": [
+      "核心體溫升高伴中樞神經功能異常",
+      "出汗較多即為中暑",
+      "僅口渴",
+      "四肢冰冷"
+    ],
+    "correct": 0,
+    "explanation": "熱中暑為醫療急症需快速降溫。",
+    "difficulty": "medium"
+  },
+  {
+    "id": 78,
+    "question": "急性中風黃金治療窗（靜脈溶栓）多為？",
+    "options": [
+      "約4.5小時內（依指引）",
+      "24小時內皆可",
+      "僅30分鐘內",
+      "不需時間窗"
+    ],
+    "correct": 0,
+    "explanation": "實際依照各國最新指引與評估而定。",
+    "difficulty": "hard"
+  },
+  {
+    "id": 79,
+    "question": "AED貼片不可貼於？",
+    "options": [
+      "濕滑或藥物貼片上方",
+      "胸部右上與左下",
+      "前後貼法",
+      "除毛後乾燥皮膚"
+    ],
+    "correct": 0,
+    "explanation": "需移除藥物貼片並擦乾皮膚。",
+    "difficulty": "easy"
+  },
+  {
+    "id": 80,
+    "question": "你發現成人無呼吸、無脈，最佳第一步？",
+    "options": [
+      "立即開始高品質按壓",
+      "先量血壓",
+      "等AED到再開始",
+      "先拍背"
+    ],
+    "correct": 0,
+    "explanation": "心肺停止時立即開始按壓最關鍵。",
+    "difficulty": "easy"
+  },
+  {
+    "id": 81,
+    "question": "院前溺水患者低體溫，復溫策略？",
+    "options": [
+      "移除濕衣、保暖、漸進復溫",
+      "熱水直接淋浴",
+      "快速電熱毯高溫",
+      "不需復溫"
+    ],
+    "correct": 0,
+    "explanation": "避免誘發血流重新分佈造成不穩。",
+    "difficulty": "medium"
+  },
+  {
+    "id": 82,
+    "question": "急救車常備監測裝置？",
+    "options": [
+      "血氧機、血壓計、心電圖機",
+      "X光機",
+      "MRI",
+      "血液透析機"
+    ],
+    "correct": 0,
+    "explanation": "院前監測以生理監測為主，不含大型影像。",
+    "difficulty": "easy"
+  },
+  {
+    "id": 83,
+    "question": "成人使用口咽呼吸道前應確認？",
+    "options": [
+      "無吞嚥反射/無意識",
+      "有嘔吐反射",
+      "能自己維持氣道",
+      "鼻出血中"
+    ],
+    "correct": 0,
+    "explanation": "避免誘發嘔吐吸入。",
+    "difficulty": "medium"
+  },
+  {
+    "id": 84,
+    "question": "【院前】 成人使用口咽呼吸道前應確認？",
+    "options": [
+      "無吞嚥反射/無意識",
+      "有嘔吐反射",
+      "能自己維持氣道",
+      "鼻出血中"
+    ],
+    "correct": 0,
+    "explanation": "避免誘發嘔吐吸入。",
+    "difficulty": "medium"
+  },
+  {
+    "id": 85,
+    "question": "【情境】 院前溺水患者低體溫，復溫策略？",
+    "options": [
+      "移除濕衣、保暖、漸進復溫",
+      "熱水直接淋浴",
+      "快速電熱毯高溫",
+      "不需復溫"
+    ],
+    "correct": 0,
+    "explanation": "避免誘發血流重新分佈造成不穩。",
+    "difficulty": "medium"
+  },
+  {
+    "id": 86,
+    "question": "室上性心搏過速穩定個案優先處置？",
+    "options": [
+      "迷走神經刺激法（瓦氏法）",
+      "立即電擊同步",
+      "大量輸液",
+      "胸腔減壓"
+    ],
+    "correct": 0,
+    "explanation": "穩定SVT可先嘗試迷走神經刺激。",
+    "difficulty": "hard"
+  },
+  {
+    "id": 87,
+    "question": "【情境】 院前溺水患者低體溫，復溫策略？",
+    "options": [
+      "移除濕衣、保暖、漸進復溫",
+      "熱水直接淋浴",
+      "快速電熱毯高溫",
+      "不需復溫"
+    ],
+    "correct": 0,
+    "explanation": "避免誘發血流重新分佈造成不穩。",
+    "difficulty": "medium"
+  },
+  {
+    "id": 88,
+    "question": "成人正常體溫範圍多介於？",
+    "options": [
+      "36.0–37.5°C",
+      "35.0–36.0°C",
+      "37.5–39.0°C",
+      "34.0–35.0°C"
+    ],
+    "correct": 0,
+    "explanation": "一般口腔溫約36.0–37.5°C。",
+    "difficulty": "easy"
+  },
+  {
+    "id": 89,
+    "question": "兒童CPR按壓位置？",
+    "options": [
+      "胸骨下半部正中",
+      "左前胸",
+      "右前胸",
+      "劍突下方"
+    ],
+    "correct": 0,
+    "explanation": "與成人同為胸骨下半部。",
+    "difficulty": "easy"
+  },
+  {
+    "id": 90,
+    "question": "CPR中減少中斷的方式不含？",
+    "options": [
+      "頻繁停下校正姿勢",
+      "在AED充電時維持按壓",
+      "換手<5秒完成",
+      "通氣快速有效"
+    ],
+    "correct": 0,
+    "explanation": "避免非必要中斷，維持冠脈灌流壓。",
+    "difficulty": "medium"
+  },
+  {
+    "id": 91,
+    "question": "【情境】 你發現成人無呼吸、無脈，最佳第一步？",
+    "options": [
+      "立即開始高品質按壓",
+      "先量血壓",
+      "等AED到再開始",
+      "先拍背"
+    ],
+    "correct": 0,
+    "explanation": "心肺停止時立即開始按壓最關鍵。",
+    "difficulty": "easy"
+  },
+  {
+    "id": 92,
+    "question": "懷疑頸椎受傷病人開氣道方式？",
+    "options": [
+      "下頷抬舌（下頷推舉）",
+      "仰頭抬下巴",
+      "頭部旋轉",
+      "硬壓舌根"
+    ],
+    "correct": 0,
+    "explanation": "疑頸椎損傷避免仰頭，採下頷推舉法。",
+    "difficulty": "medium"
+  },
+  {
+    "id": 93,
+    "question": "【情境】 成人使用口咽呼吸道前應確認？",
+    "options": [
+      "無吞嚥反射/無意識",
+      "有嘔吐反射",
+      "能自己維持氣道",
+      "鼻出血中"
+    ],
+    "correct": 0,
+    "explanation": "避免誘發嘔吐吸入。",
+    "difficulty": "medium"
+  },
+  {
+    "id": 94,
+    "question": "胸痛且懷疑右室梗塞時下列何者需避免？",
+    "options": [
+      "硝酸甘油",
+      "阿斯匹靈",
+      "氧氣（低氧時）",
+      "監測"
+    ],
+    "correct": 0,
+    "explanation": "右室梗塞對前負荷依賴，高風險低血壓。",
+    "difficulty": "hard"
+  },
+  {
+    "id": 95,
+    "question": "【站點考】 懷疑頸椎受傷病人開氣道方式？",
+    "options": [
+      "下頷抬舌（下頷推舉）",
+      "仰頭抬下巴",
+      "頭部旋轉",
+      "硬壓舌根"
+    ],
+    "correct": 0,
+    "explanation": "疑頸椎損傷避免仰頭，採下頷推舉法。",
+    "difficulty": "medium"
+  },
+  {
+    "id": 96,
+    "question": "【站點考】 成人使用口咽呼吸道前應確認？",
+    "options": [
+      "無吞嚥反射/無意識",
+      "有嘔吐反射",
+      "能自己維持氣道",
+      "鼻出血中"
+    ],
+    "correct": 0,
+    "explanation": "避免誘發嘔吐吸入。",
+    "difficulty": "medium"
+  },
+  {
+    "id": 97,
+    "question": "【模擬】 成人正常體溫範圍多介於？",
+    "options": [
+      "36.0–37.5°C",
+      "35.0–36.0°C",
+      "37.5–39.0°C",
+      "34.0–35.0°C"
+    ],
+    "correct": 0,
+    "explanation": "一般口腔溫約36.0–37.5°C。",
+    "difficulty": "easy"
+  },
+  {
+    "id": 98,
+    "question": "【院前】 你發現成人無呼吸、無脈，最佳第一步？",
+    "options": [
+      "立即開始高品質按壓",
+      "先量血壓",
+      "等AED到再開始",
+      "先拍背"
+    ],
+    "correct": 0,
+    "explanation": "心肺停止時立即開始按壓最關鍵。",
+    "difficulty": "easy"
+  },
+  {
+    "id": 99,
+    "question": "成人呼吸停止但有脈搏，通氣頻率？",
+    "options": [
+      "每6秒一次（10次/分）",
+      "每3秒一次",
+      "與按壓30:2",
+      "不需通氣"
+    ],
+    "correct": 0,
+    "explanation": "有脈搏無呼吸：每6秒給救援呼吸。",
+    "difficulty": "medium"
+  },
+  {
+    "id": 100,
+    "question": "【模擬】 兒童CPR按壓位置？",
+    "options": [
+      "胸骨下半部正中",
+      "左前胸",
+      "右前胸",
+      "劍突下方"
+    ],
+    "correct": 0,
+    "explanation": "與成人同為胸骨下半部。",
+    "difficulty": "easy"
+  },
+  {
+    "id": 101,
+    "question": "【院前】 急救車常備監測裝置？",
+    "options": [
+      "血氧機、血壓計、心電圖機",
+      "X光機",
+      "MRI",
+      "血液透析機"
+    ],
+    "correct": 0,
+    "explanation": "院前監測以生理監測為主，不含大型影像。",
+    "difficulty": "easy"
+  },
+  {
+    "id": 102,
+    "question": "【模擬】 懷疑頸椎受傷病人開氣道方式？",
+    "options": [
+      "下頷抬舌（下頷推舉）",
+      "仰頭抬下巴",
+      "頭部旋轉",
+      "硬壓舌根"
+    ],
+    "correct": 0,
+    "explanation": "疑頸椎損傷避免仰頭，採下頷推舉法。",
+    "difficulty": "medium"
+  },
+  {
+    "id": 103,
+    "question": "【情境】 AED貼片不可貼於？",
+    "options": [
+      "濕滑或藥物貼片上方",
+      "胸部右上與左下",
+      "前後貼法",
+      "除毛後乾燥皮膚"
+    ],
+    "correct": 0,
+    "explanation": "需移除藥物貼片並擦乾皮膚。",
+    "difficulty": "easy"
+  },
+  {
+    "id": 104,
+    "question": "嬰兒脈搏檢查時間上限？",
+    "options": [
+      "≤10秒",
+      "≤20秒",
+      "≤30秒",
+      "≤5秒"
+    ],
+    "correct": 0,
+    "explanation": "避免延誤按壓。",
+    "difficulty": "easy"
+  },
+  {
+    "id": 105,
+    "question": "【模擬】 AED貼片不可貼於？",
+    "options": [
+      "濕滑或藥物貼片上方",
+      "胸部右上與左下",
+      "前後貼法",
+      "除毛後乾燥皮膚"
+    ],
+    "correct": 0,
+    "explanation": "需移除藥物貼片並擦乾皮膚。",
+    "difficulty": "easy"
+  },
+  {
+    "id": 106,
+    "question": "兒童心搏過緩合併灌流差首選處置？",
+    "options": [
+      "立即開始CPR並準備腎上腺素",
+      "先觀察",
+      "立刻電擊",
+      "大量喝水"
+    ],
+    "correct": 0,
+    "explanation": "PBLS中灌流差之顯著心搏過緩需CPR與藥物支持。",
+    "difficulty": "hard"
+  },
+  {
+    "id": 107,
+    "question": "脫水常見體徵不含？",
+    "options": [
+      "全身浮腫為唯一表徵",
+      "口乾皮膚彈性差",
+      "心跳加快",
+      "尿量減少"
+    ],
+    "correct": 0,
+    "explanation": "浮腫與脫水不相符。",
+    "difficulty": "easy"
+  },
+  {
+    "id": 108,
+    "question": "【情境】 急救車常備監測裝置？",
+    "options": [
+      "血氧機、血壓計、心電圖機",
+      "X光機",
+      "MRI",
+      "血液透析機"
+    ],
+    "correct": 0,
+    "explanation": "院前監測以生理監測為主，不含大型影像。",
+    "difficulty": "easy"
+  },
+  {
+    "id": 109,
+    "question": "【站點考】 院前溺水患者低體溫，復溫策略？",
+    "options": [
+      "移除濕衣、保暖、漸進復溫",
+      "熱水直接淋浴",
+      "快速電熱毯高溫",
+      "不需復溫"
+    ],
+    "correct": 0,
+    "explanation": "避免誘發血流重新分佈造成不穩。",
+    "difficulty": "medium"
+  },
+  {
+    "id": 110,
+    "question": "【情境】 胸痛且懷疑右室梗塞時下列何者需避免？",
+    "options": [
+      "硝酸甘油",
+      "阿斯匹靈",
+      "氧氣（低氧時）",
+      "監測"
+    ],
+    "correct": 0,
+    "explanation": "右室梗塞對前負荷依賴，高風險低血壓。",
+    "difficulty": "hard"
+  },
+  {
+    "id": 111,
+    "question": "【情境】 嬰兒脈搏檢查時間上限？",
+    "options": [
+      "≤10秒",
+      "≤20秒",
+      "≤30秒",
+      "≤5秒"
+    ],
+    "correct": 0,
+    "explanation": "避免延誤按壓。",
+    "difficulty": "easy"
+  },
+  {
+    "id": 112,
+    "question": "【模擬】 胸痛且懷疑右室梗塞時下列何者需避免？",
+    "options": [
+      "硝酸甘油",
+      "阿斯匹靈",
+      "氧氣（低氧時）",
+      "監測"
+    ],
+    "correct": 0,
+    "explanation": "右室梗塞對前負荷依賴，高風險低血壓。",
+    "difficulty": "hard"
+  },
+  {
+    "id": 113,
+    "question": "【模擬】 急性中風黃金治療窗（靜脈溶栓）多為？",
+    "options": [
+      "約4.5小時內（依指引）",
+      "24小時內皆可",
+      "僅30分鐘內",
+      "不需時間窗"
+    ],
+    "correct": 0,
+    "explanation": "實際依照各國最新指引與評估而定。",
+    "difficulty": "hard"
+  },
+  {
+    "id": 114,
+    "question": "【院前】 成人正常體溫範圍多介於？",
+    "options": [
+      "36.0–37.5°C",
+      "35.0–36.0°C",
+      "37.5–39.0°C",
+      "34.0–35.0°C"
+    ],
+    "correct": 0,
+    "explanation": "一般口腔溫約36.0–37.5°C。",
+    "difficulty": "easy"
+  },
+  {
+    "id": 115,
+    "question": "【情境】 成人呼吸停止但有脈搏，通氣頻率？",
+    "options": [
+      "每6秒一次（10次/分）",
+      "每3秒一次",
+      "與按壓30:2",
+      "不需通氣"
+    ],
+    "correct": 0,
+    "explanation": "有脈搏無呼吸：每6秒給救援呼吸。",
+    "difficulty": "medium"
+  },
+  {
+    "id": 116,
+    "question": "【院前】 CPR中減少中斷的方式不含？",
+    "options": [
+      "頻繁停下校正姿勢",
+      "在AED充電時維持按壓",
+      "換手<5秒完成",
+      "通氣快速有效"
+    ],
+    "correct": 0,
+    "explanation": "避免非必要中斷，維持冠脈灌流壓。",
+    "difficulty": "medium"
+  },
+  {
+    "id": 117,
+    "question": "嚴重外傷低血壓，首要優先？",
+    "options": [
+      "止血與快速轉運至適當醫院",
+      "先完整病史",
+      "先口服止痛",
+      "長時間現場評估"
+    ],
+    "correct": 0,
+    "explanation": "控制出血與黃金時間轉運至關鍵。",
+    "difficulty": "medium"
+  },
+  {
+    "id": 118,
+    "question": "兩救者嬰兒CPR手法最佳？",
+    "options": [
+      "雙拇指環抱按壓+密合通氣",
+      "單手掌根",
+      "兩指按壓（優先單人）",
+      "拳擊式按壓"
+    ],
+    "correct": 0,
+    "explanation": "雙拇指環抱式可提供更深按壓與穩定胸廓。",
+    "difficulty": "medium"
+  },
+  {
+    "id": 119,
+    "question": "【情境】 成人使用口咽呼吸道前應確認？",
+    "options": [
+      "無吞嚥反射/無意識",
+      "有嘔吐反射",
+      "能自己維持氣道",
+      "鼻出血中"
+    ],
+    "correct": 0,
+    "explanation": "避免誘發嘔吐吸入。",
+    "difficulty": "medium"
+  },
+  {
+    "id": 120,
+    "question": "【模擬】 嬰兒脈搏檢查時間上限？",
+    "options": [
+      "≤10秒",
+      "≤20秒",
+      "≤30秒",
+      "≤5秒"
+    ],
+    "correct": 0,
+    "explanation": "避免延誤按壓。",
+    "difficulty": "easy"
+  },
+  {
+    "id": 121,
+    "question": "兒童疑呼吸衰竭最可靠的早期指標？",
+    "options": [
+      "呼吸工作量增加（鼻翼煽動、凹陷）",
+      "皮膚發紅",
+      "高血壓",
+      "喜怒無常"
+    ],
+    "correct": 0,
+    "explanation": "兒童多以呼吸窘迫徵象先出現。",
+    "difficulty": "medium"
+  },
+  {
+    "id": 122,
+    "question": "【模擬】 急性中風黃金治療窗（靜脈溶栓）多為？",
+    "options": [
+      "約4.5小時內（依指引）",
+      "24小時內皆可",
+      "僅30分鐘內",
+      "不需時間窗"
+    ],
+    "correct": 0,
+    "explanation": "實際依照各國最新指引與評估而定。",
+    "difficulty": "hard"
+  },
+  {
+    "id": 123,
+    "question": "兒童溺水回岸，首要？",
+    "options": [
+      "先給5次有效吹氣",
+      "先胸外按壓2分鐘",
+      "先去找AED",
+      "先量體溫"
+    ],
+    "correct": 0,
+    "explanation": "溺水以缺氧為主，先通氣。",
+    "difficulty": "hard"
+  },
+  {
+    "id": 124,
+    "question": "【模擬】 兒童心搏過緩合併灌流差首選處置？",
+    "options": [
+      "立即開始CPR並準備腎上腺素",
+      "先觀察",
+      "立刻電擊",
+      "大量喝水"
+    ],
+    "correct": 0,
+    "explanation": "PBLS中灌流差之顯著心搏過緩需CPR與藥物支持。",
+    "difficulty": "hard"
+  },
+  {
+    "id": 125,
+    "question": "【模擬】 懷疑頸椎受傷病人開氣道方式？",
+    "options": [
+      "下頷抬舌（下頷推舉）",
+      "仰頭抬下巴",
+      "頭部旋轉",
+      "硬壓舌根"
+    ],
+    "correct": 0,
+    "explanation": "疑頸椎損傷避免仰頭，採下頷推舉法。",
+    "difficulty": "medium"
+  },
+  {
+    "id": 126,
+    "question": "【情境】 成人呼吸停止但有脈搏，通氣頻率？",
+    "options": [
+      "每6秒一次（10次/分）",
+      "每3秒一次",
+      "與按壓30:2",
+      "不需通氣"
+    ],
+    "correct": 0,
+    "explanation": "有脈搏無呼吸：每6秒給救援呼吸。",
+    "difficulty": "medium"
+  },
+  {
+    "id": 127,
+    "question": "【院前】 脫水常見體徵不含？",
+    "options": [
+      "全身浮腫為唯一表徵",
+      "口乾皮膚彈性差",
+      "心跳加快",
+      "尿量減少"
+    ],
+    "correct": 0,
+    "explanation": "浮腫與脫水不相符。",
+    "difficulty": "easy"
+  },
+  {
+    "id": 128,
+    "question": "【院前】 胸痛且懷疑右室梗塞時下列何者需避免？",
+    "options": [
+      "硝酸甘油",
+      "阿斯匹靈",
+      "氧氣（低氧時）",
+      "監測"
+    ],
+    "correct": 0,
+    "explanation": "右室梗塞對前負荷依賴，高風險低血壓。",
+    "difficulty": "hard"
+  },
+  {
+    "id": 129,
+    "question": "【站點考】 兒童溺水回岸，首要？",
+    "options": [
+      "先給5次有效吹氣",
+      "先胸外按壓2分鐘",
+      "先去找AED",
+      "先量體溫"
+    ],
+    "correct": 0,
+    "explanation": "溺水以缺氧為主，先通氣。",
+    "difficulty": "hard"
+  },
+  {
+    "id": 130,
+    "question": "【模擬】 嬰兒脈搏檢查時間上限？",
+    "options": [
+      "≤10秒",
+      "≤20秒",
+      "≤30秒",
+      "≤5秒"
+    ],
+    "correct": 0,
+    "explanation": "避免延誤按壓。",
+    "difficulty": "easy"
+  },
+  {
+    "id": 131,
+    "question": "【院前】 急性中風黃金治療窗（靜脈溶栓）多為？",
+    "options": [
+      "約4.5小時內（依指引）",
+      "24小時內皆可",
+      "僅30分鐘內",
+      "不需時間窗"
+    ],
+    "correct": 0,
+    "explanation": "實際依照各國最新指引與評估而定。",
+    "difficulty": "hard"
+  },
+  {
+    "id": 132,
+    "question": "【模擬】 室上性心搏過速穩定個案優先處置？",
+    "options": [
+      "迷走神經刺激法（瓦氏法）",
+      "立即電擊同步",
+      "大量輸液",
+      "胸腔減壓"
+    ],
+    "correct": 0,
+    "explanation": "穩定SVT可先嘗試迷走神經刺激。",
+    "difficulty": "hard"
+  },
+  {
+    "id": 133,
+    "question": "【院前】 CPR中減少中斷的方式不含？",
+    "options": [
+      "頻繁停下校正姿勢",
+      "在AED充電時維持按壓",
+      "換手<5秒完成",
+      "通氣快速有效"
+    ],
+    "correct": 0,
+    "explanation": "避免非必要中斷，維持冠脈灌流壓。",
+    "difficulty": "medium"
+  },
+  {
+    "id": 134,
+    "question": "【模擬】 CPR中減少中斷的方式不含？",
+    "options": [
+      "頻繁停下校正姿勢",
+      "在AED充電時維持按壓",
+      "換手<5秒完成",
+      "通氣快速有效"
+    ],
+    "correct": 0,
+    "explanation": "避免非必要中斷，維持冠脈灌流壓。",
+    "difficulty": "medium"
+  },
+  {
+    "id": 135,
+    "question": "【模擬】 嬰兒脈搏檢查時間上限？",
+    "options": [
+      "≤10秒",
+      "≤20秒",
+      "≤30秒",
+      "≤5秒"
+    ],
+    "correct": 0,
+    "explanation": "避免延誤按壓。",
+    "difficulty": "easy"
+  },
+  {
+    "id": 136,
+    "question": "【院前】 兩救者嬰兒CPR手法最佳？",
+    "options": [
+      "雙拇指環抱按壓+密合通氣",
+      "單手掌根",
+      "兩指按壓（優先單人）",
+      "拳擊式按壓"
+    ],
+    "correct": 0,
+    "explanation": "雙拇指環抱式可提供更深按壓與穩定胸廓。",
+    "difficulty": "medium"
+  },
+  {
+    "id": 137,
+    "question": "【模擬】 成人正常體溫範圍多介於？",
+    "options": [
+      "36.0–37.5°C",
+      "35.0–36.0°C",
+      "37.5–39.0°C",
+      "34.0–35.0°C"
+    ],
+    "correct": 0,
+    "explanation": "一般口腔溫約36.0–37.5°C。",
+    "difficulty": "easy"
+  },
+  {
+    "id": 138,
+    "question": "【站點考】 懷疑頸椎受傷病人開氣道方式？",
+    "options": [
+      "下頷抬舌（下頷推舉）",
+      "仰頭抬下巴",
+      "頭部旋轉",
+      "硬壓舌根"
+    ],
+    "correct": 0,
+    "explanation": "疑頸椎損傷避免仰頭，採下頷推舉法。",
+    "difficulty": "medium"
+  },
+  {
+    "id": 139,
+    "question": "【站點考】 嬰兒脈搏檢查時間上限？",
+    "options": [
+      "≤10秒",
+      "≤20秒",
+      "≤30秒",
+      "≤5秒"
+    ],
+    "correct": 0,
+    "explanation": "避免延誤按壓。",
+    "difficulty": "easy"
+  },
+  {
+    "id": 140,
+    "question": "疑心因性昏厥倒地，旁觀者該做？",
+    "options": [
+      "檢查安全、喚醒、呼救、AED、CPR",
+      "先搬至椅子",
+      "灌咖啡",
+      "抓耳垂"
+    ],
+    "correct": 0,
+    "explanation": "BLS初步流程：檢安全→反應→呼救/AED→呼吸脈搏→CPR。",
+    "difficulty": "easy"
+  },
+  {
+    "id": 141,
+    "question": "【院前】 急救車常備監測裝置？",
+    "options": [
+      "血氧機、血壓計、心電圖機",
+      "X光機",
+      "MRI",
+      "血液透析機"
+    ],
+    "correct": 0,
+    "explanation": "院前監測以生理監測為主，不含大型影像。",
+    "difficulty": "easy"
+  },
+  {
+    "id": 142,
+    "question": "【模擬】 成人使用口咽呼吸道前應確認？",
+    "options": [
+      "無吞嚥反射/無意識",
+      "有嘔吐反射",
+      "能自己維持氣道",
+      "鼻出血中"
+    ],
+    "correct": 0,
+    "explanation": "避免誘發嘔吐吸入。",
+    "difficulty": "medium"
+  },
+  {
+    "id": 143,
+    "question": "【站點考】 院前溺水患者低體溫，復溫策略？",
+    "options": [
+      "移除濕衣、保暖、漸進復溫",
+      "熱水直接淋浴",
+      "快速電熱毯高溫",
+      "不需復溫"
+    ],
+    "correct": 0,
+    "explanation": "避免誘發血流重新分佈造成不穩。",
+    "difficulty": "medium"
+  },
+  {
+    "id": 144,
+    "question": "【站點考】 成人正常體溫範圍多介於？",
+    "options": [
+      "36.0–37.5°C",
+      "35.0–36.0°C",
+      "37.5–39.0°C",
+      "34.0–35.0°C"
+    ],
+    "correct": 0,
+    "explanation": "一般口腔溫約36.0–37.5°C。",
+    "difficulty": "easy"
+  },
+  {
+    "id": 145,
+    "question": "【院前】 兒童心搏過緩合併灌流差首選處置？",
+    "options": [
+      "立即開始CPR並準備腎上腺素",
+      "先觀察",
+      "立刻電擊",
+      "大量喝水"
+    ],
+    "correct": 0,
+    "explanation": "PBLS中灌流差之顯著心搏過緩需CPR與藥物支持。",
+    "difficulty": "hard"
+  },
+  {
+    "id": 146,
+    "question": "【站點考】 疑心因性昏厥倒地，旁觀者該做？",
+    "options": [
+      "檢查安全、喚醒、呼救、AED、CPR",
+      "先搬至椅子",
+      "灌咖啡",
+      "抓耳垂"
+    ],
+    "correct": 0,
+    "explanation": "BLS初步流程：檢安全→反應→呼救/AED→呼吸脈搏→CPR。",
+    "difficulty": "easy"
+  },
+  {
+    "id": 147,
+    "question": "【情境】 兩救者嬰兒CPR手法最佳？",
+    "options": [
+      "雙拇指環抱按壓+密合通氣",
+      "單手掌根",
+      "兩指按壓（優先單人）",
+      "拳擊式按壓"
+    ],
+    "correct": 0,
+    "explanation": "雙拇指環抱式可提供更深按壓與穩定胸廓。",
+    "difficulty": "medium"
+  },
+  {
+    "id": 148,
+    "question": "【院前】 AED貼片不可貼於？",
+    "options": [
+      "濕滑或藥物貼片上方",
+      "胸部右上與左下",
+      "前後貼法",
+      "除毛後乾燥皮膚"
+    ],
+    "correct": 0,
+    "explanation": "需移除藥物貼片並擦乾皮膚。",
+    "difficulty": "easy"
+  },
+  {
+    "id": 149,
+    "question": "【院前】 急性中風黃金治療窗（靜脈溶栓）多為？",
+    "options": [
+      "約4.5小時內（依指引）",
+      "24小時內皆可",
+      "僅30分鐘內",
+      "不需時間窗"
+    ],
+    "correct": 0,
+    "explanation": "實際依照各國最新指引與評估而定。",
+    "difficulty": "hard"
+  },
+  {
+    "id": 150,
+    "question": "【站點考】 室上性心搏過速穩定個案優先處置？",
+    "options": [
+      "迷走神經刺激法（瓦氏法）",
+      "立即電擊同步",
+      "大量輸液",
+      "胸腔減壓"
+    ],
+    "correct": 0,
+    "explanation": "穩定SVT可先嘗試迷走神經刺激。",
+    "difficulty": "hard"
+  },
+  {
+    "id": 151,
+    "question": "【情境】 脫水常見體徵不含？",
+    "options": [
+      "全身浮腫為唯一表徵",
+      "口乾皮膚彈性差",
+      "心跳加快",
+      "尿量減少"
+    ],
+    "correct": 0,
+    "explanation": "浮腫與脫水不相符。",
+    "difficulty": "easy"
+  },
+  {
+    "id": 152,
+    "question": "【站點考】 嬰兒脈搏檢查時間上限？",
+    "options": [
+      "≤10秒",
+      "≤20秒",
+      "≤30秒",
+      "≤5秒"
+    ],
+    "correct": 0,
+    "explanation": "避免延誤按壓。",
+    "difficulty": "easy"
+  },
+  {
+    "id": 153,
+    "question": "【站點考】 脫水常見體徵不含？",
+    "options": [
+      "全身浮腫為唯一表徵",
+      "口乾皮膚彈性差",
+      "心跳加快",
+      "尿量減少"
+    ],
+    "correct": 0,
+    "explanation": "浮腫與脫水不相符。",
+    "difficulty": "easy"
+  },
+  {
+    "id": 154,
+    "question": "疑似鴉片類過量首選拮抗劑？",
+    "options": [
+      "納洛酮（Naloxone）",
+      "腎上腺素",
+      "胺碘酮",
+      "硝酸甘油"
+    ],
+    "correct": 0,
+    "explanation": "Naloxone為鴉片拮抗劑，可IN/IM/IV給藥。",
+    "difficulty": "easy"
+  },
+  {
+    "id": 155,
+    "question": "【情境】 急救車常備監測裝置？",
+    "options": [
+      "血氧機、血壓計、心電圖機",
+      "X光機",
+      "MRI",
+      "血液透析機"
+    ],
+    "correct": 0,
+    "explanation": "院前監測以生理監測為主，不含大型影像。",
+    "difficulty": "easy"
+  },
+  {
+    "id": 156,
+    "question": "【情境】 室上性心搏過速穩定個案優先處置？",
+    "options": [
+      "迷走神經刺激法（瓦氏法）",
+      "立即電擊同步",
+      "大量輸液",
+      "胸腔減壓"
+    ],
+    "correct": 0,
+    "explanation": "穩定SVT可先嘗試迷走神經刺激。",
+    "difficulty": "hard"
+  },
+  {
+    "id": 157,
+    "question": "【模擬】 室上性心搏過速穩定個案優先處置？",
+    "options": [
+      "迷走神經刺激法（瓦氏法）",
+      "立即電擊同步",
+      "大量輸液",
+      "胸腔減壓"
+    ],
+    "correct": 0,
+    "explanation": "穩定SVT可先嘗試迷走神經刺激。",
+    "difficulty": "hard"
+  },
+  {
+    "id": 158,
+    "question": "【模擬】 急性中風黃金治療窗（靜脈溶栓）多為？",
+    "options": [
+      "約4.5小時內（依指引）",
+      "24小時內皆可",
+      "僅30分鐘內",
+      "不需時間窗"
+    ],
+    "correct": 0,
+    "explanation": "實際依照各國最新指引與評估而定。",
+    "difficulty": "hard"
+  },
+  {
+    "id": 159,
+    "question": "【模擬】 AED貼片不可貼於？",
+    "options": [
+      "濕滑或藥物貼片上方",
+      "胸部右上與左下",
+      "前後貼法",
+      "除毛後乾燥皮膚"
+    ],
+    "correct": 0,
+    "explanation": "需移除藥物貼片並擦乾皮膚。",
+    "difficulty": "easy"
+  },
+  {
+    "id": 160,
+    "question": "【院前】 兒童CPR按壓位置？",
+    "options": [
+      "胸骨下半部正中",
+      "左前胸",
+      "右前胸",
+      "劍突下方"
+    ],
+    "correct": 0,
+    "explanation": "與成人同為胸骨下半部。",
+    "difficulty": "easy"
+  },
+  {
+    "id": 161,
+    "question": "【情境】 兒童疑呼吸衰竭最可靠的早期指標？",
+    "options": [
+      "呼吸工作量增加（鼻翼煽動、凹陷）",
+      "皮膚發紅",
+      "高血壓",
+      "喜怒無常"
+    ],
+    "correct": 0,
+    "explanation": "兒童多以呼吸窘迫徵象先出現。",
+    "difficulty": "medium"
+  },
+  {
+    "id": 162,
+    "question": "【模擬】 院前溺水患者低體溫，復溫策略？",
+    "options": [
+      "移除濕衣、保暖、漸進復溫",
+      "熱水直接淋浴",
+      "快速電熱毯高溫",
+      "不需復溫"
+    ],
+    "correct": 0,
+    "explanation": "避免誘發血流重新分佈造成不穩。",
+    "difficulty": "medium"
+  },
+  {
+    "id": 163,
+    "question": "【院前】 疑似鴉片類過量首選拮抗劑？",
+    "options": [
+      "納洛酮（Naloxone）",
+      "腎上腺素",
+      "胺碘酮",
+      "硝酸甘油"
+    ],
+    "correct": 0,
+    "explanation": "Naloxone為鴉片拮抗劑，可IN/IM/IV給藥。",
+    "difficulty": "easy"
+  },
+  {
+    "id": 164,
+    "question": "【情境】 疑似鴉片類過量首選拮抗劑？",
+    "options": [
+      "納洛酮（Naloxone）",
+      "腎上腺素",
+      "胺碘酮",
+      "硝酸甘油"
+    ],
+    "correct": 0,
+    "explanation": "Naloxone為鴉片拮抗劑，可IN/IM/IV給藥。",
+    "difficulty": "easy"
+  },
+  {
+    "id": 165,
+    "question": "【模擬】 急性中風黃金治療窗（靜脈溶栓）多為？",
+    "options": [
+      "約4.5小時內（依指引）",
+      "24小時內皆可",
+      "僅30分鐘內",
+      "不需時間窗"
+    ],
+    "correct": 0,
+    "explanation": "實際依照各國最新指引與評估而定。",
+    "difficulty": "hard"
+  },
+  {
+    "id": 166,
+    "question": "【院前】 急性中風黃金治療窗（靜脈溶栓）多為？",
+    "options": [
+      "約4.5小時內（依指引）",
+      "24小時內皆可",
+      "僅30分鐘內",
+      "不需時間窗"
+    ],
+    "correct": 0,
+    "explanation": "實際依照各國最新指引與評估而定。",
+    "difficulty": "hard"
+  },
+  {
+    "id": 167,
+    "question": "【模擬】 疑心因性昏厥倒地，旁觀者該做？",
+    "options": [
+      "檢查安全、喚醒、呼救、AED、CPR",
+      "先搬至椅子",
+      "灌咖啡",
+      "抓耳垂"
+    ],
+    "correct": 0,
+    "explanation": "BLS初步流程：檢安全→反應→呼救/AED→呼吸脈搏→CPR。",
+    "difficulty": "easy"
+  },
+  {
+    "id": 168,
+    "question": "【情境】 兒童溺水回岸，首要？",
+    "options": [
+      "先給5次有效吹氣",
+      "先胸外按壓2分鐘",
+      "先去找AED",
+      "先量體溫"
+    ],
+    "correct": 0,
+    "explanation": "溺水以缺氧為主，先通氣。",
+    "difficulty": "hard"
+  },
+  {
+    "id": 169,
+    "question": "【模擬】 脫水常見體徵不含？",
+    "options": [
+      "全身浮腫為唯一表徵",
+      "口乾皮膚彈性差",
+      "心跳加快",
+      "尿量減少"
+    ],
+    "correct": 0,
+    "explanation": "浮腫與脫水不相符。",
+    "difficulty": "easy"
+  },
+  {
+    "id": 170,
+    "question": "院前心跳停止常用抗心律不整藥物？",
+    "options": [
+      "胺碘酮",
+      "青黴素",
+      "對乙醯氨基酚",
+      "二甲雙胍"
+    ],
+    "correct": 0,
+    "explanation": "胺碘酮可用於VF/pVT不應答於電擊。",
+    "difficulty": "hard"
+  },
+  {
+    "id": 171,
+    "question": "【情境】 你發現成人無呼吸、無脈，最佳第一步？",
+    "options": [
+      "立即開始高品質按壓",
+      "先量血壓",
+      "等AED到再開始",
+      "先拍背"
+    ],
+    "correct": 0,
+    "explanation": "心肺停止時立即開始按壓最關鍵。",
+    "difficulty": "easy"
+  },
+  {
+    "id": 172,
+    "question": "【模擬】 兒童心搏過緩合併灌流差首選處置？",
+    "options": [
+      "立即開始CPR並準備腎上腺素",
+      "先觀察",
+      "立刻電擊",
+      "大量喝水"
+    ],
+    "correct": 0,
+    "explanation": "PBLS中灌流差之顯著心搏過緩需CPR與藥物支持。",
+    "difficulty": "hard"
+  },
+  {
+    "id": 173,
+    "question": "【情境】 成人使用口咽呼吸道前應確認？",
+    "options": [
+      "無吞嚥反射/無意識",
+      "有嘔吐反射",
+      "能自己維持氣道",
+      "鼻出血中"
+    ],
+    "correct": 0,
+    "explanation": "避免誘發嘔吐吸入。",
+    "difficulty": "medium"
+  },
+  {
+    "id": 174,
+    "question": "【情境】 成人使用口咽呼吸道前應確認？",
+    "options": [
+      "無吞嚥反射/無意識",
+      "有嘔吐反射",
+      "能自己維持氣道",
+      "鼻出血中"
+    ],
+    "correct": 0,
+    "explanation": "避免誘發嘔吐吸入。",
+    "difficulty": "medium"
+  },
+  {
+    "id": 175,
+    "question": "【站點考】 兩救者嬰兒CPR手法最佳？",
+    "options": [
+      "雙拇指環抱按壓+密合通氣",
+      "單手掌根",
+      "兩指按壓（優先單人）",
+      "拳擊式按壓"
+    ],
+    "correct": 0,
+    "explanation": "雙拇指環抱式可提供更深按壓與穩定胸廓。",
+    "difficulty": "medium"
+  },
+  {
+    "id": 176,
+    "question": "【院前】 兩救者嬰兒CPR手法最佳？",
+    "options": [
+      "雙拇指環抱按壓+密合通氣",
+      "單手掌根",
+      "兩指按壓（優先單人）",
+      "拳擊式按壓"
+    ],
+    "correct": 0,
+    "explanation": "雙拇指環抱式可提供更深按壓與穩定胸廓。",
+    "difficulty": "medium"
+  },
+  {
+    "id": 177,
+    "question": "【站點考】 疑心因性昏厥倒地，旁觀者該做？",
+    "options": [
+      "檢查安全、喚醒、呼救、AED、CPR",
+      "先搬至椅子",
+      "灌咖啡",
+      "抓耳垂"
+    ],
+    "correct": 0,
+    "explanation": "BLS初步流程：檢安全→反應→呼救/AED→呼吸脈搏→CPR。",
+    "difficulty": "easy"
+  },
+  {
+    "id": 178,
+    "question": "【院前】 胸痛且懷疑右室梗塞時下列何者需避免？",
+    "options": [
+      "硝酸甘油",
+      "阿斯匹靈",
+      "氧氣（低氧時）",
+      "監測"
+    ],
+    "correct": 0,
+    "explanation": "右室梗塞對前負荷依賴，高風險低血壓。",
+    "difficulty": "hard"
+  },
+  {
+    "id": 179,
+    "question": "【站點考】 急救車常備監測裝置？",
+    "options": [
+      "血氧機、血壓計、心電圖機",
+      "X光機",
+      "MRI",
+      "血液透析機"
+    ],
+    "correct": 0,
+    "explanation": "院前監測以生理監測為主，不含大型影像。",
+    "difficulty": "easy"
+  },
+  {
+    "id": 180,
+    "question": "【院前】 懷疑頸椎受傷病人開氣道方式？",
+    "options": [
+      "下頷抬舌（下頷推舉）",
+      "仰頭抬下巴",
+      "頭部旋轉",
+      "硬壓舌根"
+    ],
+    "correct": 0,
+    "explanation": "疑頸椎損傷避免仰頭，採下頷推舉法。",
+    "difficulty": "medium"
+  },
+  {
+    "id": 181,
+    "question": "【模擬】 成人呼吸停止但有脈搏，通氣頻率？",
+    "options": [
+      "每6秒一次（10次/分）",
+      "每3秒一次",
+      "與按壓30:2",
+      "不需通氣"
+    ],
+    "correct": 0,
+    "explanation": "有脈搏無呼吸：每6秒給救援呼吸。",
+    "difficulty": "medium"
+  },
+  {
+    "id": 182,
+    "question": "【模擬】 嬰兒脈搏檢查時間上限？",
+    "options": [
+      "≤10秒",
+      "≤20秒",
+      "≤30秒",
+      "≤5秒"
+    ],
+    "correct": 0,
+    "explanation": "避免延誤按壓。",
+    "difficulty": "easy"
+  },
+  {
+    "id": 183,
+    "question": "【站點考】 兒童疑呼吸衰竭最可靠的早期指標？",
+    "options": [
+      "呼吸工作量增加（鼻翼煽動、凹陷）",
+      "皮膚發紅",
+      "高血壓",
+      "喜怒無常"
+    ],
+    "correct": 0,
+    "explanation": "兒童多以呼吸窘迫徵象先出現。",
+    "difficulty": "medium"
+  },
+  {
+    "id": 184,
+    "question": "【院前】 AED貼片不可貼於？",
+    "options": [
+      "濕滑或藥物貼片上方",
+      "胸部右上與左下",
+      "前後貼法",
+      "除毛後乾燥皮膚"
+    ],
+    "correct": 0,
+    "explanation": "需移除藥物貼片並擦乾皮膚。",
+    "difficulty": "easy"
+  },
+  {
+    "id": 185,
+    "question": "【情境】 成人使用口咽呼吸道前應確認？",
+    "options": [
+      "無吞嚥反射/無意識",
+      "有嘔吐反射",
+      "能自己維持氣道",
+      "鼻出血中"
+    ],
+    "correct": 0,
+    "explanation": "避免誘發嘔吐吸入。",
+    "difficulty": "medium"
+  },
+  {
+    "id": 186,
+    "question": "PBLS評估次序ABCDE中，『B』主要評估？",
+    "options": [
+      "呼吸（Breathing）",
+      "循環（Circulation）",
+      "神經學（Disability）",
+      "暴露（Exposure）"
+    ],
+    "correct": 0,
+    "explanation": "B即呼吸，評估呼吸工作量、胸動、SpO2等。",
+    "difficulty": "easy"
+  },
+  {
+    "id": 187,
+    "question": "【院前】 你發現成人無呼吸、無脈，最佳第一步？",
+    "options": [
+      "立即開始高品質按壓",
+      "先量血壓",
+      "等AED到再開始",
+      "先拍背"
+    ],
+    "correct": 0,
+    "explanation": "心肺停止時立即開始按壓最關鍵。",
+    "difficulty": "easy"
+  },
+  {
+    "id": 188,
+    "question": "【院前】 成人正常體溫範圍多介於？",
+    "options": [
+      "36.0–37.5°C",
+      "35.0–36.0°C",
+      "37.5–39.0°C",
+      "34.0–35.0°C"
+    ],
+    "correct": 0,
+    "explanation": "一般口腔溫約36.0–37.5°C。",
+    "difficulty": "easy"
+  },
+  {
+    "id": 189,
+    "question": "【情境】 你發現成人無呼吸、無脈，最佳第一步？",
+    "options": [
+      "立即開始高品質按壓",
+      "先量血壓",
+      "等AED到再開始",
+      "先拍背"
+    ],
+    "correct": 0,
+    "explanation": "心肺停止時立即開始按壓最關鍵。",
+    "difficulty": "easy"
+  },
+  {
+    "id": 190,
+    "question": "【情境】 成人呼吸停止但有脈搏，通氣頻率？",
+    "options": [
+      "每6秒一次（10次/分）",
+      "每3秒一次",
+      "與按壓30:2",
+      "不需通氣"
+    ],
+    "correct": 0,
+    "explanation": "有脈搏無呼吸：每6秒給救援呼吸。",
+    "difficulty": "medium"
+  },
+  {
+    "id": 191,
+    "question": "【情境】 成人使用口咽呼吸道前應確認？",
+    "options": [
+      "無吞嚥反射/無意識",
+      "有嘔吐反射",
+      "能自己維持氣道",
+      "鼻出血中"
+    ],
+    "correct": 0,
+    "explanation": "避免誘發嘔吐吸入。",
+    "difficulty": "medium"
+  },
+  {
+    "id": 192,
+    "question": "【模擬】 CPR中減少中斷的方式不含？",
+    "options": [
+      "頻繁停下校正姿勢",
+      "在AED充電時維持按壓",
+      "換手<5秒完成",
+      "通氣快速有效"
+    ],
+    "correct": 0,
+    "explanation": "避免非必要中斷，維持冠脈灌流壓。",
+    "difficulty": "medium"
+  },
+  {
+    "id": 193,
+    "question": "【院前】 兩救者嬰兒CPR手法最佳？",
+    "options": [
+      "雙拇指環抱按壓+密合通氣",
+      "單手掌根",
+      "兩指按壓（優先單人）",
+      "拳擊式按壓"
+    ],
+    "correct": 0,
+    "explanation": "雙拇指環抱式可提供更深按壓與穩定胸廓。",
+    "difficulty": "medium"
+  },
+  {
+    "id": 194,
+    "question": "【站點考】 急救車常備監測裝置？",
+    "options": [
+      "血氧機、血壓計、心電圖機",
+      "X光機",
+      "MRI",
+      "血液透析機"
+    ],
+    "correct": 0,
+    "explanation": "院前監測以生理監測為主，不含大型影像。",
+    "difficulty": "easy"
+  },
+  {
+    "id": 195,
+    "question": "【院前】 懷疑頸椎受傷病人開氣道方式？",
+    "options": [
+      "下頷抬舌（下頷推舉）",
+      "仰頭抬下巴",
+      "頭部旋轉",
+      "硬壓舌根"
+    ],
+    "correct": 0,
+    "explanation": "疑頸椎損傷避免仰頭，採下頷推舉法。",
+    "difficulty": "medium"
+  },
+  {
+    "id": 196,
+    "question": "【站點考】 院前溺水患者低體溫，復溫策略？",
+    "options": [
+      "移除濕衣、保暖、漸進復溫",
+      "熱水直接淋浴",
+      "快速電熱毯高溫",
+      "不需復溫"
+    ],
+    "correct": 0,
+    "explanation": "避免誘發血流重新分佈造成不穩。",
+    "difficulty": "medium"
+  },
+  {
+    "id": 197,
+    "question": "【站點考】 成人使用口咽呼吸道前應確認？",
+    "options": [
+      "無吞嚥反射/無意識",
+      "有嘔吐反射",
+      "能自己維持氣道",
+      "鼻出血中"
+    ],
+    "correct": 0,
+    "explanation": "避免誘發嘔吐吸入。",
+    "difficulty": "medium"
+  },
+  {
+    "id": 198,
+    "question": "【院前】 兒童CPR按壓位置？",
+    "options": [
+      "胸骨下半部正中",
+      "左前胸",
+      "右前胸",
+      "劍突下方"
+    ],
+    "correct": 0,
+    "explanation": "與成人同為胸骨下半部。",
+    "difficulty": "easy"
+  },
+  {
+    "id": 199,
+    "question": "【情境】 AED貼片不可貼於？",
+    "options": [
+      "濕滑或藥物貼片上方",
+      "胸部右上與左下",
+      "前後貼法",
+      "除毛後乾燥皮膚"
+    ],
+    "correct": 0,
+    "explanation": "需移除藥物貼片並擦乾皮膚。",
+    "difficulty": "easy"
+  },
+  {
+    "id": 200,
+    "question": "【站點考】 室上性心搏過速穩定個案優先處置？",
+    "options": [
+      "迷走神經刺激法（瓦氏法）",
+      "立即電擊同步",
+      "大量輸液",
+      "胸腔減壓"
+    ],
+    "correct": 0,
+    "explanation": "穩定SVT可先嘗試迷走神經刺激。",
+    "difficulty": "hard"
   }
 ]
+
