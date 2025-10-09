@@ -74,10 +74,22 @@
 
         /* 减少动效需求者降低透明特效 */
         @media (prefers-reduced-motion: reduce) {
-            .glass-card { backdrop-filter: none; -webkit-backdrop-filter: none; }
-            .team-member-card.liquid-glass { backdrop-filter: none; -webkit-backdrop-filter: none; }
-            .sidebar { backdrop-filter: none; -webkit-backdrop-filter: none; }
-            .marquee { backdrop-filter: none; -webkit-backdrop-filter: none; }
+            .glass-card { 
+                -webkit-backdrop-filter: none; 
+                backdrop-filter: none; 
+            }
+            .team-member-card.liquid-glass { 
+                -webkit-backdrop-filter: none; 
+                backdrop-filter: none; 
+            }
+            .sidebar { 
+                -webkit-backdrop-filter: none; 
+                backdrop-filter: none; 
+            }
+            .marquee { 
+                -webkit-backdrop-filter: none; 
+                backdrop-filter: none; 
+            }
         }
 
         /* 頂部標題欄 */
@@ -163,45 +175,117 @@
             transform: scale(1.1);
         }
 
-        /* 跑馬燈 */
-        .marquee {
+        /* === 統一液態玻璃膠囊跑馬燈 === */
+        :root {
+            --pill-h: 56px;
+            --pill-radius: 9999px;
+            --pill-bg: rgba(255, 255, 255, 0.16);
+            --pill-border: rgba(255, 255, 255, 0.28);
+            --pill-shadow: 0 10px 30px rgba(0, 0, 0, 0.18);
+            --pill-blur: 18px;
+            --pill-pad-x: 18px;
+        }
+
+        /* 外層容器：固定在 header 下方，水平置中 */
+        .marquee.glass-pill {
             position: fixed;
             top: 80px;
-            left: 0;
-            right: 0;
-            height: 60px;
-            background: rgba(52, 152, 219, 0.9);
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 999;
+            height: var(--pill-h);
+            min-width: min(92vw, 1200px);
+            max-width: min(92vw, 1200px);
             display: flex;
             align-items: center;
-            overflow: hidden;
-            z-index: 999;
-            -webkit-backdrop-filter: blur(10px);
-            backdrop-filter: blur(10px);
+            padding: 0 calc(var(--pill-pad-x) + 8px);
+            border-radius: var(--pill-radius);
+            /* 液態玻璃核心 */
+            background: var(--pill-bg);
+            backdrop-filter: blur(var(--pill-blur)) saturate(160%);
+            -webkit-backdrop-filter: blur(var(--pill-blur)) saturate(160%);
+            border: 1px solid var(--pill-border);
+            box-shadow: var(--pill-shadow);
+            /* 防止混色污染整頁 */
+            isolation: isolate;
         }
 
-        .marquee-content {
+        /* 內部滾動軌道 */
+        .marquee .marquee-track {
             display: flex;
-            animation: marquee 30s linear infinite;
+            align-items: center;
+            gap: 28px;
             white-space: nowrap;
-            width: 100%;
+            will-change: transform;
+            animation: marqueeScroll 26s linear infinite;
         }
 
-        .marquee-item {
-            margin-right: 50px;
-            color: white;
+        /* 滑過暫停 */
+        .marquee:hover .marquee-track {
+            animation-play-state: paused;
+        }
+
+        /* 單一公告項目 */
+        .marquee .marquee-item {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            color: #1f2937;
+            font-size: 15px;
+            font-weight: 600;
+            letter-spacing: 0.2px;
+            opacity: 0.9;
+        }
+
+        .marquee .marquee-item i {
             font-size: 16px;
-            font-weight: 500;
-            flex-shrink: 0;
-            padding: 0 20px;
+            opacity: 0.9;
         }
 
-        @keyframes marquee {
+        /* 左側藍色高光 */
+        .marquee .pill-highlight {
+            position: absolute;
+            left: 6px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 96px;
+            height: calc(var(--pill-h) - 12px);
+            border-radius: var(--pill-radius);
+            background:
+                radial-gradient(100px 60px at 20% 50%, rgba(0, 170, 255, 0.55), transparent 60%),
+                radial-gradient(120px 80px at 45% 40%, rgba(64, 224, 255, 0.35), transparent 65%);
+            filter: blur(6px) saturate(140%);
+            mix-blend-mode: screen;
+            pointer-events: none;
+        }
+
+        /* 動畫定義 */
+        @keyframes marqueeScroll {
             0% { 
-                transform: translateX(100vw); 
+                transform: translateX(0); 
             }
             100% { 
-                transform: translateX(-100%); 
+                transform: translateX(-50%); 
             }
+        }
+
+        /* 適配窄螢幕 */
+        @media (max-width: 768px) {
+            :root {
+                --pill-h: 50px;
+                --pill-pad-x: 14px;
+            }
+            .marquee .marquee-item {
+                font-size: 14px;
+            }
+            .marquee .pill-highlight {
+                width: 84px;
+            }
+        }
+
+        /* 登入/註冊頁面隱藏 */
+        body.auth .marquee {
+            display: none !important;
         }
 
         /* 跑馬燈暫停效果 */
@@ -365,6 +449,26 @@
             min-height: calc(100vh - 180px);
         }
 
+        /* 團隊頁面標題居中 */
+        .team-page h1 {
+            font-size: 2.5rem;
+            color: #333;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-align: center;
+        }
+
+        .team-page p {
+            color: #666;
+            font-size: 1.1rem;
+            text-align: center;
+            margin-bottom: 2rem;
+            line-height: 1.6;
+        }
+
         .team-members-grid {
             display: flex;
             justify-content: center;
@@ -503,29 +607,12 @@
             pointer-events: none;
         }
 
-        /* 兼容旧的member-photo样式（用于占位符） */
-        .member-photo {
-            width: 120px;
-            height: 120px;
+        /* 占位符樣式（在瓶蓋內使用） */
+        .bottle-cap__photo .photo-placeholder {
+            width: 100%;
+            height: 100%;
             border-radius: 50%;
-            background: linear-gradient(180deg, rgba(255, 255, 255, 0.28), rgba(255, 255, 255, 0.08));
-            border: 1px solid rgba(255, 255, 255, 0.45);
-            box-shadow:
-                inset 0 8px 18px rgba(255, 255, 255, 0.45),
-                inset 0 -8px 18px rgba(0, 0, 0, 0.08),
-                0 10px 24px rgba(0, 0, 0, 0.12);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 16px;
-            position: relative;
-        }
-
-        .photo-placeholder {
-            width: 100px;
-            height: 100px;
-            border-radius: 50%;
-            background: white;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -568,6 +655,231 @@
         /* 可選：固定整站用亮色方案，避免系統暗色干擾 */
         html {
             color-scheme: light;
+        }
+
+        /* === 寶特瓶蓋樣式容器 === */
+        :root {
+            --cap-size: 180px;
+            --cap-color: #e7eef6;
+            --cap-edge: #cfd9e6;
+            --cap-shadow: rgba(0,0,0,.18);
+            --cap-inner-shadow: rgba(0,0,0,.22);
+        }
+
+        .bottle-cap {
+            --s: var(--cap-size);
+            width: var(--s);
+            height: var(--s);
+            position: relative;
+            border-radius: 50%;
+            display: grid;
+            place-items: center;
+            filter: drop-shadow(0 12px 24px var(--cap-shadow));
+            isolation: isolate;
+            margin: 0 auto 16px;
+        }
+
+        /* 鋸齒邊緣 */
+        .bottle-cap::before {
+            content: "";
+            position: absolute;
+            inset: -10px;
+            border-radius: 50%;
+            background: repeating-conic-gradient(
+                var(--cap-edge) 0deg 6deg,
+                transparent 6deg 12deg
+            );
+            -webkit-mask: radial-gradient(circle, transparent 62%, #000 63%);
+            mask: radial-gradient(circle, transparent 62%, #000 63%);
+            filter: blur(.3px);
+        }
+
+        /* 上層圓面 */
+        .bottle-cap__face {
+            position: relative;
+            width: calc(var(--s) - 28px);
+            height: calc(var(--s) - 28px);
+            border-radius: 50%;
+            background:
+                radial-gradient(140% 120% at 30% 25%, #ffffff 0%, var(--cap-color) 38%, #dfe8f2 70%),
+                radial-gradient(200% 140% at 70% 85%, #c1cedd 0%, transparent 60%);
+            box-shadow:
+                inset 0 10px 24px rgba(255,255,255,.8),
+                inset 0 -22px 28px var(--cap-inner-shadow);
+            overflow: hidden;
+        }
+
+        /* 光澤反射 */
+        .bottle-cap__face::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            border-radius: 50%;
+            background:
+                radial-gradient(220px 120px at 30% 18%, rgba(255,255,255,.85), transparent 60%),
+                radial-gradient(220px 120px at 70% 80%, rgba(255,255,255,.15), transparent 70%);
+            mix-blend-mode: screen;
+            pointer-events: none;
+        }
+
+        /* 相片區 */
+        .bottle-cap__photo {
+            position: absolute;
+            inset: 14%;
+            border-radius: 50%;
+            overflow: hidden;
+            box-shadow:
+                inset 0 0 0 2px rgba(255,255,255,.85),
+                inset 0 10px 16px rgba(0,0,0,.08);
+        }
+
+        .bottle-cap__photo img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transform: scale(1.02);
+        }
+
+        /* Hover 效果 */
+        .bottle-cap:hover {
+            transform: rotate(-3deg) scale(1.03);
+            transition: 0.4s ease;
+        }
+
+        /* === 3D 翻轉卡片容器 === */
+        .cap-card {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .cap-3d {
+            width: 220px;
+            height: 220px;
+            position: relative;
+            perspective: 1200px;
+            cursor: pointer;
+            outline: none;
+        }
+
+        .cap-3d:focus-visible {
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.35);
+            border-radius: 16px;
+        }
+
+        /* 兩面共用 */
+        .cap-face {
+            position: absolute;
+            inset: 0;
+            transform-style: preserve-3d;
+            backface-visibility: hidden;
+            display: grid;
+            place-items: center;
+            transition: transform 1.4s cubic-bezier(0.22, 0.85, 0.25, 1);
+        }
+
+        /* 正面：瓶蓋略有浮起陰影 */
+        .cap-front {
+            transform: rotateY(0deg) translateZ(0);
+            filter: drop-shadow(0 14px 26px rgba(0, 0, 0, 0.18));
+        }
+
+        /* 背面：預設 180 度朝內 */
+        .cap-back {
+            transform: rotateY(180deg) translateZ(0);
+        }
+
+        .cap-back-inner {
+            width: 100%;
+            height: 100%;
+            border-radius: 26px;
+            background: rgba(255, 255, 255, 0.18);
+            backdrop-filter: blur(16px) saturate(160%);
+            -webkit-backdrop-filter: blur(16px) saturate(160%);
+            border: 1px solid rgba(255, 255, 255, 0.35);
+            box-shadow: inset 0 10px 18px rgba(255, 255, 255, 0.6), 0 18px 32px rgba(0, 0, 0, 0.18);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .cap-back-inner h4 {
+            margin: 0;
+            font-size: 18px;
+            color: #1f2937;
+        }
+
+        .cap-back-inner .title {
+            margin: 0 0 6px;
+            color: #6b7280;
+        }
+
+        .cap-back-inner .contact {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .cap-back-inner .contact a {
+            color: #374151;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .cap-back-inner .contact i {
+            margin-right: 8px;
+            color: #6366f1;
+        }
+
+        /* 🌀 扭開動畫：點開時「旋轉 + 翻面 + 微抬起」 */
+        .cap-3d.is-open .cap-front {
+            animation: twist-open 1.4s cubic-bezier(0.22, 0.85, 0.25, 1);
+            transform: rotateY(-180deg) translateZ(0);
+            filter: drop-shadow(0 22px 36px rgba(0, 0, 0, 0.22));
+        }
+
+        .cap-3d.is-open .cap-back {
+            transform: rotateY(0deg) translateZ(0);
+        }
+
+        /* 關閉（蓋回去）時加入回轉感 */
+        .cap-3d:not(.is-open).closing .cap-front {
+            animation: twist-close 1.2s cubic-bezier(0.3, 0.9, 0.3, 1);
+        }
+
+        /* 旋轉關鍵影格：帶些 Z 軸扭轉與輕微抬升感 */
+        @keyframes twist-open {
+            0%   { transform: rotateY(0) rotateZ(0) translateY(0); }
+            40%  { transform: rotateY(-30deg) rotateZ(-220deg) translateY(-4px); }
+            100% { transform: rotateY(-180deg) rotateZ(-540deg) translateY(0); }
+        }
+
+        @keyframes twist-close {
+            0%   { transform: rotateY(-180deg) rotateZ(0deg) translateY(0); }
+            50%  { transform: rotateY(-130deg) rotateZ(180deg) translateY(-3px); }
+            100% { transform: rotateY(0) rotateZ(360deg) translateY(0); }
+        }
+
+        /* 行動裝置優化 */
+        @media (max-width: 768px) {
+            .cap-3d {
+                width: 200px;
+                height: 200px;
+            }
+        }
+
+        /* 尊重使用者：減少動效模式時直接切換，不動畫 */
+        @media (prefers-reduced-motion: reduce) {
+            .cap-face {
+                transition: none !important;
+                animation: none !important;
+            }
         }
 
         /* 周哲旭照片特殊樣式 */
@@ -618,20 +930,8 @@
                 flex-shrink: 0;
             }
 
-            .avatar-glass {
-                width: 90px;
-                height: 90px;
-            }
-
-            .member-photo {
-                width: 90px;
-                height: 90px;
-            }
-
-            .photo-placeholder {
-                width: 70px;
-                height: 70px;
-                font-size: 28px;
+            .bottle-cap {
+                --cap-size: 120px;
             }
 
             .member-name {
@@ -713,16 +1013,28 @@
         </div>
     </div>
 
-    <!-- 跑馬燈 -->
-    <div class="marquee">
-        <div class="marquee-content">
-            <div class="marquee-item">🎯 歡迎使用PBLS VR教學平台！</div>
-            <div class="marquee-item">📚 360°實境教學影片，身臨其境的學習體驗</div>
-            <div class="marquee-item">🤖 虛擬人互動，提升急救溝通技巧</div>
-            <div class="marquee-item">🎮 VR實際操作，模擬真實急救情境</div>
-            <div class="marquee-item">📊 即時成績追蹤，掌握學習進度</div>
-            <div class="marquee-item">💡 問題導向學習法，提升急救技能</div>
+    <!-- 液態玻璃膠囊跑馬燈 -->
+    <div class="marquee glass-pill" role="marquee" aria-label="最新公告">
+        <div class="marquee-track">
+            <div class="marquee-item">
+                <i class="fas fa-bullhorn"></i>
+                歡迎使用PBLS VR教學平台！
+            </div>
+            <div class="marquee-item">
+                <i class="fas fa-vr-cardboard"></i>
+                360°實境教學影片，身臨其境的學習體驗
+            </div>
+            <div class="marquee-item">
+                <i class="fas fa-comments"></i>
+                虛擬人互動，提升急救溝通技巧
+            </div>
+            <div class="marquee-item">
+                <i class="fas fa-chart-line"></i>
+                即時成績追蹤，掌握學習進度
+            </div>
         </div>
+        <!-- 可選：左側藍色高光 -->
+        <span class="pill-highlight" aria-hidden="true"></span>
     </div>
 
     <!-- 主要內容區域 -->
@@ -734,61 +1046,164 @@
             
             <!-- 團隊成員卡片 -->
             <div class="team-members-grid">
+                <!-- 周哲旭 - 有照片 -->
                 <div class="team-member-card liquid-glass">
                     <div class="liquid-content">
-                        <div class="avatar-glass">
-                            <img src="assets/周哲旭.png" alt="周哲旭">
+                        <div class="cap-card">
+                            <div class="cap-3d" tabindex="0" role="button" aria-expanded="false" aria-label="查看周哲旭聯絡資訊">
+                                <!-- 正面（瓶蓋） -->
+                                <div class="cap-face cap-front">
+                                    <div class="bottle-cap" style="--cap-size: 180px; --cap-color:#e7eef6; --cap-edge:#cfd9e6;">
+                                        <div class="bottle-cap__face"></div>
+                                        <div class="bottle-cap__photo">
+                                            <img src="assets/周哲旭.png" alt="周哲旭頭像">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- 背面（聯絡資訊） -->
+                                <div class="cap-face cap-back">
+                                    <div class="cap-back-inner">
+                                        <h4>周哲旭</h4>
+                                        <p class="title">職位</p>
+                                        <div class="contact">
+                                            <a href="mailto:zhexuz558@gmail.com"><i class="fas fa-envelope"></i> zhexuz558@gmail.com</a>
+                                            <a href="tel:+886939993712"><i class="fas fa-phone"></i> +886 939-993-712</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <h3 class="member-name">周哲旭</h3>
+                            <p class="member-role">職位</p>
                         </div>
-                        <h3 class="member-name">周哲旭</h3>
-                        <p class="member-role">職位</p>
                     </div>
                 </div>
             
+                <!-- 潘蓁樺 -->
                 <div class="team-member-card liquid-glass">
                     <div class="liquid-content">
-                        <div class="member-photo">
-                            <div class="photo-placeholder">
-                                <i class="fas fa-user"></i>
+                        <div class="cap-card">
+                            <div class="cap-3d" tabindex="0" role="button" aria-expanded="false" aria-label="查看潘蓁樺聯絡資訊">
+                                <div class="cap-face cap-front">
+                                    <div class="bottle-cap" style="--cap-size: 180px; --cap-color:#f4e6e6; --cap-edge:#e3d1d1;">
+                                        <div class="bottle-cap__face"></div>
+                                        <div class="bottle-cap__photo">
+                                            <div class="photo-placeholder">
+                                                <i class="fas fa-user"></i>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="cap-face cap-back">
+                                    <div class="cap-back-inner">
+                                        <h4>潘蓁樺</h4>
+                                        <p class="title">職位</p>
+                                        <div class="contact">
+                                            <a><i class="fas fa-envelope"></i> </a>
+                                            <a><i class="fas fa-phone"></i> </a>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
+                            <h3 class="member-name">潘蓁樺</h3>
+                            <p class="member-role">職位</p>
                         </div>
-                        <h3 class="member-name">潘蓁樺</h3>
-                        <p class="member-role">職位</p>
                     </div>
                 </div>
                 
+                <!-- 邱子芸 -->
                 <div class="team-member-card liquid-glass">
                     <div class="liquid-content">
-                        <div class="member-photo">
-                            <div class="photo-placeholder">
-                                <i class="fas fa-user"></i>
+                        <div class="cap-card">
+                            <div class="cap-3d" tabindex="0" role="button" aria-expanded="false" aria-label="查看邱子芸聯絡資訊">
+                                <div class="cap-face cap-front">
+                                    <div class="bottle-cap" style="--cap-size: 180px; --cap-color:#e6f4f1; --cap-edge:#d1e8e3;">
+                                        <div class="bottle-cap__face"></div>
+                                        <div class="bottle-cap__photo">
+                                            <div class="photo-placeholder">
+                                                <i class="fas fa-user"></i>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="cap-face cap-back">
+                                    <div class="cap-back-inner">
+                                        <h4>邱子芸</h4>
+                                        <p class="title">職位</p>
+                                        <div class="contact">
+                                            <a><i class="fas fa-envelope"></i> </a>
+                                            <a><i class="fas fa-phone"></i> </a>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
+                            <h3 class="member-name">邱子芸</h3>
+                            <p class="member-role">職位</p>
                         </div>
-                        <h3 class="member-name">邱子芸</h3>
-                        <p class="member-role">職位</p>
                     </div>
                 </div>
 
+                <!-- 謝昕璦 -->
                 <div class="team-member-card liquid-glass">
                     <div class="liquid-content">
-                        <div class="member-photo">
-                            <div class="photo-placeholder">
-                                <i class="fas fa-user"></i>
+                        <div class="cap-card">
+                            <div class="cap-3d" tabindex="0" role="button" aria-expanded="false" aria-label="查看謝昕璦聯絡資訊">
+                                <div class="cap-face cap-front">
+                                    <div class="bottle-cap" style="--cap-size: 180px; --cap-color:#f4f0e6; --cap-edge:#e8e3d1;">
+                                        <div class="bottle-cap__face"></div>
+                                        <div class="bottle-cap__photo">
+                                            <div class="photo-placeholder">
+                                                <i class="fas fa-user"></i>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="cap-face cap-back">
+                                    <div class="cap-back-inner">
+                                        <h4>謝昕璦</h4>
+                                        <p class="title">職位</p>
+                                        <div class="contact">
+                                            <a><i class="fas fa-envelope"></i> </a>
+                                            <a><i class="fas fa-phone"></i> </a>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
+                            <h3 class="member-name">謝昕璦</h3>
+                            <p class="member-role">職位</p>
                         </div>
-                        <h3 class="member-name">謝昕璦</h3>
-                        <p class="member-role">職位</p>
                     </div>
                 </div>
                 
+                <!-- 林立凡 -->
                 <div class="team-member-card liquid-glass">
                     <div class="liquid-content">
-                        <div class="member-photo">
-                            <div class="photo-placeholder">
-                                <i class="fas fa-user"></i>
+                        <div class="cap-card">
+                            <div class="cap-3d" tabindex="0" role="button" aria-expanded="false" aria-label="查看林立凡聯絡資訊">
+                                <div class="cap-face cap-front">
+                                    <div class="bottle-cap" style="--cap-size: 180px; --cap-color:#ebe6f4; --cap-edge:#ddd1e8;">
+                                        <div class="bottle-cap__face"></div>
+                                        <div class="bottle-cap__photo">
+                                            <div class="photo-placeholder">
+                                                <i class="fas fa-user"></i>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="cap-face cap-back">
+                                    <div class="cap-back-inner">
+                                        <h4>林立凡</h4>
+                                        <p class="title">職位</p>
+                                        <div class="contact">
+                                            <a><i class="fas fa-envelope"></i> </a>
+                                            <a><i class="fas fa-phone"></i> </a>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
+                            <h3 class="member-name">林立凡</h3>
+                            <p class="member-role">職位</p>
                         </div>
-                        <h3 class="member-name">林立凡</h3>
-                        <p class="member-role">職位</p>
                     </div>
                 </div>
             </div>
@@ -815,10 +1230,40 @@
             });
         }
 
+        // 瓶蓋 3D 翻轉功能初始化
+        function initCapFlip() {
+            document.querySelectorAll('.cap-3d').forEach(el => {
+                const toggle = () => {
+                    const open = el.classList.toggle('is-open');
+                    el.setAttribute('aria-expanded', open ? 'true' : 'false');
+                    
+                    // 為了播放關閉動畫：先加 .closing 再移除
+                    if (!open) {
+                        el.classList.add('closing');
+                        setTimeout(() => el.classList.remove('closing'), 1200);  // 配合 1.2s 動畫
+                    }
+                };
+
+                // 點擊事件
+                el.addEventListener('click', toggle);
+                
+                // 鍵盤事件（Enter 或 Space）
+                el.addEventListener('keydown', e => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        toggle();
+                    }
+                });
+            });
+        }
+
         // 頁面載入時更新用戶資訊顯示
         document.addEventListener('DOMContentLoaded', function() {
             // 初始化液态玻璃效果
             initLiquidGlassEffect();
+            
+            // 初始化瓶蓋 3D 翻轉功能
+            initCapFlip();
             
             setTimeout(() => {
                 updateUserInfoDisplay();

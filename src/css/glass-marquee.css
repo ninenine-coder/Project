@@ -1,0 +1,111 @@
+/* === 液態玻璃膠囊跑馬燈樣式 === */
+:root {
+    --pill-h: 56px;
+    --pill-radius: 9999px;
+    --pill-bg: rgba(255, 255, 255, 0.16);
+    --pill-border: rgba(255, 255, 255, 0.28);
+    --pill-shadow: 0 10px 30px rgba(0, 0, 0, 0.18);
+    --pill-blur: 18px;
+    --pill-pad-x: 18px;
+}
+
+/* 外層容器：固定在 header 下方，水平置中 */
+.marquee.glass-pill {
+    position: fixed;
+    top: 80px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 999;
+    height: var(--pill-h);
+    min-width: min(92vw, 1200px);
+    max-width: min(92vw, 1200px);
+    display: flex;
+    align-items: center;
+    padding: 0 calc(var(--pill-pad-x) + 8px);
+    border-radius: var(--pill-radius);
+    
+    /* 液態玻璃核心 */
+    background: var(--pill-bg);
+    -webkit-backdrop-filter: blur(var(--pill-blur)) saturate(160%);
+    backdrop-filter: blur(var(--pill-blur)) saturate(160%);
+    border: 1px solid var(--pill-border);
+    box-shadow: var(--pill-shadow);
+    
+    /* 防止混色污染整頁 */
+    isolation: isolate;
+}
+
+/* 內部滾動軌道 */
+.marquee .marquee-track {
+    display: flex;
+    align-items: center;
+    gap: 28px;
+    white-space: nowrap;
+    will-change: transform;
+    animation: marqueeScroll 26s linear infinite;
+}
+
+/* 滑過暫停 */
+.marquee:hover .marquee-track {
+    animation-play-state: paused;
+}
+
+/* 單一公告項目 */
+.marquee .marquee-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    color: #1f2937;
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: 0.2px;
+    opacity: 0.9;
+}
+
+.marquee .marquee-item i {
+    font-size: 16px;
+    opacity: 0.9;
+}
+
+/* 左側藍色高光 */
+.marquee .pill-highlight {
+    position: absolute;
+    left: 6px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 96px;
+    height: calc(var(--pill-h) - 12px);
+    border-radius: var(--pill-radius);
+    background:
+        radial-gradient(100px 60px at 20% 50%, rgba(0, 170, 255, 0.55), transparent 60%),
+        radial-gradient(120px 80px at 45% 40%, rgba(64, 224, 255, 0.35), transparent 65%);
+    filter: blur(6px) saturate(140%);
+    mix-blend-mode: screen;
+    pointer-events: none;
+}
+
+/* 動畫定義 */
+@keyframes marqueeScroll {
+    0%   { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+}
+
+/* 適配窄螢幕 */
+@media (max-width: 768px) {
+    :root {
+        --pill-h: 50px;
+        --pill-pad-x: 14px;
+    }
+    .marquee .marquee-item {
+        font-size: 14px;
+    }
+    .marquee .pill-highlight {
+        width: 84px;
+    }
+}
+
+/* 登入/註冊頁面隱藏 */
+body.auth .marquee {
+    display: none !important;
+}
+
