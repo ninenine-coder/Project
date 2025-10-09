@@ -318,20 +318,27 @@
 
         /* ===== GitHub Pages 液態玻璃修復方案 ===== */
         
-        /* 基礎液態玻璃樣式（所有玻璃元素共用） */
-        .glass, .glass-card, .marquee.glass-pill, .liquid-glass {
-            background: rgba(255,255,255,0.10) !important;
-            border: 1px solid rgba(255,255,255,0.28);
+        /* ✨ 修復 GitHub Pages 下 backdrop-filter 無法渲染的問題 */
+        .glass-card, .marquee.glass-pill, .card, .glass, .liquid-glass {
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(22px) saturate(200%);
+            -webkit-backdrop-filter: blur(22px) saturate(200%);
             border-radius: 16px;
-            box-shadow: 0 10px 30px rgba(0,0,0,.18), inset 0 1px 2px rgba(255,255,255,.18);
-            color: rgba(31,41,55, .95);
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.18);
+
+            /* 👇 這 3 行是關鍵 */
+            transform: translateZ(0);
+            will-change: backdrop-filter;
+            isolation: isolate;
         }
 
-        /* 有支援 backdrop-filter 時才開啟模糊效果 */
+        /* 有支援 backdrop-filter 時確保模糊效果正常 */
         .support-backdrop .glass,
         .support-backdrop .glass-card,
         .support-backdrop .marquee.glass-pill,
         .support-backdrop .liquid-glass {
+            /* 基礎樣式已包含模糊效果，這裡確保優先級 */
             backdrop-filter: blur(22px) saturate(200%) !important;
             -webkit-backdrop-filter: blur(22px) saturate(200%) !important;
         }
@@ -344,6 +351,9 @@
             background: rgba(255,255,255,0.30) !important;
             backdrop-filter: none !important;
             -webkit-backdrop-filter: none !important;
+            /* 移除關鍵屬性，避免不必要的 GPU 層 */
+            transform: none !important;
+            will-change: auto !important;
         }
 
         /* 跑馬燈容器優化 */
