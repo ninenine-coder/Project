@@ -21,5 +21,21 @@ export default defineConfig({
         react: './src/main.tsx'
       }
     }
+  },
+  css: {
+    postcss: {
+      plugins: [
+        {
+          postcssPlugin: 'internal:preserve-backdrop-filter',
+          Declaration(decl) {
+            // 保留 backdrop-filter 不被移除
+            if (decl.prop === 'backdrop-filter' || decl.prop === '-webkit-backdrop-filter') {
+              // 確保聲明被保留
+              decl.important = false;
+            }
+          }
+        }
+      ]
+    }
   }
 })
