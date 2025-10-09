@@ -20,17 +20,42 @@
             justify-content: center;
             align-items: center;
             padding: 20px;
+            position: relative;
+        }
+
+        /* 全局背景 */
+        .global-bg {
+            position: fixed;
+            inset: 0; /* top, right, bottom, left 全为 0 */
+            z-index: -1; /* 最底层 */
+            pointer-events: none; /* 不阻挡点击 */
+            background-image: url("./assets/背景.png");
+            background-position: center calc(50% + 58px); /* 往下移2.3公分 */
+            background-repeat: no-repeat;
+            background-size: contain; /* 改为contain确保完整显示 */
+            opacity: 0.6; /* 注册页面使用较低的透明度 */
+        }
+
+        /* 确保内容在背景之上 */
+        .main-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        @media print {
+            .global-bg { display: none; }
         }
 
         .register-container {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(20px);
+            background: rgba(255, 255, 255, 0.15);
+            -webkit-backdrop-filter: saturate(160%) blur(20px);
+            backdrop-filter: saturate(160%) blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.35);
             border-radius: 20px;
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
             padding: 40px;
             width: 100%;
             max-width: 600px;
-            border: 1px solid rgba(255, 255, 255, 0.3);
         }
 
         .register-header {
@@ -235,6 +260,9 @@
     </style>
 </head>
 <body>
+    <!-- 全局背景 -->
+    <div class="global-bg" aria-hidden="true"></div>
+    
     <div class="register-container">
         <div class="register-header">
             <div class="logo">

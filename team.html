@@ -17,9 +17,61 @@
 
         body {
             font-family: 'Microsoft JhengHei', sans-serif;
-            background: white;
+            background: transparent;
             min-height: 100vh;
             color: #333;
+            position: relative;
+        }
+
+        /* 全局背景 */
+        .global-bg {
+            position: fixed;
+            inset: 0; /* top, right, bottom, left 全为 0 */
+            z-index: -1; /* 最底层 */
+            pointer-events: none; /* 不阻挡点击 */
+            background-image: url("./assets/背景.png");
+            background-position: center calc(50% + 58px); /* 往下移2.3公分 */
+            background-repeat: no-repeat;
+            background-size: contain; /* 改为contain确保完整显示 */
+            opacity: 0.9; /* 可依需求调整淡化程度 */
+        }
+
+        @media print {
+            .global-bg { display: none; }
+        }
+
+        /* 毛玻璃卡片样式 */
+        :root {
+            --glass-alpha: .65;                /* 透明度 */
+            --glass-border: rgba(255,255,255,.35);
+            --glass-shadow: 0 10px 30px rgba(16,24,40,.12);
+            --glass-radius: 20px;
+            --glass-blur: 14px;
+            --glass-bg: rgba(255,255,255,var(--glass-alpha));
+        }
+
+        .glass-card {
+            background: var(--glass-bg);
+            -webkit-backdrop-filter: saturate(160%) blur(var(--glass-blur));
+            backdrop-filter: saturate(160%) blur(var(--glass-blur));
+            border: 1px solid var(--glass-border);
+            border-radius: var(--glass-radius);
+            box-shadow: var(--glass-shadow);
+        }
+
+        /* 内容排版建议 */
+        .glass-padding { padding: 28px; }
+        .glass-title { font-size: 24px; font-weight: 800; color:#1f2937; }
+        .glass-sub { font-size: 14px; color:#4b5563; }
+
+        /* 兼容性/效能：若不支援 backdrop-filter 改高透明白 */
+        @supports not ((-webkit-backdrop-filter: blur(1px)) or (backdrop-filter: blur(1px))) {
+            .glass-card { background: rgba(255,255,255,.85); }
+        }
+
+        /* 减少动效需求者降低透明特效 */
+        @media (prefers-reduced-motion: reduce) {
+            .glass-card { backdrop-filter: none; -webkit-backdrop-filter: none; }
         }
 
         /* 頂部標題欄 */
@@ -302,11 +354,6 @@
         .team-page {
             padding: 20px 30px 40px 30px;
             min-height: calc(100vh - 180px);
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(20px);
-            border-radius: 20px;
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
         }
 
         .team-members-grid {
@@ -322,18 +369,27 @@
             flex-direction: column;
             align-items: center;
             text-align: center;
-            background: white;
-            border-radius: 20px;
+            background: rgba(255, 255, 255, 0.1) !important;
+            -webkit-backdrop-filter: blur(20px) saturate(180%) !important;
+            backdrop-filter: blur(20px) saturate(180%) !important;
+            border: 1px solid rgba(255, 255, 255, 0.2) !important;
+            border-radius: 20px !important;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1) !important;
             padding: 15px;
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            transition: all 0.3s ease;
             width: 180px;
+            position: relative;
+            overflow: hidden;
             flex-shrink: 0;
         }
 
         .team-member-card:hover {
             transform: translateY(-5px);
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+            background: rgba(255, 255, 255, 0.15) !important;
+            -webkit-backdrop-filter: blur(25px) saturate(200%) !important;
+            backdrop-filter: blur(25px) saturate(200%) !important;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2) !important;
+            border: 1px solid rgba(255, 255, 255, 0.3) !important;
         }
 
         .member-photo {
@@ -452,6 +508,9 @@
     <script type="module" src="src/services/learningTimeService.js"></script>
 </head>
 <body>
+    <!-- 全局背景 -->
+    <div class="global-bg" aria-hidden="true"></div>
+    
     <!-- 側邊欄 -->
     <div class="sidebar">
         <!-- 頂部：Logo -->

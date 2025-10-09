@@ -17,9 +17,87 @@
 
         body {
             font-family: 'Microsoft JhengHei', sans-serif;
-            background: white;
+            background: transparent;
             min-height: 100vh;
             color: #333;
+            position: relative;
+        }
+
+        /* 全局背景 */
+        .global-bg {
+            position: fixed;
+            inset: 0; /* top, right, bottom, left 全为 0 */
+            z-index: -1; /* 最底层 */
+            pointer-events: none; /* 不阻挡点击 */
+            background-image: url("./assets/背景.png");
+            background-position: center calc(50% + 58px); /* 往下移2.3公分 */
+            background-repeat: no-repeat;
+            background-size: contain; /* 改为contain确保完整显示 */
+            opacity: 0.9; /* 可依需求调整淡化程度 */
+        }
+
+        /* 主要内容区域 */
+        .main-content {
+            position: relative;
+            z-index: 1;
+            min-height: calc(100vh - 80px); /* 减去header高度 */
+            padding-left: 0; /* 确保左边不被遮挡 */
+            margin-left: 0; /* 确保左边不被遮挡 */
+        }
+
+        /* 内容容器，确保内容在背景之上 */
+        .content-container {
+            position: relative;
+            z-index: 1;
+        }
+
+        @media print {
+            .global-bg { display: none; }
+        }
+
+        /* 顶部间距变量 */
+        :root {
+            --masthead-h: 80px;                /* 顶部导航栏高度 */
+            --section-gap: 60px;               /* 额外上方留白 */
+        }
+
+        /* 毛玻璃卡片样式 */
+        :root {
+            --glass-alpha: .65;                /* 透明度 */
+            --glass-border: rgba(255,255,255,.35);
+            --glass-shadow: 0 10px 30px rgba(16,24,40,.12);
+            --glass-radius: 20px;
+            --glass-blur: 14px;
+            --glass-bg: rgba(255,255,255,var(--glass-alpha));
+        }
+
+        /* 统一顶部间距 */
+        .section-offset {
+            padding-top: calc(var(--masthead-h) + var(--section-gap));
+        }
+
+        .glass-card {
+            background: var(--glass-bg);
+            -webkit-backdrop-filter: saturate(160%) blur(var(--glass-blur));
+            backdrop-filter: saturate(160%) blur(var(--glass-blur));
+            border: 1px solid var(--glass-border);
+            border-radius: var(--glass-radius);
+            box-shadow: var(--glass-shadow);
+        }
+
+        /* 内容排版建议 */
+        .glass-padding { padding: 28px; }
+        .glass-title { font-size: 24px; font-weight: 800; color:#1f2937; }
+        .glass-sub { font-size: 14px; color:#4b5563; }
+
+        /* 兼容性/效能：若不支援 backdrop-filter 改高透明白 */
+        @supports not ((-webkit-backdrop-filter: blur(1px)) or (backdrop-filter: blur(1px))) {
+            .glass-card { background: rgba(255,255,255,.85); }
+        }
+
+        /* 减少动效需求者降低透明特效 */
+        @media (prefers-reduced-motion: reduce) {
+            .glass-card { backdrop-filter: none; -webkit-backdrop-filter: none; }
         }
 
         /* 頂部標題欄 */
@@ -63,7 +141,7 @@
         }
 
         .user-info {
-            background: white;
+            background: transparent;
             padding: 8px 15px;
             border-radius: 20px;
             font-size: 14px;
@@ -288,25 +366,36 @@
             flex: 1;
             display: flex;
             flex-direction: column;
-            margin-left: 80px;
-            margin-top: 140px; /* 為固定標題欄(80px)和跑馬燈(60px)留出空間 */
-            padding: 20px 30px 40px 30px;
-            min-height: calc(100vh - 180px);
+            margin-left: 0; /* 改为0，让背景从左边开始 */
+            margin-top: 140px; /* 与历史成绩页面对齐 */
+            padding: 20px 30px 40px 100px; /* 内容从侧边栏右边开始，但背景覆盖全屏 */
+            min-height: calc(100vh - 100px);
         }
 
         .sidebar:hover ~ .main-content {
-            margin-left: 180px;
+            padding-left: 200px; /* 侧边栏展开时，内容向右移动 */
         }
 
         /* 練習專區首頁樣式 */
         .practice-homepage {
             padding: 20px 30px 40px 30px;
             min-height: calc(100vh - 180px);
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(20px);
-            border-radius: 20px;
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .practice-homepage h1 {
+            text-align: center !important;
+            font-size: 36px;
+            color: #2c3e50;
+            margin-bottom: 20px;
+            width: 100%;
+        }
+
+        .practice-homepage p {
+            text-align: center !important;
+            font-size: 18px;
+            color: #7f8c8d;
+            margin-bottom: 40px;
+            width: 100%;
         }
 
         /* 360實境教學影片樣式 */
@@ -383,7 +472,7 @@
         .play-button-center {
             width: 80px;
             height: 80px;
-            background: white;
+            background: transparent;
             border-radius: 50%;
             display: flex;
             align-items: center;
@@ -496,18 +585,27 @@
         }
 
         .practice-option-card {
-            background: white;
-            border-radius: 20px;
+            background: rgba(255, 255, 255, 0.1) !important;
+            -webkit-backdrop-filter: blur(20px) saturate(180%) !important;
+            backdrop-filter: blur(20px) saturate(180%) !important;
+            border: 1px solid rgba(255, 255, 255, 0.2) !important;
+            border-radius: 20px !important;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1) !important;
             padding: 40px 30px;
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            transition: all 0.3s ease;
             width: 300px;
             text-align: center;
+            position: relative;
+            overflow: hidden;
         }
 
         .practice-option-card:hover {
             transform: translateY(-10px);
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+            background: rgba(255, 255, 255, 0.15) !important;
+            -webkit-backdrop-filter: blur(25px) saturate(200%) !important;
+            backdrop-filter: blur(25px) saturate(200%) !important;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2) !important;
+            border: 1px solid rgba(255, 255, 255, 0.3) !important;
         }
 
         .practice-icon {
@@ -606,10 +704,13 @@
         }
 
         .selector-container {
-            background: white;
-            border-radius: 15px;
+            background: var(--glass-bg);
+            -webkit-backdrop-filter: saturate(160%) blur(var(--glass-blur));
+            backdrop-filter: saturate(160%) blur(var(--glass-blur));
+            border: 1px solid var(--glass-border);
+            border-radius: var(--glass-radius);
+            box-shadow: var(--glass-shadow);
             padding: 30px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
         }
 
         .selector-label {
@@ -627,7 +728,7 @@
             border: 2px solid #e0e0e0;
             border-radius: 25px;
             font-size: 16px;
-            background: white;
+            background: transparent;
             cursor: pointer;
             transition: all 0.3s ease;
         }
@@ -649,10 +750,13 @@
         }
 
         .scenario-detail-content {
-            background: white;
-            border-radius: 20px;
+            background: var(--glass-bg);
+            -webkit-backdrop-filter: saturate(160%) blur(var(--glass-blur));
+            backdrop-filter: saturate(160%) blur(var(--glass-blur));
+            border: 1px solid var(--glass-border);
+            border-radius: var(--glass-radius);
+            box-shadow: var(--glass-shadow);
             padding: 40px;
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
             display: flex;
             gap: 30px;
             align-items: center;
@@ -828,11 +932,13 @@
             }
 
             .main-content {
-                margin-left: 60px;
+                margin-left: 0; /* 移动设备也让背景从左边开始 */
+                margin-top: 120px; /* 与历史成绩页面对齐 */
+                padding-left: 80px; /* 内容从侧边栏右边开始 */
             }
 
             .sidebar:hover ~ .main-content {
-                margin-left: 160px;
+                padding-left: 160px; /* 侧边栏展开时，内容向右移动 */
             }
 
             .virtual-human-grid {
@@ -912,6 +1018,9 @@
     <script type="module" src="src/services/learningTimeService.js"></script>
 </head>
 <body>
+    <!-- 全局背景 -->
+    <div class="global-bg" aria-hidden="true"></div>
+    
     <!-- 側邊欄 -->
             <div class="sidebar">
         <!-- 頂部：Logo -->
@@ -985,9 +1094,9 @@
             <!-- 主要內容區域 -->
             <div class="main-content">
                 <!-- 練習專區首頁內容 -->
-                <div class="practice-homepage" id="practiceHomepage">
-            <h1>練習專區</h1>
-                    <p>選擇您要進行的練習類型</p>
+                <div class="practice-homepage content-container" id="practiceHomepage">
+                    <h1>練習專區</h1>
+                    <p>這裡提供360°實境教學影片與虛擬人互動學習。</p>
                     
                     <!-- 練習選項按鈕 -->
                     <div class="practice-options">
@@ -1016,7 +1125,7 @@
                                         </div>
 
                 <!-- 360實境教學影片內容 -->
-                <div class="vr-video-content" id="vrVideoContent" style="display: none;">
+                <div class="vr-video-content content-container" id="vrVideoContent" style="display: none;">
                     <div class="content-header">
                         <h2><i class="fas fa-play-circle"></i> 360實境教學影片</h2>
                         <p>沉浸式VR學習體驗，讓您身臨其境地學習急救技能</p>
@@ -1047,7 +1156,7 @@
                 </div>
 
                 <!-- 虛擬人模擬內容 -->
-                <div class="virtual-human-content" id="virtualHumanContent" style="display: none;">
+                <div class="virtual-human-content content-container" id="virtualHumanContent" style="display: none;">
                     <div class="content-header">
                         <h2><i class="fas fa-comment-dots"></i> 虛擬人模擬</h2>
                             <p>與AI驅動的虛擬患者進行對話練習，提升溝通技巧</p>
