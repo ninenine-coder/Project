@@ -15,25 +15,33 @@
             box-sizing: border-box;
         }
 
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* 讓 backdrop-filter 看到的背景永遠在最底層這一層 */
+        .global-bg {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            background: url("./assets/背景.png") center calc(50% + 58px) / cover no-repeat;
+            /* 如果想跟你之前一樣高度微移，用上面這行；想更淡可以疊白漸層： */
+            /* background:
+                linear-gradient(to bottom, rgba(255,255,255,.85), rgba(255,255,255,.9)),
+                url("./assets/背景.png") center calc(50% + 58px) / cover no-repeat; */
+            pointer-events: none;
+        }
+
+        /* 讓內容都在背景之上 */
         body {
             font-family: 'Microsoft JhengHei', sans-serif;
-            background: transparent;
+            background: transparent;           /* ← 改透明，避免"模糊到白色空氣" */
             min-height: 100vh;
             color: #333;
             position: relative;
-        }
-
-        /* 全局背景 */
-        .global-bg {
-            position: fixed;
-            inset: 0; /* top, right, bottom, left 全为 0 */
-            z-index: -1; /* 最底层 */
-            pointer-events: none; /* 不阻挡点击 */
-            background-image: url("./assets/背景.png");
-            background-position: center calc(50% + 58px); /* 往下移2.3公分 */
-            background-repeat: no-repeat;
-            background-size: contain; /* 改为contain确保完整显示 */
-            opacity: 0.9; /* 可依需求调整淡化程度 */
+            overflow-x: hidden;
         }
 
         /* 主要内容区域 */
@@ -45,15 +53,24 @@
             margin-left: 0; /* 确保左边不被遮挡 */
         }
 
+        /* 最上層內容 z-index 拉高一點，確保在 .global-bg 之上 */
+        #root, .main-content, .header, .marquee, .sidebar {
+            position: relative;
+            z-index: 1;
+        }
+
+        /* 練習首頁容器不要再有背景色，以免被當成 backdrop 的"背景" */
+        .practice-homepage,
+        .practice-options {
+            background: transparent;
+        }
+
         /* 内容容器，确保内容在背景之上 */
         .content-container {
             position: relative;
             z-index: 1;
         }
 
-        @media print {
-            .global-bg { display: none; }
-        }
 
         /* 顶部间距变量 */
         :root {
@@ -98,6 +115,67 @@
         /* 减少动效需求者降低透明特效 */
         @media (prefers-reduced-motion: reduce) {
             .glass-card { backdrop-filter: none; -webkit-backdrop-filter: none; }
+        }
+
+        /* === 水流波紋效果 === */
+        .liquid-glass {
+            position: relative;
+            border-radius: 28px;
+            overflow: hidden;
+            background: transparent;
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            box-shadow:
+                inset 0 0 18px rgba(255,255,255,0.25),
+                0 8px 25px rgba(0,0,0,0.25);
+            transition: transform .35s ease, box-shadow .35s ease;
+            perspective: 1000px;
+            width: 300px; /* 确保左右宽度一致，与考试专区一致 */
+        }
+
+        /* 折射光層 + 水紋 */
+        .liquid-glass::before {
+            content: "";
+            position: absolute;
+            inset: -20%;
+            background:
+                radial-gradient(circle at var(--x, 50%) var(--y, 50%), rgba(255,255,255,0.6) 0%, rgba(255,255,255,0.15) 50%, transparent 80%),
+                url("https://i.imgur.com/XHrj4RK.png"); /* 半透明水紋圖案 */
+            background-size: 200% 200%;
+            background-blend-mode: overlay;
+            opacity: var(--opacity, 0.8);
+            filter: blur(15px) saturate(130%);
+            transition: opacity 0.3s ease;
+            pointer-events: none;
+            animation: waterIdle 10s ease-in-out infinite alternate;
+        }
+
+        @keyframes waterIdle {
+            0%   { background-position: 0% 0%; }
+            50%  { background-position: 50% 100%; }
+            100% { background-position: 0% 0%; }
+        }
+
+        /* 滑鼠移入時加速波紋流動 */
+        .liquid-glass:hover::before {
+            animation: waterFlow 3s ease-in-out infinite;
+            filter: blur(10px) brightness(1.1);
+        }
+
+        @keyframes waterFlow {
+            0%   { background-position: 0% 0%; }
+            25%  { background-position: 100% 50%; }
+            50%  { background-position: 50% 100%; }
+            75%  { background-position: 0% 50%; }
+            100% { background-position: 0% 0%; }
+        }
+
+        .liquid-content {
+            position: relative;
+            z-index: 2;
+            padding: 2rem;
+            text-align: center;
+            background: rgba(255,255,255,0.03);
+            border-radius: inherit;
         }
 
         /* 頂部標題欄 */
@@ -617,6 +695,9 @@
             align-items: center;
             justify-content: center;
             margin: 0 auto 20px auto;
+            box-shadow: 0 10px 24px rgba(99,102,241,0.35);
+            position: relative;
+            z-index: 1;
         }
 
         .practice-icon i {
@@ -644,10 +725,12 @@
             padding: 12px 30px;
             border-radius: 25px;
             font-size: 16px;
-            font-weight: 500;
+            font-weight: 600;
             cursor: pointer;
             transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+            box-shadow: 0 8px 22px rgba(99,102,241,0.35);
+            position: relative;
+            z-index: 1;
         }
 
         .practice-btn:hover {
@@ -966,8 +1049,8 @@
                 align-items: center;
             }
 
-            .practice-option-card {
-                width: 280px;
+            .liquid-glass {
+                width: 280px; /* 移动端稍小一点，与考试专区一致 */
             }
 
             .scenario-detail-content {
@@ -1018,7 +1101,7 @@
     <script type="module" src="src/services/learningTimeService.js"></script>
 </head>
 <body>
-    <!-- 全局背景 -->
+    <!-- 固定底圖，讓 backdrop-filter 一定有東西可以"透視＋模糊" -->
     <div class="global-bg" aria-hidden="true"></div>
     
     <!-- 側邊欄 -->
@@ -1100,28 +1183,32 @@
                     
                     <!-- 練習選項按鈕 -->
                     <div class="practice-options">
-                        <div class="practice-option-card">
-                            <div class="practice-icon">
-                                <i class="fas fa-play-circle"></i>
+                        <div class="liquid-glass" id="liquid-glass-1">
+                            <div class="liquid-content">
+                                <div class="practice-icon" style="margin: 0 auto 20px auto;">
+                                    <i class="fas fa-play-circle"></i>
+                                </div>
+                                <h3 style="font-size: 24px; font-weight: 800; color: #1e293b; margin: 14px 0 8px;">360實境教學影片</h3>
+                                <p style="color: #64748b; line-height: 1.6; margin-bottom: 20px;">沉浸式VR學習體驗，讓您身臨其境地學習急救技能</p>
+                                <button class="practice-btn" onclick="enterPractice('vr-video')">
+                                    進入360實境教學
+                                </button>
                             </div>
-                            <h3>360實境教學影片</h3>
-                            <p>沉浸式VR學習體驗，讓您身臨其境地學習急救技能</p>
-                            <button class="practice-btn" onclick="enterPractice('vr-video')">
-                                進入360實境教學
-                            </button>
                         </div>
 
-                        <div class="practice-option-card">
-                            <div class="practice-icon">
-                                <i class="fas fa-comment-dots"></i>
-                                    </div>
-                            <h3>虛擬人模擬</h3>
-                            <p>與AI驅動的虛擬患者進行對話練習，提升溝通技巧</p>
-                            <button class="practice-btn" onclick="enterPractice('virtual-human')">
-                                進入虛擬人模擬
-                            </button>
-                                    </div>
+                        <div class="liquid-glass" id="liquid-glass-2">
+                            <div class="liquid-content">
+                                <div class="practice-icon" style="margin: 0 auto 20px auto;">
+                                    <i class="fas fa-comment-dots"></i>
                                 </div>
+                                <h3 style="font-size: 24px; font-weight: 800; color: #1e293b; margin: 14px 0 8px;">虛擬人模擬</h3>
+                                <p style="color: #64748b; line-height: 1.6; margin-bottom: 20px;">與AI驅動的虛擬患者進行對話練習，提升溝通技巧</p>
+                                <button class="practice-btn" onclick="enterPractice('virtual-human')">
+                                    進入虛擬人模擬
+                                </button>
+                            </div>
+                        </div>
+                    </div>
                                         </div>
 
                 <!-- 360實境教學影片內容 -->
@@ -1274,6 +1361,34 @@
         // 語言切換功能已移至 language-switcher.js
 
         // YouTube 360度影片已直接嵌入，無需額外播放函數
+
+        // 水流波紋效果交互
+        function initLiquidGlassEffect() {
+            const cards = document.querySelectorAll('.liquid-glass');
+            
+            cards.forEach(card => {
+                const handleMove = (e) => {
+                    const rect = card.getBoundingClientRect();
+                    const x = ((e.clientX - rect.left) / rect.width) * 100;
+                    const y = ((e.clientY - rect.top) / rect.height) * 100;
+                    card.style.setProperty('--x', `${x}%`);
+                    card.style.setProperty('--y', `${y}%`);
+                    card.style.setProperty('--opacity', '1');
+                };
+
+                const handleLeave = () => {
+                    card.style.setProperty('--opacity', '0.8');
+                };
+
+                card.addEventListener('mousemove', handleMove);
+                card.addEventListener('mouseleave', handleLeave);
+            });
+        }
+
+        // 页面加载完成后初始化液态玻璃效果
+        document.addEventListener('DOMContentLoaded', function() {
+            initLiquidGlassEffect();
+        });
 
         // 進入練習內容
         function enterPractice(practiceType) {

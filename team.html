@@ -364,44 +364,146 @@
             flex-wrap: nowrap;
         }
 
-        .team-member-card {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            text-align: center;
-            background: rgba(255, 255, 255, 0.1) !important;
-            -webkit-backdrop-filter: blur(20px) saturate(180%) !important;
-            backdrop-filter: blur(20px) saturate(180%) !important;
-            border: 1px solid rgba(255, 255, 255, 0.2) !important;
-            border-radius: 20px !important;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1) !important;
-            padding: 15px;
-            transition: all 0.3s ease;
-            width: 180px;
+        /* === 液態玻璃卡片（團隊成員用） === */
+        .team-member-card.liquid-glass {
             position: relative;
+            border-radius: 24px;
             overflow: hidden;
+            background: transparent;
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            box-shadow:
+                inset 0 0 18px rgba(255, 255, 255, 0.25),
+                0 8px 25px rgba(0, 0, 0, 0.25);
+            transition: transform .35s ease, box-shadow .35s ease;
+            perspective: 1000px;
+            width: 180px;
             flex-shrink: 0;
         }
 
-        .team-member-card:hover {
-            transform: translateY(-5px);
-            background: rgba(255, 255, 255, 0.15) !important;
-            -webkit-backdrop-filter: blur(25px) saturate(200%) !important;
-            backdrop-filter: blur(25px) saturate(200%) !important;
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2) !important;
-            border: 1px solid rgba(255, 255, 255, 0.3) !important;
+        /* ✨ 折射光與水紋層 */
+        .team-member-card.liquid-glass::before {
+            content: "";
+            position: absolute;
+            inset: -20%;
+            background:
+                radial-gradient(circle at var(--x, 50%) var(--y, 50%),
+                    rgba(255, 255, 255, 0.60) 0%,
+                    rgba(255, 255, 255, 0.18) 50%,
+                    transparent 80%),
+                url("https://i.imgur.com/XHrj4RK.png");
+            background-size: 200% 200%;
+            background-blend-mode: overlay;
+            filter: blur(14px) saturate(130%);
+            opacity: var(--opacity, 0.85);
+            transition: opacity .25s ease;
+            pointer-events: none;
+            animation: waterIdle 10s ease-in-out infinite alternate;
         }
 
-        .member-photo {
-            width: 100px;
-            height: 100px;
+        /* 🌊 背層液體厚度與彩光 */
+        .team-member-card.liquid-glass::after {
+            content: "";
+            position: absolute;
+            inset: -50%;
+            background:
+                radial-gradient(circle at 30% 25%, rgba(255, 255, 255, 0.18), transparent 70%),
+                radial-gradient(circle at 70% 80%, rgba(255, 255, 255, 0.12), transparent 70%),
+                conic-gradient(from 0deg,
+                    rgba(255, 255, 255, 0.18),
+                    rgba(255, 192, 203, 0.12),
+                    rgba(173, 216, 230, 0.12),
+                    rgba(255, 255, 255, 0.18));
+            filter: blur(38px);
+            mix-blend-mode: screen;
+            opacity: 0.58;
+            animation: liquidFlow 14s ease-in-out infinite alternate;
+            pointer-events: none;
+        }
+
+        /* 滑鼠互動 */
+        .team-member-card.liquid-glass:hover {
+            transform: translateY(-6px) scale(1.02);
+            box-shadow:
+                inset 0 0 20px rgba(255, 255, 255, 0.35),
+                0 15px 40px rgba(0, 0, 0, 0.25);
+        }
+
+        /* 內容層 */
+        .liquid-content {
+            position: relative;
+            z-index: 2;
+            padding: 26px 22px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: inherit;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* === 頭像玻璃圈（內凹亮邊＋柔光） === */
+        .avatar-glass {
+            width: 120px;
+            height: 120px;
+            margin: 0 auto 16px;
             border-radius: 50%;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            position: relative;
+            overflow: hidden;
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.28), rgba(255, 255, 255, 0.08));
+            border: 1px solid rgba(255, 255, 255, 0.45);
+            box-shadow:
+                inset 0 8px 18px rgba(255, 255, 255, 0.45),
+                inset 0 -8px 18px rgba(0, 0, 0, 0.08),
+                0 10px 24px rgba(0, 0, 0, 0.12);
+        }
+
+        .avatar-glass img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 50%;
+            transform: scale(1.02);
+            filter: saturate(108%);
+        }
+
+        /* 頭像上方高光 */
+        .avatar-glass::before {
+            content: "";
+            position: absolute;
+            inset: -20% -20% 60% -20%;
+            background: radial-gradient(120px 80px at 50% 20%, rgba(255, 255, 255, 0.55), transparent 60%);
+            mix-blend-mode: screen;
+            filter: blur(10px);
+            pointer-events: none;
+        }
+
+        /* 底部反射 */
+        .avatar-glass::after {
+            content: "";
+            position: absolute;
+            inset: 60% -20% -20% -20%;
+            background: radial-gradient(120px 80px at 50% 80%, rgba(255, 255, 255, 0.20), transparent 70%);
+            mix-blend-mode: screen;
+            filter: blur(12px);
+            pointer-events: none;
+        }
+
+        /* 兼容旧的member-photo样式（用于占位符） */
+        .member-photo {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.28), rgba(255, 255, 255, 0.08));
+            border: 1px solid rgba(255, 255, 255, 0.45);
+            box-shadow:
+                inset 0 8px 18px rgba(255, 255, 255, 0.45),
+                inset 0 -8px 18px rgba(0, 0, 0, 0.08),
+                0 10px 24px rgba(0, 0, 0, 0.12);
             display: flex;
             align-items: center;
             justify-content: center;
-            margin-bottom: 12px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            margin: 0 auto 16px;
+            position: relative;
         }
 
         .photo-placeholder {
@@ -420,17 +522,38 @@
             text-align: center;
         }
 
+        /* 名稱 / 職稱 */
         .member-name {
-            font-size: 18px;
-            font-weight: bold;
-            color: #2c3e50;
-            margin-bottom: 5px;
+            font-size: 22px;
+            color: #1f2937;
+            font-weight: 800;
+            margin: 6px 0 6px;
         }
 
         .member-role {
             font-size: 14px;
-            color: #7f8c8d;
+            color: #64748b;
             margin: 0;
+        }
+
+        /* === 動畫定義 === */
+        @keyframes waterIdle {
+            0% { background-position: 0% 0%; }
+            50% { background-position: 50% 100%; }
+            100% { background-position: 0% 0%; }
+        }
+
+        @keyframes liquidFlow {
+            0% { transform: translate(0%, 0%) scale(1); }
+            50% { transform: translate(-3%, 1.5%) scale(1.05); }
+            100% { transform: translate(0%, 0%) scale(1); }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .liquid-glass::before,
+            .liquid-glass::after {
+                animation: none;
+            }
         }
 
         /* 周哲旭照片特殊樣式 */
@@ -476,26 +599,33 @@
                 padding: 0 10px;
             }
 
-            .team-member-card {
+            .team-member-card.liquid-glass {
                 width: 140px;
                 flex-shrink: 0;
             }
 
+            .avatar-glass {
+                width: 90px;
+                height: 90px;
+            }
+
             .member-photo {
-                width: 80px;
-                height: 80px;
+                width: 90px;
+                height: 90px;
             }
 
             .photo-placeholder {
-                width: 60px;
-                height: 60px;
-                font-size: 24px;
+                width: 70px;
+                height: 70px;
+                font-size: 28px;
             }
 
-            .member-image {
-                width: 100px;
-                height: 100px;
-                transform: translateY(-5px);
+            .member-name {
+                font-size: 18px;
+            }
+
+            .member-role {
+                font-size: 12px;
             }
         }
     </style>
@@ -590,59 +720,59 @@
             
             <!-- 團隊成員卡片 -->
             <div class="team-members-grid">
-                <div class="team-member-card">
-                    <div class="member-photo zhe-xu-photo">
-                        <img src="assets/周哲旭.png" alt="周哲旭" class="member-image">
-                    </div>
-                    <div class="member-info">
+                <div class="team-member-card liquid-glass">
+                    <div class="liquid-content">
+                        <div class="avatar-glass">
+                            <img src="assets/周哲旭.png" alt="周哲旭">
+                        </div>
                         <h3 class="member-name">周哲旭</h3>
                         <p class="member-role">職位</p>
                     </div>
-            </div>
+                </div>
             
-                <div class="team-member-card">
-                    <div class="member-photo">
-                        <div class="photo-placeholder">
-                            <i class="fas fa-user"></i>
+                <div class="team-member-card liquid-glass">
+                    <div class="liquid-content">
+                        <div class="member-photo">
+                            <div class="photo-placeholder">
+                                <i class="fas fa-user"></i>
+                            </div>
                         </div>
-                    </div>
-                    <div class="member-info">
                         <h3 class="member-name">潘蓁樺</h3>
                         <p class="member-role">職位</p>
                     </div>
-                    </div>
+                </div>
                 
-                <div class="team-member-card">
-                    <div class="member-photo">
-                        <div class="photo-placeholder">
-                            <i class="fas fa-user"></i>
+                <div class="team-member-card liquid-glass">
+                    <div class="liquid-content">
+                        <div class="member-photo">
+                            <div class="photo-placeholder">
+                                <i class="fas fa-user"></i>
+                            </div>
                         </div>
-                    </div>
-                    <div class="member-info">
                         <h3 class="member-name">邱子芸</h3>
                         <p class="member-role">職位</p>
                     </div>
                 </div>
 
-                <div class="team-member-card">
-                    <div class="member-photo">
-                        <div class="photo-placeholder">
-                            <i class="fas fa-user"></i>
+                <div class="team-member-card liquid-glass">
+                    <div class="liquid-content">
+                        <div class="member-photo">
+                            <div class="photo-placeholder">
+                                <i class="fas fa-user"></i>
+                            </div>
                         </div>
-                    </div>
-                    <div class="member-info">
                         <h3 class="member-name">謝昕璦</h3>
                         <p class="member-role">職位</p>
                     </div>
-                    </div>
+                </div>
                 
-                <div class="team-member-card">
-                    <div class="member-photo">
-                        <div class="photo-placeholder">
-                            <i class="fas fa-user"></i>
+                <div class="team-member-card liquid-glass">
+                    <div class="liquid-content">
+                        <div class="member-photo">
+                            <div class="photo-placeholder">
+                                <i class="fas fa-user"></i>
+                            </div>
                         </div>
-                    </div>
-                    <div class="member-info">
                         <h3 class="member-name">林立凡</h3>
                         <p class="member-role">職位</p>
                     </div>
@@ -652,8 +782,30 @@
     </div>
 
     <script>
+        // 液态玻璃交互效果
+        function initLiquidGlassEffect() {
+            const cards = document.querySelectorAll('.liquid-glass');
+            cards.forEach(card => {
+                const move = (e) => {
+                    const r = card.getBoundingClientRect();
+                    const x = ((e.clientX - r.left) / r.width) * 100;
+                    const y = ((e.clientY - r.top) / r.height) * 100;
+                    card.style.setProperty('--x', `${x}%`);
+                    card.style.setProperty('--y', `${y}%`);
+                    card.style.setProperty('--opacity', '1');
+                };
+                const leave = () => card.style.setProperty('--opacity', '.85');
+                card.addEventListener('mousemove', move);
+                card.addEventListener('mouseenter', move);
+                card.addEventListener('mouseleave', leave);
+            });
+        }
+
         // 頁面載入時更新用戶資訊顯示
         document.addEventListener('DOMContentLoaded', function() {
+            // 初始化液态玻璃效果
+            initLiquidGlassEffect();
+            
             setTimeout(() => {
                 updateUserInfoDisplay();
             }, 1000);
