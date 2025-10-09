@@ -5,32 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>團隊 - PBLS VR教學平台</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <!-- Glass System CSS -->
+    <link rel="stylesheet" href="assets/css/glass-system.css">
     <!-- i18next -->
     <script src="https://unpkg.com/i18next@23.7.6/i18next.min.js"></script>
     <script src="https://unpkg.com/i18next-browser-languagedetector@7.2.0/i18nextBrowserLanguageDetector.min.js"></script>
     
-    <!-- CSS 特性檢測腳本 -->
-    <script>
-    (function () {
-        const root = document.documentElement;
-
-        // 1) 測試 backdrop-filter
-        const supportBackdrop =
-            CSS.supports('backdrop-filter', 'blur(1px)') ||
-            CSS.supports('-webkit-backdrop-filter', 'blur(1px)');
-
-        root.classList.toggle('support-backdrop', supportBackdrop);
-        root.classList.toggle('no-backdrop', !supportBackdrop);
-
-        // 2) 測試 mask（瓶蓋齒圈用到）
-        const supportMask =
-            CSS.supports('mask', 'radial-gradient(black, transparent)') ||
-            CSS.supports('-webkit-mask', 'radial-gradient(black, transparent)');
-
-        root.classList.toggle('support-mask', supportMask);
-        root.classList.toggle('no-mask', !supportMask);
-    })();
-    </script>
+    <!-- Glass System Feature Detection -->
+    <script src="src/js/feature-detect.js"></script>
     <style>
         * {
             margin: 0;
@@ -316,58 +298,7 @@
             animation-play-state: paused;
         }
 
-        /* ===== GitHub Pages 液態玻璃修復方案 ===== */
-        
-        /* ✨ 修復 GitHub Pages 下 backdrop-filter 無法渲染的問題 */
-        .glass-card, .marquee.glass-pill, .card, .glass, .liquid-glass {
-            background: rgba(255, 255, 255, 0.08);
-            backdrop-filter: blur(22px) saturate(200%);
-            -webkit-backdrop-filter: blur(22px) saturate(200%);
-            border-radius: 16px;
-            border: 1px solid rgba(255, 255, 255, 0.25);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.18);
-
-            /* 👇 這 3 行是關鍵 */
-            transform: translateZ(0);
-            will-change: backdrop-filter;
-            isolation: isolate;
-        }
-
-        /* 有支援 backdrop-filter 時確保模糊效果正常 */
-        .support-backdrop .glass,
-        .support-backdrop .glass-card,
-        .support-backdrop .marquee.glass-pill,
-        .support-backdrop .liquid-glass {
-            /* 基礎樣式已包含模糊效果，這裡確保優先級 */
-            backdrop-filter: blur(22px) saturate(200%) !important;
-            -webkit-backdrop-filter: blur(22px) saturate(200%) !important;
-        }
-
-        /* 沒支援 backdrop-filter 時的回退方案 */
-        .no-backdrop .glass,
-        .no-backdrop .glass-card,
-        .no-backdrop .marquee.glass-pill,
-        .no-backdrop .liquid-glass {
-            background: rgba(255,255,255,0.30) !important;
-            backdrop-filter: none !important;
-            -webkit-backdrop-filter: none !important;
-            /* 移除關鍵屬性，避免不必要的 GPU 層 */
-            transform: none !important;
-            will-change: auto !important;
-        }
-
-        /* 跑馬燈容器優化 */
-        .marquee.glass-pill {
-            position: fixed;
-            top: 88px;
-            left: 16px;
-            right: 16px;
-            height: 58px;
-            display: flex;
-            align-items: center;
-            padding: 0 18px;
-            z-index: 1000;
-        }
+        /* ===== 團隊頁面專用樣式 ===== */
 
         /* 側邊欄樣式 */
         .sidebar {
@@ -1096,28 +1027,14 @@
         </div>
     </div>
 
-    <!-- 液態玻璃膠囊跑馬燈 -->
-    <div class="marquee glass-pill" role="marquee" aria-label="最新公告">
-        <div class="marquee-track">
-            <div class="marquee-item">
-                <i class="fas fa-bullhorn"></i>
-                歡迎使用PBLS VR教學平台！
-            </div>
-            <div class="marquee-item">
-                <i class="fas fa-vr-cardboard"></i>
-                360°實境教學影片，身臨其境的學習體驗
-            </div>
-            <div class="marquee-item">
-                <i class="fas fa-comments"></i>
-                虛擬人互動，提升急救溝通技巧
-            </div>
-            <div class="marquee-item">
-                <i class="fas fa-chart-line"></i>
-                即時成績追蹤，掌握學習進度
-            </div>
+    <!-- Glass System 跑馬燈 -->
+    <div class="marquee glass glass-pill glass--lighter" role="marquee" aria-label="最新公告">
+        <div class="marquee-content">
+            <div class="marquee-item">🎯 歡迎使用PBLS VR教學平台！</div>
+            <div class="marquee-item">📚 360°實境教學影片，身臨其境</div>
+            <div class="marquee-item">🤖 虛擬人互動，提升溝通技巧</div>
+            <div class="marquee-item">🎮 VR實際操作，模擬真實急救情境</div>
         </div>
-        <!-- 可選：左側藍色高光 -->
-        <span class="pill-highlight" aria-hidden="true"></span>
     </div>
 
     <!-- 主要內容區域 -->
