@@ -163,9 +163,9 @@ Project/
 
 ## 聯絡資訊
 
-- 專案負責人：[您的姓名]
-- 電子郵件：[您的電子郵件]
-- 專案網址：[您的專案網址]
+- 專案負責人：周哲旭
+- 電子郵件：zhexuz558@gmail.com
+- 專案網址：https://ninenine-coder.github.io/Project/
 
 ---
 
