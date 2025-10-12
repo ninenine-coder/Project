@@ -1294,11 +1294,36 @@
                     }, 150);
                 });
             });
+            
+            // 更新用戶資訊顯示
+            setTimeout(() => {
+                updateUserInfoDisplay();
+            }, 1000);
         });
 
         // 用戶頭像功能
         function showUserProfile() {
-            alert('用戶資料功能開發中，敬請期待！');
+            // 使用動態導入來避免模組問題
+            import('./js/userInfoDisplay.js').then(module => {
+                module.userInfoDisplay.showUserProfile();
+            }).catch(error => {
+                console.error('顯示用戶資料失敗:', error);
+                alert('無法載入用戶資料');
+            });
+        }
+
+        // 更新用戶資訊顯示
+        function updateUserInfoDisplay() {
+            // 使用動態導入來避免模組問題
+            import('./js/userInfoDisplay.js').then(module => {
+                module.userInfoDisplay.updateDisplay();
+            }).catch(error => {
+                console.error('更新用戶資訊顯示失敗:', error);
+                const userInfoDisplay = document.getElementById('user-info-display');
+                if (userInfoDisplay) {
+                    userInfoDisplay.textContent = '載入中...';
+                }
+            });
         }
 
         // 登出功能

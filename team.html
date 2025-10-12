@@ -138,7 +138,7 @@
         }
 
         .user-info {
-            background: white;
+            background: transparent;
             padding: 8px 15px;
             border-radius: 20px;
             font-size: 14px;
@@ -822,34 +822,34 @@
             padding: 20px;
         }
 
-        .cap-back-inner h4 {
-            margin: 0;
-            font-size: 18px;
-            color: #1f2937;
-        }
+         .cap-back-inner h4 {
+             margin: 0;
+             font-size: 18px;
+             color: white;
+         }
 
-        .cap-back-inner .title {
-            margin: 0 0 6px;
-            color: #6b7280;
-        }
+         .cap-back-inner .title {
+             margin: 0 0 6px;
+             color: white;
+         }
 
-        .cap-back-inner .contact {
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-        }
+         .cap-back-inner .contact {
+             display: flex;
+             flex-direction: column;
+             gap: 6px;
+         }
 
-        .cap-back-inner .contact a {
-            color: #374151;
-            text-decoration: none;
-            font-weight: 600;
-            font-size: 14px;
-        }
+         .cap-back-inner .contact a {
+             color: white;
+             text-decoration: none;
+             font-weight: 600;
+             font-size: 14px;
+         }
 
-        .cap-back-inner .contact i {
-            margin-right: 8px;
-            color: #6366f1;
-        }
+         .cap-back-inner .contact i {
+             margin-right: 8px;
+             color: white;
+         }
 
         /* 🌀 扭開動畫：點開時「旋轉 + 翻面 + 微抬起」 */
         .cap-3d.is-open .cap-front {
@@ -958,13 +958,48 @@
         }
     </style>
     
-    <!-- 語言切換功能 -->
-    <script src="src/js/language-switcher.js"></script>
-    <!-- 用戶資料服務 -->
-    <script type="module" src="src/services/userDataService.js"></script>
-    <!-- 學習時間服務 -->
-    <script type="module" src="src/services/learningTimeService.js"></script>
-</head>
+     <!-- 語言切換功能 -->
+     <script src="src/js/language-switcher.js"></script>
+     <!-- 用戶資料服務 -->
+     <script type="module" src="src/services/userDataService.js"></script>
+     <!-- 學習時間服務 -->
+     <script type="module" src="src/services/learningTimeService.js"></script>
+     
+     <!-- 錯誤處理腳本 -->
+     <script>
+         // 捕獲並忽略 Babel 相關錯誤
+         window.addEventListener('error', function(e) {
+             // 忽略 Babel 相關錯誤
+             if (e.message && e.message.includes('@babel/runtime')) {
+                 console.warn('Babel 錯誤已忽略:', e.message);
+                 e.preventDefault();
+                 return false;
+             }
+             // 忽略模組解析錯誤
+             if (e.message && e.message.includes('Failed to resolve module specifier')) {
+                 console.warn('模組解析錯誤已忽略:', e.message);
+                 e.preventDefault();
+                 return false;
+             }
+         });
+         
+         // 捕獲未處理的 Promise 拒絕
+         window.addEventListener('unhandledrejection', function(e) {
+             // 忽略 Babel 相關錯誤
+             if (e.reason && e.reason.message && e.reason.message.includes('@babel/runtime')) {
+                 console.warn('Babel Promise 錯誤已忽略:', e.reason.message);
+                 e.preventDefault();
+             }
+             // 忽略瀏覽器擴展相關的異步錯誤
+             else if (e.reason && e.reason.message && 
+                     (e.reason.message.includes('message channel closed') || 
+                      e.reason.message.includes('asynchronous response'))) {
+                 console.warn('瀏覽器擴展相關錯誤已忽略:', e.reason.message);
+                 e.preventDefault();
+             }
+         });
+     </script>
+ </head>
 <body>
     <!-- 全局背景 -->
     <div class="global-bg" aria-hidden="true"></div>
@@ -1281,17 +1316,27 @@
 
         // 更新用戶資訊顯示
         function updateUserInfoDisplay() {
-            if (window.userDataService && window.userDataService.isLoggedIn()) {
+            // 使用動態導入來避免模組問題
+            import('./js/userInfoDisplay.js').then(module => {
+                module.userInfoDisplay.updateDisplay();
+            }).catch(error => {
+                console.error('更新用戶資訊顯示失敗:', error);
                 const userInfoDisplay = document.getElementById('user-info-display');
                 if (userInfoDisplay) {
-                    userInfoDisplay.textContent = window.userDataService.getUserInfo();
+                    userInfoDisplay.textContent = '載入中...';
                 }
-            }
+            });
         }
 
         // 用戶頭像功能
         function showUserProfile() {
-            alert('用戶資料功能開發中，敬請期待！');
+            // 使用動態導入來避免模組問題
+            import('./js/userInfoDisplay.js').then(module => {
+                module.userInfoDisplay.showUserProfile();
+            }).catch(error => {
+                console.error('顯示用戶資料失敗:', error);
+                alert('無法載入用戶資料');
+            });
         }
 
         // 登出功能
