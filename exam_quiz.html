@@ -3148,8 +3148,8 @@
     
     <!-- 完整解决方案：自动匿名登入 + 成绩保存 -->
     <script type="module">
-      import { auth, db } from './js/firebase.js';
-      import { ensureSignedIn, getUserKey } from './js/auth-helpers.js';
+      import { auth, db, authReady } from './js/firebase.js';
+      import { waitAuthReady } from './js/authService.js';
       import {
         collection, addDoc, serverTimestamp
       } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore.js";
@@ -3172,7 +3172,12 @@
       // === 交卷時呼叫這個 ===
       async function handleExamFinish(finalScore, timeSpentMs, startedAtMs, correctCount, questionCount) {
         try {
-          const user = await ensureSignedIn(); // ← 确保已登录（自动还原或匿名登录）
+          const user = await waitAuthReady(); // ← 等待認證完成
+          if (!user) {
+            console.error('❌ 用戶未登入，無法保存成績');
+            alert('請先登入以保存成績');
+            return;
+          }
           const userName = resolveUserName();
 
           const payload = {
@@ -3329,13 +3334,11 @@
                 const { db, auth } = window.__FB__;
                 
                 // 确保用户已登录
-                if (!auth.currentUser) {
-                  console.log("🔐 用户未登录，尝试匿名登录...");
-                  const { signInAnonymously } = await import("https://www.gstatic.com/firebasejs/10.13.1/firebase-auth.js");
-                  await signInAnonymously(auth);
+                const user = await waitAuthReady();
+                if (!user) {
+                  console.error("❌ 用戶未登入，無法同步本地成績");
+                  return;
                 }
-                
-                const user = auth.currentUser;
                 const userName = window.currentUserName || "未命名使用者";
                 
                 console.log("👤 使用者：", userName, "｜分數：", finalScore);

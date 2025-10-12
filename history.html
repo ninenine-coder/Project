@@ -1137,80 +1137,29 @@
                 const historyList = document.getElementById('historyList');
                 historyList.innerHTML = '<div class="loading-message"><i class="fas fa-spinner fa-spin"></i> 載入成績中...</div>';
                 
-                // 載入 Firebase 模組
-                const { auth, db } = await import('./js/firebase.js');
-                const { 
-                    collection, 
-                    query, 
-                    where, 
-                    limit, 
-                    getDocs 
-                } = await import('https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore.js');
+                // 使用統一的歷史資料服務
+                const { loadMyScores } = await import('./js/history-data.js');
+                historyScores = await loadMyScores(50);
                 
-                // 確保用戶已登入
-                if (!auth.currentUser) {
-                    console.log('用戶未登入，載入本地成績');
+                console.log(`✅ 載入了 ${historyScores.length} 筆成績`);
+                
+                if (historyScores.length === 0) {
+                    // 載入本地成績作為備用
                     loadLocalScores();
                     return;
                 }
                 
-                // 查詢用戶的成績（簡化查詢，避免索引需求）
-                const scoresQuery = query(
-                    collection(db, 'scores'),
-                    where('uid', '==', auth.currentUser.uid),
-                    limit(50)
-                );
+                // 處理時間戳記
+                historyScores = historyScores.map(score => ({
+                    ...score,
+                    submittedAt: score.submittedAt?.toDate?.() || new Date()
+                }));
                 
-                const snapshot = await getDocs(scoresQuery);
-                historyScores = [];
-                
-                snapshot.forEach(doc => {
-                    const data = doc.data();
-                    historyScores.push({
-                        id: doc.id,
-                        ...data,
-                        submittedAt: data.submittedAt?.toDate?.() || new Date()
-                    });
-                });
-                
-                // 在客戶端按時間排序
-                historyScores.sort((a, b) => new Date(b.submittedAt) - new Date(a.submittedAt));
-                
-                console.log(`✅ 載入了 ${historyScores.length} 筆成績`);
-                
-                // 同時載入本地成績
-                const localScores = JSON.parse(localStorage.getItem('pbls_local_scores') || '[]');
-                console.log(`📋 載入了 ${localScores.length} 筆本地成績`);
-                
-                // 合併成績（避免重複）
-                const allScores = [...historyScores];
-                localScores.forEach(localScore => {
-                    if (!historyScores.some(score => 
-                        score.uid === localScore.uid && 
-                        score.score === localScore.score && 
-                        Math.abs(new Date(score.submittedAt || score.createdAt) - new Date(localScore.createdAt)) < 60000
-                    )) {
-                        allScores.push({
-                            ...localScore,
-                            submittedAt: new Date(localScore.createdAt),
-                            isLocal: true
-                        });
-                    }
-                });
-                
-                // 按時間排序
-                allScores.sort((a, b) => new Date(b.submittedAt) - new Date(a.submittedAt));
-                
-                displayHistoryScores(allScores);
-                updateStatistics(allScores);
+                displayHistoryScores(historyScores);
+                updateStatistics(historyScores);
                 
             } catch (error) {
                 console.error('❌ 載入歷史成績失敗:', error);
-                
-                // 檢查是否為索引錯誤
-                if (error.code === 'failed-precondition' || error.message.includes('index')) {
-                    console.log('📋 Firebase 需要建立索引，暫時使用本地成績');
-                }
                 
                 // 載入本地成績作為備用
                 loadLocalScores();
@@ -1361,46 +1310,22 @@
             try {
                 console.log('🧪 開始測試 Firebase 查詢...');
                 
-                const { auth, db } = await import('./js/firebase.js');
-                const { 
-                    collection, 
-                    query, 
-                    where, 
-                    limit, 
-                    getDocs 
-                } = await import('https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore.js');
+                // 使用統一的歷史資料服務
+                const { loadMyScores } = await import('./js/history-data.js');
+                const scores = await loadMyScores(10);
                 
-                if (!auth.currentUser) {
-                    console.log('❌ 用戶未登入，無法測試查詢');
-                    alert('請先登入以測試查詢功能');
-                    return;
-                }
+                console.log(`✅ 查詢成功，找到 ${scores.length} 筆成績`);
                 
-                console.log('👤 當前用戶:', auth.currentUser.uid);
-                
-                // 測試基本查詢
-                const testQuery = query(
-                    collection(db, 'scores'),
-                    where('uid', '==', auth.currentUser.uid),
-                    limit(10)
-                );
-                
-                const snapshot = await getDocs(testQuery);
-                console.log(`✅ 查詢成功，找到 ${snapshot.size} 筆成績`);
-                
-                if (snapshot.size > 0) {
+                if (scores.length > 0) {
                     console.log('📊 成績範例:');
-                    snapshot.forEach((doc, index) => {
-                        if (index < 3) { // 只顯示前3筆
-                            const data = doc.data();
-                            console.log(`  ${index + 1}. ${data.score}分 (${data.examType || '筆試測驗'})`);
-                        }
+                    scores.slice(0, 3).forEach((score, index) => {
+                        console.log(`  ${index + 1}. ${score.score}分 (${score.examType || '筆試測驗'})`);
                     });
                 } else {
                     console.log('📋 該用戶尚未有成績記錄');
                 }
                 
-                alert(`測試完成！找到 ${snapshot.size} 筆成績記錄`);
+                alert(`測試完成！找到 ${scores.length} 筆成績記錄`);
                 
             } catch (error) {
                 console.error('❌ 測試查詢失敗:', error);
