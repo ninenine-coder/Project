@@ -262,7 +262,7 @@ class UserFieldManager {
                 await this.initialize();
             }
 
-            const { collection, getDocs } = await import("https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js");
+            const { collection, getDocs } = await import("https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore.js");
             
             const usersRef = collection(this.db, 'user');
             const usersSnap = await getDocs(usersRef);
@@ -315,7 +315,7 @@ class UserFieldManager {
                 await this.initialize();
             }
 
-            const { collection, getDocs } = await import("https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js");
+            const { collection, getDocs } = await import("https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore.js");
             
             const usersRef = collection(this.db, 'user');
             const usersSnap = await getDocs(usersRef);

@@ -3,12 +3,7 @@
  * 用於記錄用戶在平台上的總上線時間
  */
 
-// Firebase 配置
-const firebaseConfig = {
-    apiKey: "AIzaSyBuWO8hFVjjTUe2tqJDrqdbeGTrp4PoT5Q",
-    authDomain: "progect-115a5.firebaseapp.com",
-    projectId: "progect-115a5"
-};
+import { auth, db } from '../../js/firebase.js';
 
 class OnlineTimeService {
     constructor() {
@@ -62,8 +57,7 @@ class OnlineTimeService {
         try {
             if (!this.currentUser || !this.currentUser.uid) return;
 
-            const { getFirestore, doc, getDoc, setDoc } = await import("https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js");
-            const db = getFirestore();
+            const { doc, getDoc, setDoc } = await import("https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore.js");
             
             const userRef = doc(db, 'user', this.currentUser.uid);
             const userSnap = await getDoc(userRef);

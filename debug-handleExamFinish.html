@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>调试 handleExamFinish 函数</title>
+</head>
+<body>
+    <h1>调试 handleExamFinish 函数</h1>
+    <button onclick="testFunction()">测试函数</button>
+    <div id="debug-info"></div>
+
+    <!-- 1. 先載入 firebase.js -->
+    <script type="module" src="./js/firebase.js"></script>
+    
+    <!-- 2. 载入 handleExamFinish 函数 -->
+    <script type="module">
+      import { auth, db } from './js/firebase.js';
+      import {
+        collection, addDoc, serverTimestamp, setDoc, doc, getDocs, query, orderBy, documentId, limit
+      } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore.js";
+      import {
+        onAuthStateChanged, signInAnonymously as fbSignInAnonymously
+      } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-auth.js";
+
+      console.log("🔍 开始加载 handleExamFinish 函数...");
+
+      function ensureFirebase() {
+        return {
+          app: window.__FB__.app,
+          db: db,
+          auth: auth,
+        };
+      }
+
+      async function ensureSignedIn(auth) {
+        if (auth.currentUser) return auth.currentUser;
+        try {
+          const cred = await fbSignInAnonymously(auth);
+          console.log("🔐 已匿名登入：", cred.user.uid);
+          return cred.user;
+        } catch (e) {
+          console.error("❌ 匿名登入失敗：", e.code, e.message);
+          throw e;
+        }
+      }
+
+      function resolveUserName() {
+        try {
+          const p = JSON.parse(localStorage.getItem("pbls_user_profile") || "null");
+          if (p?.name) return p.name;
+        } catch {}
+        return (window.currentUserName && String(window.currentUserName)) || "未命名使用者";
+      }
+
+      async function getNextScoreId(db) {
+        try {
+          const q = query(collection(db, "scores"), orderBy(documentId(), "desc"), limit(1));
+          const snap = await getDocs(q);
+          if (snap.empty) return 1;
+          const lastId = snap.docs[0].id;
+          const match = lastId.match(/^scores(\d+)$/);
+          const maxId = match ? parseInt(match[1]) : 0;
+          const nextId = maxId + 1;
+          console.log("📊 獲取的下一個序號:", nextId);
+          return nextId;
+        } catch (error) {
+          console.error("❌ 獲取序號失敗:", error);
+          return 1;
+        }
+      }
+
+      // 定义 handleExamFinish 函数
+      async function handleExamFinish(finalScore, timeSpentMs, startedAtMs, correctCount, questionCount) {
+        console.log("🎯 handleExamFinish 函数被调用！");
+        console.log("参数:", { finalScore, timeSpentMs, startedAtMs, correctCount, questionCount });
+        
+        const { db, auth } = ensureFirebase();
+        try {
+          const user = await ensureSignedIn(auth);
+          const userName = resolveUserName();
+          console.log("👤 使用者：", userName, "｜分數：", finalScore);
+          console.log("🔐 用戶 UID：", user.uid);
+
+          const nextScoreId = await getNextScoreId(db);
+          console.log("📊 下一個序號：", nextScoreId);
+
+          const data = { 
+            uid: user.uid,
+            userName,
+            score: Math.round(Number(finalScore)),
+            timeSpentMs: Math.max(0, Math.floor(timeSpentMs || 0)),
+            startedAt: startedAtMs ? Math.floor(startedAtMs) : null,
+            correctCount: Number.isInteger(correctCount) ? correctCount : null,
+            questionCount: Number.isInteger(questionCount) ? questionCount : null,
+            examType: "筆試測驗",
+            submittedAt: serverTimestamp(),
+            clientInfo: {
+              userAgent: navigator.userAgent,
+              timestamp: Date.now()
+            }
+          };
+
+          console.log("📊 準備寫入資料：", data);
+
+          const docRef = doc(db, "scores", `scores${nextScoreId}`);
+          await setDoc(docRef, data);
+
+          console.log(`✅ 成績已成功保存到 scores 集合，文件 ID: scores${nextScoreId}`);
+          return true;
+        } catch (error) {
+          console.error("❌ 保存成績失敗：", error);
+          return false;
+        }
+      }
+
+      // 立即暴露到 window
+      window.handleExamFinish = handleExamFinish;
+      console.log("✅ handleExamFinish 函數已暴露到 window 對象");
+      console.log("🔍 函數類型:", typeof window.handleExamFinish);
+      
+      // 测试函数是否可用
+      if (typeof window.handleExamFinish === 'function') {
+        console.log("✅ handleExamFinish 函數測試成功");
+      } else {
+        console.error("❌ handleExamFinish 函數測試失敗");
+      }
+
+      // 观察登录状态
+      const { auth } = ensureFirebase();
+      onAuthStateChanged(auth, (u) => {
+        console.log("🔐 auth 狀態：", u ? (u.isAnonymous ? "匿名-" + u.uid : (u.email || u.uid)) : "未登入");
+      });
+    </script>
+
+    <script>
+        function testFunction() {
+            const debugDiv = document.getElementById('debug-info');
+            
+            console.log("🧪 开始测试...");
+            debugDiv.innerHTML = '<p>测试中...</p>';
+            
+            if (typeof window.handleExamFinish === 'function') {
+                debugDiv.innerHTML = '<p style="color: green;">✅ handleExamFinish 函数存在！</p>';
+                
+                // 测试调用
+                window.handleExamFinish(85, 12000, Date.now() - 12000, 17, 20)
+                    .then(success => {
+                        if (success) {
+                            debugDiv.innerHTML += '<p style="color: green;">✅ 测试成绩保存成功！</p>';
+                        } else {
+                            debugDiv.innerHTML += '<p style="color: red;">❌ 测试成绩保存失败！</p>';
+                        }
+                    })
+                    .catch(error => {
+                        debugDiv.innerHTML += '<p style="color: red;">❌ 测试时发生错误：' + error.message + '</p>';
+                    });
+            } else {
+                debugDiv.innerHTML = '<p style="color: red;">❌ handleExamFinish 函数不存在！</p>';
+                debugDiv.innerHTML += '<p>函数类型: ' + typeof window.handleExamFinish + '</p>';
+                debugDiv.innerHTML += '<p>window 上的函数: ' + Object.keys(window).filter(k => k.includes('handle')).join(', ') + '</p>';
+            }
+        }
+        
+        // 页面加载完成后立即检查
+        window.addEventListener('load', () => {
+            console.log("📄 页面加载完成，检查函数...");
+            setTimeout(() => {
+                console.log("🔍 延迟检查 window.handleExamFinish:", typeof window.handleExamFinish);
+                if (typeof window.handleExamFinish === 'function') {
+                    console.log("✅ 页面加载后函数存在");
+                } else {
+                    console.error("❌ 页面加载后函数不存在");
+                }
+            }, 1000);
+        });
+    </script>
+</body>
+</html>

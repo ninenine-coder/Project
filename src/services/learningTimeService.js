@@ -3,17 +3,12 @@
  * 基於用戶需求重新設計的學習時間追蹤系統
  */
 
-// Firebase 配置
-const firebaseConfig = {
-    apiKey: "AIzaSyBuWO8hFVjjTUe2tqJDrqdbeGTrp4PoT5Q",
-    authDomain: "progect-115a5.firebaseapp.com",
-    projectId: "progect-115a5"
-};
+import { auth, db } from '../../js/firebase.js';
 
 class LearningTimeService {
     constructor() {
         this.currentUser = null;
-        this.db = null;
+        this.db = db;
         this.isInitialized = false;
         this.updateInterval = null;
         this.isPageVisible = true;
@@ -28,11 +23,7 @@ class LearningTimeService {
 
         try {
             // 初始化 Firebase
-            const { initializeApp } = await import("https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js");
-            const { getFirestore } = await import("https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js");
-            
-            const app = initializeApp(firebaseConfig);
-            this.db = getFirestore(app);
+            // Firebase 已通过 firebase.js 初始化，直接使用 db 实例
 
             // 取得目前用戶
             this.currentUser = JSON.parse(localStorage.getItem('pbls_user') || '{}');
@@ -77,7 +68,7 @@ class LearningTimeService {
      */
     async getTotalLearningTime() {
         try {
-            const { doc, getDoc, setDoc, serverTimestamp } = await import("https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js");
+            const { doc, getDoc, setDoc, serverTimestamp } = await import("https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore.js");
             const userRef = doc(this.db, "user", this.currentUser.uid);
             const userDoc = await getDoc(userRef);
             
@@ -108,7 +99,7 @@ class LearningTimeService {
      */
     async updateLearningTime(additionalTime) {
         try {
-            const { doc, updateDoc, increment } = await import("https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js");
+            const { doc, updateDoc, increment } = await import("https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore.js");
             const userRef = doc(this.db, "user", this.currentUser.uid);
             
             await updateDoc(userRef, {

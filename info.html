@@ -816,6 +816,26 @@
     <script src="src/js/language-switcher.js"></script>
     <!-- 用戶資料服務 -->
     <script type="module" src="src/services/userDataService.js"></script>
+    
+    <!-- 錯誤處理腳本 -->
+    <script>
+        // 捕獲並忽略 Babel 相關錯誤
+        window.addEventListener('error', function(e) {
+            if (e.message.includes('@babel/runtime') || e.message.includes('babel')) {
+                console.warn('Babel 相關錯誤已忽略:', e.message);
+                e.preventDefault();
+                return false;
+            }
+        });
+        
+        // 捕獲未處理的 Promise 拒絕
+        window.addEventListener('unhandledrejection', function(e) {
+            if (e.reason && e.reason.message && e.reason.message.includes('@babel/runtime')) {
+                console.warn('Babel Promise 錯誤已忽略:', e.reason.message);
+                e.preventDefault();
+            }
+        });
+    </script>
 </head>
 <body>
     <!-- 全局背景 -->
@@ -912,16 +932,10 @@
             <section class="section section-white" id="flowchart-section">
                 <h2 class="section-title">PBLS 流程圖</h2>
                 <div class="flowchart-container">
-                    <img
-                        src="/PBLS流程圖.png"
-                        alt="PBLS流程圖"
-                        class="flowchart-image"
-                        onerror="this.style.display='none'; this.nextElementSibling.style.display='block';"
-                    />
-                    <div style="display: none; padding: 40px; text-align: center; color: #666;">
-                        <i class="fas fa-image" style="font-size: 48px; margin-bottom: 20px;"></i>
-                        <p>PBLS流程圖圖片載入中...</p>
-                        <p style="font-size: 14px; margin-top: 10px;">請確保圖片文件位於正確路徑</p>
+                    <div style="padding: 40px; text-align: center; color: #666; background: rgba(255, 255, 255, 0.8); border-radius: 15px; border: 2px dashed #e1bee7;">
+                        <i class="fas fa-info-circle" style="font-size: 48px; margin-bottom: 20px; color: #9c27b0;"></i>
+                        <p style="font-size: 18px; font-weight: 600; color: #4a148c; margin-bottom: 15px;">PBLS 流程圖</p>
+                        <p style="font-size: 14px; line-height: 1.6;">流程圖內容將在後續版本中提供</p>
                     </div>
                 </div>
             </section>

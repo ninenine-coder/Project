@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>测试实时历史成绩</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .test-section { margin: 20px 0; padding: 15px; border: 1px solid #ccc; border-radius: 8px; }
+        .success { background-color: #d4edda; border-color: #c3e6cb; }
+        .error { background-color: #f8d7da; border-color: #f5c6cb; }
+        button { padding: 10px 20px; margin: 5px; background: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; }
+        button:hover { background: #0056b3; }
+        .log { background: #f8f9fa; padding: 10px; margin: 10px 0; border-radius: 4px; font-family: monospace; white-space: pre-wrap; }
+        
+        /* 成绩表格样式 */
+        .results-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .results-table th {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px 12px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .results-table td {
+            padding: 12px;
+            border-bottom: 1px solid #e5e7eb;
+            font-size: 14px;
+        }
+
+        .results-table tr:hover {
+            background-color: #f9fafb;
+        }
+
+        .results-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .exam-title {
+            font-weight: 600;
+            color: #374151;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 6px 12px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+    </style>
+</head>
+<body>
+    <h1>🧪 实时历史成绩测试页面</h1>
+    
+    <div class="test-section">
+        <h3>1. Firebase 初始化检查</h3>
+        <button onclick="checkFirebaseInit()">检查 Firebase 初始化</button>
+        <div id="firebase-status" class="log"></div>
+    </div>
+    
+    <div class="test-section">
+        <h3>2. 匿名登录测试</h3>
+        <button onclick="testAnonymousLogin()">测试匿名登录</button>
+        <div id="auth-status" class="log"></div>
+    </div>
+    
+    <div class="test-section">
+        <h3>3. 学号/工号检查</h3>
+        <button onclick="checkUserKey()">检查学号/工号</button>
+        <div id="userkey-status" class="log"></div>
+    </div>
+    
+    <div class="test-section">
+        <h3>4. 实时成绩监听测试</h3>
+        <button onclick="startRealtimeListener()">开始实时监听</button>
+        <button onclick="stopRealtimeListener()">停止监听</button>
+        <div id="listener-status" class="log"></div>
+    </div>
+    
+    <div class="test-section">
+        <h3>5. 成绩表格</h3>
+        <table class="results-table">
+            <thead>
+                <tr>
+                    <th>測驗類型</th>
+                    <th>測驗時間</th>
+                    <th>成績</th>
+                    <th>答對/總題</th>
+                    <th>耗時</th>
+                    <th>操作</th>
+                </tr>
+            </thead>
+            <tbody id="rows">
+                <tr><td colspan="6" style="text-align:center;color:#666;padding:24px">等待连接...</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- 加载 Firebase -->
+    <script type="module" src="./js/firebase.js"></script>
+    
+    <script type="module">
+        import { auth, db } from './js/firebase.js';
+        import {
+            collection, query, where, orderBy, limit, onSnapshot
+        } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore.js";
+        import { signInAnonymously, onAuthStateChanged } 
+            from "https://www.gstatic.com/firebasejs/10.13.1/firebase-auth.js";
+
+        const tbody = document.getElementById('rows');
+        let unsubscribe = null;
+
+        // 取得「學號/工號」（你登入時已存過）
+        function getUserKey() {
+            try {
+                const p = JSON.parse(localStorage.getItem('pbls_user_profile') || 'null');
+                // 依你專案的欄位順序取值
+                return p?.学号 || p?.工号 || p?.name || p?.studentId || null;
+            } catch { return null; }
+        }
+
+        // 時間/分數/題數格式化
+        const fmtTime = v => {
+            try {
+                if (v?.toDate) return v.toDate().toLocaleString();
+                if (v?.seconds) return new Date(v.seconds * 1000).toLocaleString(); // Timestamp-like
+                if (typeof v === 'string' || typeof v === 'number') return new Date(v).toLocaleString();
+            } catch {}
+            return '-';
+        };
+        const fmtDuration = v => {
+            if (v == null) return '-';
+            const ms = v > 1e6 ? v : v * 1000; // 兼容秒/毫秒
+            const s = Math.max(0, Math.round(ms / 1000));
+            return `${Math.floor(s/60)}分${s%60}秒`;
+        };
+        const scoreText = r =>
+            r.scorePct != null ? Math.round(r.scorePct * 100) + '%' :
+            r.scoreRaw != null ? r.scoreRaw :
+            r.score     != null ? r.score     : '-';
+        const solvedText = r => {
+            const c = r.correctCount ?? r.correct ?? null;
+            const t = r.totalQuestions ?? r.questionCount ?? null;
+            return (c==null && t==null) ? '-' : `${c ?? '-'} / ${t ?? '-'}`;
+        };
+
+        function renderRows(rows) {
+            if (!rows.length) {
+                tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;color:#666;padding:24px">目前沒有任何成績紀錄</td></tr>`;
+                return;
+            }
+            tbody.innerHTML = rows.map(r => {
+                const submitted = fmtTime(r.submittedAt);
+                const title = r.examTitle || r.examId || r.examType || '(未命名)';
+                const dur = fmtDuration(r.timeSpentMs ?? r.durationMs ?? r.durationSec);
+                return `<tr>
+                    <td class="exam-title">${title}</td>
+                    <td>${submitted}</td>
+                    <td>${scoreText(r)}</td>
+                    <td>${solvedText(r)}</td>
+                    <td>${dur}</td>
+                    <td><a class="btn" href="result.html?attemptId=${encodeURIComponent(r.id)}">查看</a></td>
+                </tr>`;
+            }).join('');
+        }
+
+        async function ensureSignedIn() {
+            if (auth.currentUser) return auth.currentUser;
+            const cred = await signInAnonymously(auth);
+            return cred.user;
+        }
+
+        // 監聽本人（學號/工號）所有成績，時間倒序
+        function listenMyScores(userKey) {
+            const status = document.getElementById('listener-status');
+            status.textContent = '🔄 正在建立实时监听...';
+            status.className = 'log';
+            
+            // 先試着用 submittedAt 排序（是 Timestamp 時最準確）
+            let qref;
+            try {
+                qref = query(
+                    collection(db, 'scores'),
+                    where('userName', '==', userKey),
+                    orderBy('submittedAt', 'desc'),
+                    limit(100)
+                );
+                unsubscribe = onSnapshot(qref, snap => {
+                    const rows = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+                    renderRows(rows);
+                    status.textContent = `✅ 实时监听已建立，找到 ${rows.length} 条记录\n` +
+                                       `用户键: ${userKey}\n` +
+                                       `监听状态: 活跃`;
+                    status.className = 'log success';
+                }, error => {
+                    console.error('监听错误:', error);
+                    status.textContent = `❌ 监听错误: ${error.message}`;
+                    status.className = 'log error';
+                });
+            } catch (e) {
+                // 如果 submittedAt 是字串 → Firestore 有時不讓 orderBy；改為前端排序
+                console.warn('orderBy 失败，使用前端排序:', e);
+                qref = query(
+                    collection(db, 'scores'),
+                    where('userName', '==', userKey),
+                    limit(100)
+                );
+                unsubscribe = onSnapshot(qref, snap => {
+                    const rows = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+                    rows.sort((a,b) => {
+                        const A = a.submittedAt?.seconds ? a.submittedAt.seconds*1000
+                               : a.submittedAt?.toDate ? a.submittedAt.toDate().getTime()
+                               : Date.parse(a.submittedAt) || 0;
+                        const B = b.submittedAt?.seconds ? b.submittedAt.seconds*1000
+                               : b.submittedAt?.toDate ? b.submittedAt.toDate().getTime()
+                               : Date.parse(b.submittedAt) || 0;
+                        return B - A;
+                    });
+                    renderRows(rows);
+                    status.textContent = `✅ 实时监听已建立（前端排序），找到 ${rows.length} 条记录\n` +
+                                       `用户键: ${userKey}\n` +
+                                       `监听状态: 活跃`;
+                    status.className = 'log success';
+                }, error => {
+                    console.error('监听错误:', error);
+                    status.textContent = `❌ 监听错误: ${error.message}`;
+                    status.className = 'log error';
+                });
+            }
+        }
+
+        // 检查 Firebase 初始化
+        window.checkFirebaseInit = function() {
+            const status = document.getElementById('firebase-status');
+            try {
+                if (window.__FB__?.auth && window.__FB__?.db) {
+                    status.textContent = '✅ Firebase 已正确初始化\n' + 
+                                       'Auth: ' + !!window.__FB__.auth + '\n' + 
+                                       'DB: ' + !!window.__FB__.db + '\n' +
+                                       'App: ' + !!window.__FB__.app;
+                    status.className = 'log success';
+                } else {
+                    status.textContent = '❌ Firebase 未正确初始化\n' + 
+                                       'window.__FB__: ' + !!window.__FB__;
+                    status.className = 'log error';
+                }
+            } catch (error) {
+                status.textContent = '❌ 检查失败: ' + error.message;
+                status.className = 'log error';
+            }
+        };
+
+        // 测试匿名登录
+        window.testAnonymousLogin = async function() {
+            const status = document.getElementById('auth-status');
+            try {
+                status.textContent = '🔄 正在测试匿名登录...';
+                status.className = 'log';
+                
+                const user = auth.currentUser;
+                if (user) {
+                    status.textContent = '✅ 用户已登录\n' +
+                                       'UID: ' + user.uid + '\n' +
+                                       '匿名: ' + user.isAnonymous;
+                    status.className = 'log success';
+                } else {
+                    const cred = await fbSignInAnonymously(auth);
+                    status.textContent = '✅ 匿名登录成功\n' +
+                                       'UID: ' + cred.user.uid + '\n' +
+                                       '匿名: ' + cred.user.isAnonymous;
+                    status.className = 'log success';
+                }
+            } catch (error) {
+                status.textContent = '❌ 匿名登录失败: ' + error.message + '\n' +
+                                   '错误代码: ' + error.code;
+                status.className = 'log error';
+            }
+        };
+
+        // 检查学号/工号
+        window.checkUserKey = function() {
+            const status = document.getElementById('userkey-status');
+            try {
+                const userKey = getUserKey();
+                if (userKey) {
+                    status.textContent = '✅ 找到用户标识\n' +
+                                       '学号/工号: ' + userKey + '\n' +
+                                       '来源: localStorage.pbls_user_profile';
+                    status.className = 'log success';
+                } else {
+                    status.textContent = '⚠️ 未找到学号/工号\n' +
+                                       '请确保已登录并设置了用户资料\n' +
+                                       'localStorage.pbls_user_profile: ' + localStorage.getItem('pbls_user_profile');
+                    status.className = 'log';
+                }
+            } catch (error) {
+                status.textContent = '❌ 检查失败: ' + error.message;
+                status.className = 'log error';
+            }
+        };
+
+        // 开始实时监听
+        window.startRealtimeListener = async function() {
+            const status = document.getElementById('listener-status');
+            try {
+                status.textContent = '🔄 正在启动实时监听...';
+                status.className = 'log';
+                
+                const userKey = getUserKey();
+                if (!userKey) {
+                    status.textContent = '❌ 未找到学号/工号，无法启动监听';
+                    status.className = 'log error';
+                    return;
+                }
+                
+                await ensureSignedIn();
+                listenMyScores(userKey);
+                
+            } catch (error) {
+                status.textContent = '❌ 启动监听失败: ' + error.message;
+                status.className = 'log error';
+            }
+        };
+
+        // 停止实时监听
+        window.stopRealtimeListener = function() {
+            const status = document.getElementById('listener-status');
+            if (unsubscribe) {
+                unsubscribe();
+                unsubscribe = null;
+                status.textContent = '⏹️ 实时监听已停止';
+                status.className = 'log';
+            } else {
+                status.textContent = '⚠️ 没有活跃的监听';
+                status.className = 'log';
+            }
+        };
+
+        // 页面加载完成后自动检查
+        document.addEventListener('DOMContentLoaded', () => {
+            setTimeout(() => {
+                checkFirebaseInit();
+                testAnonymousLogin();
+                checkUserKey();
+            }, 1000);
+        });
+    </script>
+</body>
+</html>

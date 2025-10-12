@@ -3,20 +3,12 @@
  * 用於處理測驗完成後的數據保存和統計更新
  */
 
-// Firebase 配置
-const firebaseConfig = {
-    apiKey: "AIzaSyBuWO8hFVjjTUe2tqJDrqdbeGTrp4PoT5Q",
-    authDomain: "progect-115a5.firebaseapp.com",
-    projectId: "progect-115a5",
-    storageBucket: "progect-115a5.appspot.com",
-    messagingSenderId: "123456789",
-    appId: "1:123456789:web:abcdef123456"
-};
+import { auth, db } from '../../js/firebase.js';
 
 class QuizResultService {
     constructor() {
         this.isInitialized = false;
-        this.db = null;
+        this.db = db;
     }
 
     /**
@@ -190,7 +182,7 @@ class QuizResultService {
      */
     async calculateAverageScore(userId) {
         try {
-            const { collection, getDocs, query, orderBy, limit } = await import("https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js");
+            const { collection, getDocs, query, orderBy, limit } = await import("https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore.js");
             
             const quizResultsRef = collection(this.db, 'user', userId, 'quizResults');
             const q = query(quizResultsRef, orderBy('date', 'desc'), limit(10)); // 最近10次測驗
@@ -232,7 +224,7 @@ class QuizResultService {
                 return [];
             }
 
-            const { collection, getDocs, query, orderBy, limit: limitQuery } = await import("https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js");
+            const { collection, getDocs, query, orderBy, limit: limitQuery } = await import("https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore.js");
             
             const quizResultsRef = collection(this.db, 'user', currentUser.uid, 'quizResults');
             const q = query(quizResultsRef, orderBy('date', 'desc'), limitQuery(limit));

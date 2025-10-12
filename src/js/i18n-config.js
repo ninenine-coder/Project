@@ -1,6 +1,6 @@
 // i18next 配置和初始化
-import i18next from 'i18next';
-import LanguageDetector from 'i18next-browser-languagedetector';
+import i18next from "https://cdn.jsdelivr.net/npm/i18next@22.5.1/dist/esm/i18next.js";
+import LanguageDetector from "https://cdn.jsdelivr.net/npm/i18next-browser-languagedetector@7.2.0/dist/esm/i18nextBrowserLanguageDetector.js";
 
 // 翻譯資源
 const resources = {

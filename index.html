@@ -144,7 +144,7 @@
             inset: -20%;
             background:
                 radial-gradient(circle at var(--x, 50%) var(--y, 50%), rgba(255,255,255,0.6) 0%, rgba(255,255,255,0.15) 50%, transparent 80%),
-                url("https://i.imgur.com/XHrj4RK.png"); /* 半透明水紋圖案 */
+                url("./assets/背景.png"); /* 半透明水紋圖案 */
             background-size: 200% 200%;
             background-blend-mode: overlay;
             opacity: var(--opacity, 0.8);
@@ -1180,6 +1180,70 @@
     <script type="module" src="src/services/userDataService.js"></script>
     <!-- 學習時間服務 -->
     <script type="module" src="src/services/learningTimeService.js"></script>
+    
+    <!-- 錯誤處理腳本 -->
+    <script>
+        // 捕獲並忽略 Babel 相關錯誤
+        window.addEventListener('error', function(e) {
+            if (e.message && (e.message.includes('@babel/runtime') || e.message.includes('babel'))) {
+                console.warn('Babel 相關錯誤已忽略:', e.message);
+                e.preventDefault();
+                return false;
+            }
+        });
+        
+        // 捕獲未處理的 Promise 拒絕
+        window.addEventListener('unhandledrejection', function(e) {
+            if (e.reason && e.reason.message && e.reason.message.includes('@babel/runtime')) {
+                console.warn('Babel Promise 錯誤已忽略:', e.reason.message);
+                e.preventDefault();
+            }
+        });
+        
+        // 捕獲圖片載入錯誤
+        window.addEventListener('error', function(e) {
+            if (e.target && e.target.tagName === 'IMG') {
+                console.warn('圖片載入失敗:', e.target.src);
+                e.preventDefault();
+                return false;
+            }
+        }, true);
+        
+        // 360 實境教學影片錯誤處理
+        window.addEventListener('error', function(e) {
+            if (e.target && e.target.tagName === 'IFRAME') {
+                console.warn('YouTube 影片載入失敗:', e.target.src);
+                // 可以添加備用方案
+                e.preventDefault();
+                return false;
+            }
+        }, true);
+        
+        // 確保 enterPractice 函數存在
+        window.enterPractice = window.enterPractice || function(practiceType) {
+            console.log('進入練習模式:', practiceType);
+            const homepage = document.getElementById('practiceHomepage');
+            const vrVideoContent = document.getElementById('vrVideoContent');
+            const virtualHumanContent = document.getElementById('virtualHumanContent');
+            
+            if (!homepage || !vrVideoContent || !virtualHumanContent) {
+                console.error('找不到練習內容元素');
+                return;
+            }
+            
+            // 隱藏首頁
+            homepage.style.display = 'none';
+            
+            // 根據類型顯示對應內容
+            if (practiceType === 'vr-video') {
+                vrVideoContent.style.display = 'block';
+                console.log('✅ 360實境教學影片已載入');
+            } else if (practiceType === 'virtual-human') {
+                virtualHumanContent.style.display = 'block';
+                console.log('✅ 虛擬人模擬已載入');
+            }
+        };
+    </script>
 </head>
 <body>
     <!-- 固定底圖，讓 backdrop-filter 一定有東西可以"透視＋模糊" -->
@@ -1249,7 +1313,7 @@
         <div class="marquee-track">
             <div class="marquee-item">
                 <i class="fas fa-bullhorn"></i> 歡迎使用PBLS VR教學平台！
-            </div>
+        </div>
             <div class="marquee-item">
                 <i class="fas fa-vr-cardboard"></i> 360°實境教學影片，身臨其境的學習體驗
             </div>

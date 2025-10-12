@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>测试连号成绩保存</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .test-section { margin: 20px 0; padding: 15px; border: 1px solid #ccc; border-radius: 8px; }
+        .success { background-color: #d4edda; border-color: #c3e6cb; }
+        .error { background-color: #f8d7da; border-color: #f5c6cb; }
+        button { padding: 10px 20px; margin: 5px; background: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; }
+        button:hover { background: #0056b3; }
+        .log { background: #f8f9fa; padding: 10px; margin: 10px 0; border-radius: 4px; font-family: monospace; white-space: pre-wrap; }
+    </style>
+</head>
+<body>
+    <h1>🧪 连号成绩保存测试页面</h1>
+    
+    <div class="test-section">
+        <h3>1. Firebase 初始化检查</h3>
+        <button onclick="checkFirebaseInit()">检查 Firebase 初始化</button>
+        <div id="firebase-status" class="log"></div>
+    </div>
+    
+    <div class="test-section">
+        <h3>2. 匿名登录测试</h3>
+        <button onclick="testAnonymousLogin()">测试匿名登录</button>
+        <div id="auth-status" class="log"></div>
+    </div>
+    
+    <div class="test-section">
+        <h3>3. 计数器状态检查</h3>
+        <button onclick="checkCounterStatus()">检查计数器状态</button>
+        <button onclick="initializeCounter()">初始化计数器</button>
+        <div id="counter-status" class="log"></div>
+    </div>
+    
+    <div class="test-section">
+        <h3>4. 连号成绩保存测试</h3>
+        <button onclick="testSequentialScore()">测试连号成绩保存</button>
+        <button onclick="testMultipleScores()">测试多次保存</button>
+        <div id="score-status" class="log"></div>
+    </div>
+    
+    <div class="test-section">
+        <h3>5. 成绩查询测试</h3>
+        <button onclick="testScoreQuery()">测试成绩查询</button>
+        <div id="query-status" class="log"></div>
+    </div>
+
+    <!-- 加载 Firebase -->
+    <script type="module" src="./js/firebase.js"></script>
+    
+    <script type="module">
+        import { auth, db } from './js/firebase.js';
+        import { createSequentialScore, initializeCounter, getCounterStatus } from './src/services/scoreSeqService.js';
+        import {
+            collection, query, where, orderBy, getDocs, doc, getDoc, setDoc
+        } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore.js";
+        import {
+            signInAnonymously as fbSignInAnonymously, serverTimestamp
+        } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-auth.js";
+
+        // 暴露到全局
+        window.auth = auth;
+        window.db = db;
+        window.createSequentialScore = createSequentialScore;
+        window.initializeCounter = initializeCounter;
+        window.getCounterStatus = getCounterStatus;
+
+        // 检查 Firebase 初始化
+        window.checkFirebaseInit = function() {
+            const status = document.getElementById('firebase-status');
+            try {
+                if (window.__FB__?.auth && window.__FB__?.db) {
+                    status.textContent = '✅ Firebase 已正确初始化\n' + 
+                                       'Auth: ' + !!window.__FB__.auth + '\n' + 
+                                       'DB: ' + !!window.__FB__.db + '\n' +
+                                       'App: ' + !!window.__FB__.app;
+                    status.className = 'log success';
+                } else {
+                    status.textContent = '❌ Firebase 未正确初始化\n' + 
+                                       'window.__FB__: ' + !!window.__FB__;
+                    status.className = 'log error';
+                }
+            } catch (error) {
+                status.textContent = '❌ 检查失败: ' + error.message;
+                status.className = 'log error';
+            }
+        };
+
+        // 测试匿名登录
+        window.testAnonymousLogin = async function() {
+            const status = document.getElementById('auth-status');
+            try {
+                status.textContent = '🔄 正在测试匿名登录...';
+                status.className = 'log';
+                
+                const user = auth.currentUser;
+                if (user) {
+                    status.textContent = '✅ 用户已登录\n' +
+                                       'UID: ' + user.uid + '\n' +
+                                       '匿名: ' + user.isAnonymous;
+                    status.className = 'log success';
+                } else {
+                    const cred = await fbSignInAnonymously(auth);
+                    status.textContent = '✅ 匿名登录成功\n' +
+                                       'UID: ' + cred.user.uid + '\n' +
+                                       '匿名: ' + cred.user.isAnonymous;
+                    status.className = 'log success';
+                }
+            } catch (error) {
+                status.textContent = '❌ 匿名登录失败: ' + error.message + '\n' +
+                                   '错误代码: ' + error.code;
+                status.className = 'log error';
+            }
+        };
+
+        // 检查计数器状态
+        window.checkCounterStatus = async function() {
+            const status = document.getElementById('counter-status');
+            try {
+                status.textContent = '🔄 正在检查计数器状态...';
+                status.className = 'log';
+                
+                const counterData = await getCounterStatus();
+                if (counterData) {
+                    status.textContent = '✅ 计数器状态:\n' +
+                                       'Next: ' + counterData.next + '\n' +
+                                       '下一个成绩 ID: scores' + counterData.next;
+                    status.className = 'log success';
+                } else {
+                    status.textContent = '⚠️ 计数器尚未初始化\n' +
+                                       '点击"初始化计数器"按钮进行初始化';
+                    status.className = 'log';
+                }
+            } catch (error) {
+                status.textContent = '❌ 检查计数器失败: ' + error.message;
+                status.className = 'log error';
+            }
+        };
+
+        // 初始化计数器
+        window.initializeCounter = async function() {
+            const status = document.getElementById('counter-status');
+            try {
+                status.textContent = '🔄 正在初始化计数器...';
+                status.className = 'log';
+                
+                await initializeCounter();
+                status.textContent = '✅ 计数器初始化成功\n' +
+                                   '下一个成绩 ID 将是: scores1';
+                status.className = 'log success';
+            } catch (error) {
+                status.textContent = '❌ 初始化计数器失败: ' + error.message;
+                status.className = 'log error';
+            }
+        };
+
+        // 测试连号成绩保存
+        window.testSequentialScore = async function() {
+            const status = document.getElementById('score-status');
+            try {
+                status.textContent = '🔄 正在测试连号成绩保存...';
+                status.className = 'log';
+                
+                const user = auth.currentUser;
+                if (!user) {
+                    status.textContent = '❌ 用户未登录，请先测试匿名登录';
+                    status.className = 'log error';
+                    return;
+                }
+
+                const payload = {
+                    uid: user.uid,
+                    userName: '测试用户',
+                    score: Math.round(Math.random() * 100),
+                    timeSpentMs: 30000,
+                    startedAt: Date.now() - 30000,
+                    correctCount: 8,
+                    questionCount: 10,
+                    examType: "筆試測驗",
+                    submittedAt: serverTimestamp(),
+                    clientInfo: { 
+                        appVersion: 'test v1.0.0', 
+                        ua: navigator.userAgent, 
+                        timestamp: Date.now() 
+                    }
+                };
+
+                console.log('📊 准备保存数据:', payload);
+                const newId = await createSequentialScore(payload);
+                
+                status.textContent = '✅ 连号成绩保存成功\n' +
+                                   'Document ID: ' + newId + '\n' +
+                                   '分数: ' + payload.score + '\n' +
+                                   '用户: ' + payload.userName;
+                status.className = 'log success';
+                
+            } catch (error) {
+                status.textContent = '❌ 连号成绩保存失败: ' + error.message + '\n' +
+                                   '错误代码: ' + error.code + '\n' +
+                                   '完整错误: ' + JSON.stringify(error, null, 2);
+                status.className = 'log error';
+            }
+        };
+
+        // 测试多次保存
+        window.testMultipleScores = async function() {
+            const status = document.getElementById('score-status');
+            try {
+                status.textContent = '🔄 正在测试多次连号保存...';
+                status.className = 'log';
+                
+                const user = auth.currentUser;
+                if (!user) {
+                    status.textContent = '❌ 用户未登录，请先测试匿名登录';
+                    status.className = 'log error';
+                    return;
+                }
+
+                const results = [];
+                for (let i = 1; i <= 3; i++) {
+                    const payload = {
+                        uid: user.uid,
+                        userName: '测试用户' + i,
+                        score: Math.round(Math.random() * 100),
+                        timeSpentMs: 30000 + i * 1000,
+                        startedAt: Date.now() - 30000 - i * 1000,
+                        correctCount: 7 + i,
+                        questionCount: 10,
+                        examType: "筆試測驗",
+                        submittedAt: serverTimestamp(),
+                        clientInfo: { 
+                            appVersion: 'test v1.0.0', 
+                            ua: navigator.userAgent, 
+                            timestamp: Date.now() 
+                        }
+                    };
+
+                    const newId = await createSequentialScore(payload);
+                    results.push({ id: newId, score: payload.score });
+                    await new Promise(resolve => setTimeout(resolve, 500)); // 延迟500ms
+                }
+                
+                let output = '✅ 多次连号保存成功:\n';
+                results.forEach((result, index) => {
+                    output += `${index + 1}. ${result.id} - 分数: ${result.score}\n`;
+                });
+                
+                status.textContent = output;
+                status.className = 'log success';
+                
+            } catch (error) {
+                status.textContent = '❌ 多次连号保存失败: ' + error.message + '\n' +
+                                   '错误代码: ' + error.code;
+                status.className = 'log error';
+            }
+        };
+
+        // 测试成绩查询
+        window.testScoreQuery = async function() {
+            const status = document.getElementById('query-status');
+            try {
+                status.textContent = '🔄 正在测试成绩查询...';
+                status.className = 'log';
+                
+                const user = auth.currentUser;
+                if (!user) {
+                    status.textContent = '❌ 用户未登录，请先测试匿名登录';
+                    status.className = 'log error';
+                    return;
+                }
+
+                const q = query(
+                    collection(db, "scores"),
+                    where("uid", "==", user.uid),
+                    orderBy("submittedAt", "desc")
+                );
+                
+                const snap = await getDocs(q);
+                const results = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+                
+                if (results.length === 0) {
+                    status.textContent = '⚠️ 未找到成绩记录\n' +
+                                       'UID: ' + user.uid;
+                    status.className = 'log';
+                } else {
+                    let output = '✅ 查询成功，找到 ' + results.length + ' 条记录:\n\n';
+                    results.forEach((data, index) => {
+                        output += `${index + 1}. ID: ${data.id}\n`;
+                        output += `   分数: ${data.score}\n`;
+                        output += `   用户: ${data.userName}\n`;
+                        output += `   类型: ${data.examType}\n`;
+                        output += `   时间: ${data.submittedAt?.toDate?.()?.toLocaleString() || '无时间'}\n\n`;
+                    });
+                    status.textContent = output;
+                    status.className = 'log success';
+                }
+                
+            } catch (error) {
+                status.textContent = '❌ 成绩查询失败: ' + error.message + '\n' +
+                                   '错误代码: ' + error.code;
+                status.className = 'log error';
+            }
+        };
+
+        // 页面加载完成后自动检查
+        document.addEventListener('DOMContentLoaded', () => {
+            setTimeout(() => {
+                checkFirebaseInit();
+                testAnonymousLogin();
+                checkCounterStatus();
+            }, 1000);
+        });
+    </script>
+</body>
+</html>

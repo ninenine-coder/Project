@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>测试 Auth 持久化机制</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; background: #f5f5f5; }
+        h1 { color: #333; }
+        .test-section { margin: 20px 0; padding: 20px; background: white; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+        .test-section h3 { margin-top: 0; color: #667eea; }
+        button { padding: 10px 20px; margin: 5px; background: #667eea; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 14px; }
+        button:hover { background: #764ba2; }
+        .log { background: #f8f9fa; padding: 15px; margin: 10px 0; border-radius: 6px; font-family: monospace; white-space: pre-wrap; font-size: 13px; border: 1px solid #e0e0e0; }
+        .success { background: #d4edda; border-color: #c3e6cb; color: #155724; }
+        .error { background: #f8d7da; border-color: #f5c6cb; color: #721c24; }
+        .info { background: #d1ecf1; border-color: #bee5eb; color: #0c5460; }
+    </style>
+</head>
+<body>
+    <h1>🧪 Auth 持久化机制测试</h1>
+    <p><strong>目的：</strong>验证 Firebase Auth 在页面刷新和跨页面时的持久化行为。</p>
+    
+    <div class="test-section">
+        <h3>1. 初始化检查</h3>
+        <button onclick="checkInit()">检查 Firebase 初始化</button>
+        <div id="init-log" class="log">等待测试...</div>
+    </div>
+    
+    <div class="test-section">
+        <h3>2. 认证状态检查</h3>
+        <button onclick="checkAuthState()">检查当前认证状态</button>
+        <button onclick="testEnsureSignedIn()">测试 ensureSignedIn()</button>
+        <div id="auth-log" class="log">等待测试...</div>
+    </div>
+    
+    <div class="test-section">
+        <h3>3. 持久化测试</h3>
+        <button onclick="testPersistence()">测试持久化机制</button>
+        <button onclick="clearAndTest()">清除持久化数据并重新登录</button>
+        <div id="persist-log" class="log">等待测试...</div>
+    </div>
+    
+    <div class="test-section">
+        <h3>4. 跨页面测试</h3>
+        <p>在新标签页打开此页面，检查是否能自动还原同一用户：</p>
+        <button onclick="openNewTab()">在新标签页打开</button>
+        <button onclick="location.reload()">刷新当前页面</button>
+        <div id="cross-log" class="log">
+当前 UID: <span id="current-uid">-</span>
+匿名状态: <span id="is-anon">-</span>
+        </div>
+    </div>
+    
+    <div class="test-section">
+        <h3>5. 学号/工号测试</h3>
+        <button onclick="setTestProfile()">设置测试学号</button>
+        <button onclick="checkUserKey()">检查当前学号/工号</button>
+        <button onclick="clearProfile()">清除学号/工号</button>
+        <div id="profile-log" class="log">等待测试...</div>
+    </div>
+
+    <script type="module">
+        import { auth, db, authReady } from './js/firebase.js';
+        import { ensureSignedIn, getUserKey } from './js/auth-helpers.js';
+        import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-auth.js";
+
+        // 监听认证状态变化
+        onAuthStateChanged(auth, (user) => {
+            const uidEl = document.getElementById('current-uid');
+            const anonEl = document.getElementById('is-anon');
+            if (user) {
+                uidEl.textContent = user.uid;
+                anonEl.textContent = user.isAnonymous ? '是' : '否';
+                console.log('🔐 认证状态变化:', user.isAnonymous ? '匿名-' + user.uid : user.email || user.uid);
+            } else {
+                uidEl.textContent = '未登录';
+                anonEl.textContent = '-';
+                console.log('🔐 认证状态变化: 未登录');
+            }
+        });
+
+        // 1. 检查初始化
+        window.checkInit = async function() {
+            const log = document.getElementById('init-log');
+            try {
+                log.className = 'log';
+                log.textContent = '🔄 正在检查...';
+                
+                await authReady;
+                
+                const result = `✅ Firebase 初始化成功
+                
+Auth 实例: ${!!auth}
+DB 实例: ${!!db}
+当前用户: ${auth.currentUser ? (auth.currentUser.isAnonymous ? '匿名-' + auth.currentUser.uid : auth.currentUser.email || auth.currentUser.uid) : '未登录'}
+持久化类型: ${auth.config?.persistence?.[0]?.type || 'local'}`;
+                
+                log.textContent = result;
+                log.className = 'log success';
+            } catch (error) {
+                log.textContent = `❌ 初始化失败: ${error.message}`;
+                log.className = 'log error';
+            }
+        };
+
+        // 2. 检查认证状态
+        window.checkAuthState = async function() {
+            const log = document.getElementById('auth-log');
+            try {
+                log.className = 'log';
+                log.textContent = '🔄 正在检查...';
+                
+                await authReady;
+                
+                if (auth.currentUser) {
+                    const result = `✅ 用户已登录
+                    
+UID: ${auth.currentUser.uid}
+匿名: ${auth.currentUser.isAnonymous}
+Email: ${auth.currentUser.email || '无'}
+创建时间: ${new Date(auth.currentUser.metadata.creationTime).toLocaleString('zh-TW')}
+最后登录: ${new Date(auth.currentUser.metadata.lastSignInTime).toLocaleString('zh-TW')}`;
+                    
+                    log.textContent = result;
+                    log.className = 'log success';
+                } else {
+                    log.textContent = '⚠️ 当前未登录';
+                    log.className = 'log info';
+                }
+            } catch (error) {
+                log.textContent = `❌ 检查失败: ${error.message}`;
+                log.className = 'log error';
+            }
+        };
+
+        // 测试 ensureSignedIn
+        window.testEnsureSignedIn = async function() {
+            const log = document.getElementById('auth-log');
+            try {
+                log.className = 'log';
+                log.textContent = '🔄 正在调用 ensureSignedIn()...';
+                
+                const user = await ensureSignedIn();
+                
+                const result = `✅ ensureSignedIn() 成功
+                
+返回用户 UID: ${user.uid}
+匿名状态: ${user.isAnonymous}
+是否新创建: ${!auth.currentUser || auth.currentUser.uid !== user.uid ? '否（已还原）' : '可能（需检查）'}`;
+                
+                log.textContent = result;
+                log.className = 'log success';
+            } catch (error) {
+                log.textContent = `❌ ensureSignedIn() 失败: ${error.message}`;
+                log.className = 'log error';
+            }
+        };
+
+        // 3. 测试持久化
+        window.testPersistence = async function() {
+            const log = document.getElementById('persist-log');
+            try {
+                log.className = 'log';
+                log.textContent = '🔄 正在测试持久化机制...';
+                
+                const beforeUID = auth.currentUser?.uid;
+                
+                // 如果没有用户，先登录
+                if (!beforeUID) {
+                    await ensureSignedIn();
+                }
+                
+                const afterUID = auth.currentUser?.uid;
+                
+                const result = `✅ 持久化测试完成
+                
+测试前 UID: ${beforeUID || '无'}
+测试后 UID: ${afterUID}
+持久化状态: ${beforeUID && beforeUID === afterUID ? '✅ 已保存（同一用户）' : '⚠️ 新登录或不同用户'}
+
+💡 提示：刷新页面后再次检查认证状态，如果 UID 相同，说明持久化成功。`;
+                
+                log.textContent = result;
+                log.className = 'log success';
+            } catch (error) {
+                log.textContent = `❌ 测试失败: ${error.message}`;
+                log.className = 'log error';
+            }
+        };
+
+        // 清除并重新登录
+        window.clearAndTest = async function() {
+            const log = document.getElementById('persist-log');
+            try {
+                log.className = 'log';
+                log.textContent = '🔄 正在清除持久化数据...';
+                
+                const oldUID = auth.currentUser?.uid;
+                
+                // 登出
+                await auth.signOut();
+                console.log('✅ 已登出');
+                
+                // 等待一会儿
+                await new Promise(r => setTimeout(r, 500));
+                
+                // 重新登录
+                const user = await ensureSignedIn();
+                
+                const result = `✅ 清除并重新登录完成
+                
+原 UID: ${oldUID || '无'}
+新 UID: ${user.uid}
+是否相同: ${oldUID === user.uid ? '是（可能是缓存）' : '否（新创建）'}
+
+💡 提示：匿名账户在登出后通常会创建新的 UID。`;
+                
+                log.textContent = result;
+                log.className = 'log success';
+            } catch (error) {
+                log.textContent = `❌ 测试失败: ${error.message}`;
+                log.className = 'log error';
+            }
+        };
+
+        // 4. 打开新标签页
+        window.openNewTab = function() {
+            window.open(window.location.href, '_blank');
+        };
+
+        // 5. 设置测试学号
+        window.setTestProfile = function() {
+            const log = document.getElementById('profile-log');
+            const testProfile = {
+                '学号': 'TEST123456',
+                '工号': null,
+                'name': '测试用户'
+            };
+            localStorage.setItem('pbls_user_profile', JSON.stringify(testProfile));
+            log.textContent = `✅ 已设置测试学号: ${testProfile['学号']}`;
+            log.className = 'log success';
+        };
+
+        // 检查学号/工号
+        window.checkUserKey = function() {
+            const log = document.getElementById('profile-log');
+            const userKey = getUserKey();
+            if (userKey) {
+                log.textContent = `✅ 当前学号/工号: ${userKey}\n\nlocalStorage 内容:\n${localStorage.getItem('pbls_user_profile')}`;
+                log.className = 'log success';
+            } else {
+                log.textContent = '⚠️ 未找到学号/工号\n\n请先设置测试学号';
+                log.className = 'log info';
+            }
+        };
+
+        // 清除学号/工号
+        window.clearProfile = function() {
+            const log = document.getElementById('profile-log');
+            localStorage.removeItem('pbls_user_profile');
+            log.textContent = '✅ 已清除学号/工号数据';
+            log.className = 'log success';
+        };
+
+        // 页面加载时自动检查
+        window.addEventListener('DOMContentLoaded', async () => {
+            await checkInit();
+            await checkAuthState();
+        });
+    </script>
+</body>
+</html>

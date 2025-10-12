@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>創建測試用戶 - PBLS VR教學平台</title>
+    <style>
+        body {
+            font-family: 'Microsoft JhengHei', sans-serif;
+            background: linear-gradient(135deg, #e8d5ff 0%, #d1c4e9 50%, #b39ddb 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            max-width: 500px;
+            width: 100%;
+        }
+        
+        h1 {
+            text-align: center;
+            color: #4a148c;
+            margin-bottom: 30px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #4a148c;
+            font-weight: 600;
+        }
+        
+        input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e1bee7;
+            border-radius: 8px;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+        
+        button {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #9c27b0, #673ab7);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+        
+        button:hover {
+            background: linear-gradient(135deg, #7b1fa2, #512da8);
+        }
+        
+        .message {
+            margin-top: 20px;
+            padding: 12px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        
+        .success {
+            background: #e8f5e8;
+            color: #2e7d32;
+            border: 1px solid #4caf50;
+        }
+        
+        .error {
+            background: #ffebee;
+            color: #c62828;
+            border: 1px solid #f44336;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔧 創建測試用戶</h1>
+        
+        <div class="form-group">
+            <label for="studentId">學號/工號</label>
+            <input type="text" id="studentId" value="test001" placeholder="請輸入學號或工號">
+        </div>
+        
+        <div class="form-group">
+            <label for="email">帳號 (Email)</label>
+            <input type="email" id="email" value="test@example.com" placeholder="請輸入電子郵件">
+        </div>
+        
+        <div class="form-group">
+            <label for="password">密碼</label>
+            <input type="password" id="password" value="test123" placeholder="請輸入密碼">
+        </div>
+        
+        <div class="form-group">
+            <label for="name">姓名</label>
+            <input type="text" id="name" value="測試用戶" placeholder="請輸入姓名">
+        </div>
+        
+        <div class="form-group">
+            <label for="school">學校/醫院</label>
+            <input type="text" id="school" value="長庚大學" placeholder="請輸入學校或醫院">
+        </div>
+        
+        <div class="form-group">
+            <label for="department">科系/科別</label>
+            <input type="text" id="department" value="醫學系" placeholder="請輸入科系或科別">
+        </div>
+        
+        <button onclick="createTestUser()">創建測試用戶</button>
+        
+        <div id="message" class="message" style="display: none;"></div>
+    </div>
+
+    <script type="module">
+        import { db } from './js/firebase.js';
+        const { doc, setDoc, getDoc } = await import("https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore.js");
+
+        window.createTestUser = async function() {
+            const studentId = document.getElementById('studentId').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value;
+            const name = document.getElementById('name').value.trim();
+            const school = document.getElementById('school').value.trim();
+            const department = document.getElementById('department').value.trim();
+            const messageDiv = document.getElementById('message');
+
+            if (!studentId || !email || !password || !name || !school || !department) {
+                showMessage('請填寫所有欄位', 'error');
+                return;
+            }
+
+            try {
+                // 檢查是否已存在
+                const docRef = doc(db, "user", studentId);
+                const snap = await getDoc(docRef);
+                
+                if (snap.exists()) {
+                    showMessage('此學號/工號已存在', 'error');
+                    return;
+                }
+
+                // 創建用戶數據
+                const userDocData = {
+                    studentId: studentId,
+                    account: email,
+                    password: password,
+                    name: name,
+                    "姓名": name,  // 中文欄位名
+                    "school/hospital": school,
+                    school: school,
+                    department: department,
+                    createdAt: new Date().toISOString(),
+                    totalTests: 0,
+                    totalTimeSpent: 0,
+                    lastLogin: null
+                };
+
+                await setDoc(docRef, userDocData);
+                
+                showMessage(`✅ 測試用戶創建成功！<br><br>
+                    <strong>登入資訊：</strong><br>
+                    帳號：${email}<br>
+                    密碼：${password}<br><br>
+                    現在可以使用這些資訊登入了！`, 'success');
+                
+            } catch (error) {
+                console.error('創建用戶失敗:', error);
+                showMessage('創建用戶失敗：' + error.message, 'error');
+            }
+        };
+
+        function showMessage(message, type) {
+            const messageDiv = document.getElementById('message');
+            messageDiv.innerHTML = message;
+            messageDiv.className = `message ${type}`;
+            messageDiv.style.display = 'block';
+        }
+    </script>
+</body>
+</html>

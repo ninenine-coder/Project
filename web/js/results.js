@@ -1,8 +1,9 @@
 // Firestore-only 成績儲存與讀取工具
+import { db } from '../../js/firebase.js';
 import {
-  getFirestore, doc, collection, setDoc, serverTimestamp,
+  doc, collection, setDoc, serverTimestamp,
   writeBatch, getDoc, getDocs, query, orderBy, limit
-} from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
+} from "https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore.js";
 
 /**
  * 儲存一次成績
@@ -25,7 +26,6 @@ export async function saveExamResultToFirestore(payload) {
   } = payload || {};
   if (!uid) throw new Error("缺少 uid，請先登入並寫入 localStorage.pbls_user.uid");
 
-  const db = getFirestore();
   const resultRef = doc(collection(db, 'user', uid, 'results')); // 自動 ID
   const attemptId = resultRef.id;
 
@@ -71,7 +71,6 @@ export async function saveExamResultToFirestore(payload) {
 async function incrementTestCount(userId) {
   try {
     const { increment, getDoc, updateDoc } = await import("https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js");
-    const db = getFirestore();
     
     // 定義用戶文件
     const userRef = doc(db, "user", userId);
@@ -109,7 +108,6 @@ async function incrementTestCount(userId) {
  */
 export async function loadMyResults({ uid, limitN = 20 }) {
   if (!uid) throw new Error("請先登入");
-  const db = getFirestore();
   const q = query(
     collection(db, 'user', uid, 'results'),
     orderBy('submittedAt', 'desc'),
@@ -123,7 +121,6 @@ export async function loadMyResults({ uid, limitN = 20 }) {
  * 讀取單筆成績＋所有詳解
  */
 export async function loadOneResultWithAnswers({ uid, attemptId }) {
-  const db = getFirestore();
   const resultRef = doc(db, 'user', uid, 'results', attemptId);
   const summarySnap = await getDoc(resultRef);
   if (!summarySnap.exists()) throw new Error('找不到這筆成績');
@@ -140,7 +137,6 @@ export async function loadOneResultWithAnswers({ uid, attemptId }) {
  */
 export async function getUserExamCount(uid) {
   try {
-    const db = getFirestore();
     const userRef = doc(db, 'user', uid);
     const userSnap = await getDoc(userRef);
     
@@ -162,7 +158,6 @@ export async function getUserExamCount(uid) {
  */
 export async function displayTestCount(userId, elementId = 'total-tests') {
   try {
-    const db = getFirestore();
     const userRef = doc(db, "user", userId);
     const userSnap = await getDoc(userRef);
 
@@ -202,7 +197,6 @@ export async function displayTestCount(userId, elementId = 'total-tests') {
 export async function updateTotalTimeSpent(userId) {
   try {
     const { increment, serverTimestamp, updateDoc } = await import("https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js");
-    const db = getFirestore();
     const userRef = doc(db, "user", userId);
     const userSnap = await getDoc(userRef);
 
@@ -241,7 +235,6 @@ export async function updateTotalTimeSpent(userId) {
  */
 export async function displayTotalTimeSpent(userId, elementId = 'total-time-spent') {
   try {
-    const db = getFirestore();
     const userRef = doc(db, "user", userId);
     const userSnap = await getDoc(userRef);
 

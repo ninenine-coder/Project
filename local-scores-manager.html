@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>本地成績管理工具 - PBLS VR教學平台</title>
+    <style>
+        body {
+            font-family: 'Microsoft JhengHei', sans-serif;
+            background: linear-gradient(135deg, #e8d5ff 0%, #d1c4e9 50%, #b39ddb 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+        
+        h1 {
+            text-align: center;
+            color: #4a148c;
+            margin-bottom: 30px;
+        }
+        
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .stat-card {
+            background: rgba(255, 255, 255, 0.8);
+            border: 2px solid #e1bee7;
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #9c27b0;
+            margin-bottom: 10px;
+        }
+        
+        .stat-label {
+            color: #6a1b9a;
+            font-size: 1.1rem;
+        }
+        
+        .controls {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+        
+        button {
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #9c27b0, #673ab7);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        button:hover {
+            background: linear-gradient(135deg, #7b1fa2, #512da8);
+            transform: translateY(-2px);
+        }
+        
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .scores-table {
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        .scores-table table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .scores-table th,
+        .scores-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #e1bee7;
+        }
+        
+        .scores-table th {
+            background: #f3e5f5;
+            color: #4a148c;
+            font-weight: 600;
+        }
+        
+        .scores-table tr:hover {
+            background: rgba(156, 39, 176, 0.1);
+        }
+        
+        .score-badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        
+        .score-excellent { background: #e8f5e8; color: #2e7d32; }
+        .score-good { background: #e3f2fd; color: #1565c0; }
+        .score-fair { background: #fff3e0; color: #ef6c00; }
+        .score-poor { background: #ffebee; color: #c62828; }
+        
+        .no-scores {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+            font-size: 1.2rem;
+        }
+        
+        .log {
+            background: #f5f5f5;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 20px;
+            font-family: monospace;
+            font-size: 14px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📊 本地成績管理工具</h1>
+        
+        <div class="stats">
+            <div class="stat-card">
+                <div class="stat-number" id="total-scores">0</div>
+                <div class="stat-label">總成績數</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="avg-score">0</div>
+                <div class="stat-label">平均分數</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="highest-score">0</div>
+                <div class="stat-label">最高分數</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="pending-sync">0</div>
+                <div class="stat-label">待同步</div>
+            </div>
+        </div>
+        
+        <div class="controls">
+            <button onclick="refreshScores()">🔄 重新整理</button>
+            <button onclick="syncAllScores()">📤 同步所有成績</button>
+            <button onclick="exportScores()">💾 匯出成績</button>
+            <button onclick="clearAllScores()" style="background: linear-gradient(135deg, #f44336, #d32f2f);">🗑️ 清除所有成績</button>
+        </div>
+        
+        <div class="scores-table">
+            <div id="scores-content">
+                <div class="no-scores">載入中...</div>
+            </div>
+        </div>
+        
+        <div class="log" id="log"></div>
+    </div>
+
+    <script type="module">
+        import { auth, db } from './js/firebase.js';
+        import { serverTimestamp } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore.js";
+
+        function log(message) {
+            const logDiv = document.getElementById('log');
+            const timestamp = new Date().toLocaleTimeString();
+            logDiv.innerHTML += `[${timestamp}] ${message}\n`;
+            logDiv.scrollTop = logDiv.scrollHeight;
+        }
+        
+        function getScoreClass(score) {
+            if (score >= 90) return 'score-excellent';
+            if (score >= 80) return 'score-good';
+            if (score >= 70) return 'score-fair';
+            return 'score-poor';
+        }
+        
+        function formatTime(ms) {
+            const seconds = Math.round(ms / 1000);
+            const minutes = Math.floor(seconds / 60);
+            const remainingSeconds = seconds % 60;
+            return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
+        }
+        
+        function formatDate(timestamp) {
+            return new Date(timestamp).toLocaleString('zh-TW');
+        }
+        
+        function loadLocalScores() {
+            const scores = JSON.parse(localStorage.getItem('pbls_local_scores') || '[]');
+            
+            // 更新統計
+            document.getElementById('total-scores').textContent = scores.length;
+            
+            if (scores.length > 0) {
+                const totalScore = scores.reduce((sum, score) => sum + score.score, 0);
+                const avgScore = Math.round(totalScore / scores.length);
+                const highestScore = Math.max(...scores.map(score => score.score));
+                
+                document.getElementById('avg-score').textContent = avgScore;
+                document.getElementById('highest-score').textContent = highestScore;
+                document.getElementById('pending-sync').textContent = scores.length;
+                
+                // 顯示成績表格
+                const tableHtml = `
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>日期時間</th>
+                                <th>用戶</th>
+                                <th>分數</th>
+                                <th>正確題數</th>
+                                <th>耗時</th>
+                                <th>狀態</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${scores.map((score, index) => `
+                                <tr>
+                                    <td>${formatDate(score.createdAt)}</td>
+                                    <td>${score.userName || '未命名使用者'}</td>
+                                    <td><span class="score-badge ${getScoreClass(score.score)}">${score.score}分</span></td>
+                                    <td>${score.correctCount || '未知'}/${score.questionCount || '未知'}</td>
+                                    <td>${formatTime(score.timeSpentMs || 0)}</td>
+                                    <td>${score.savedLocally ? '本地存儲' : '已同步'}</td>
+                                    <td>
+                                        <button onclick="syncSingleScore(${index})" style="padding: 4px 8px; font-size: 12px;">同步</button>
+                                        <button onclick="deleteScore(${index})" style="padding: 4px 8px; font-size: 12px; background: #f44336;">刪除</button>
+                                    </td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                `;
+                document.getElementById('scores-content').innerHTML = tableHtml;
+            } else {
+                document.getElementById('avg-score').textContent = '0';
+                document.getElementById('highest-score').textContent = '0';
+                document.getElementById('pending-sync').textContent = '0';
+                document.getElementById('scores-content').innerHTML = '<div class="no-scores">沒有本地成績</div>';
+            }
+        }
+        
+        window.refreshScores = function() {
+            log('🔄 重新整理本地成績...');
+            loadLocalScores();
+        };
+        
+        window.syncSingleScore = async function(index) {
+            const scores = JSON.parse(localStorage.getItem('pbls_local_scores') || '[]');
+            if (index >= scores.length) return;
+            
+            const score = scores[index];
+            log(`📤 同步成績 ${index + 1}: ${score.score}分...`);
+            
+            try {
+                // 這裡需要導入成績服務
+                const { createSequentialScore } = await import('./src/services/scoreSeqService.js');
+                
+                const payload = {
+                    uid: score.uid,
+                    userName: score.userName,
+                    score: score.score,
+                    timeSpentMs: score.timeSpentMs,
+                    startedAt: score.startedAt,
+                    correctCount: score.correctCount,
+                    questionCount: score.questionCount,
+                    examType: score.examType,
+                    submittedAt: serverTimestamp(),
+                    clientInfo: {
+                        appVersion: 'quiz v1.0.0',
+                        ua: navigator.userAgent,
+                        timestamp: Date.now()
+                    }
+                };
+                
+                const docId = await createSequentialScore(payload);
+                log(`✅ 成績同步成功: ${docId}`);
+                
+                // 移除已同步的成績
+                scores.splice(index, 1);
+                localStorage.setItem('pbls_local_scores', JSON.stringify(scores));
+                
+                loadLocalScores();
+                
+            } catch (error) {
+                log(`❌ 同步失敗: ${error.message}`);
+            }
+        };
+        
+        window.syncAllScores = async function() {
+            const scores = JSON.parse(localStorage.getItem('pbls_local_scores') || '[]');
+            if (scores.length === 0) {
+                log('📋 沒有需要同步的成績');
+                return;
+            }
+            
+            log(`📤 開始同步 ${scores.length} 筆成績...`);
+            
+            try {
+                const { createSequentialScore } = await import('./src/services/scoreSeqService.js');
+                let syncedCount = 0;
+                
+                for (let i = scores.length - 1; i >= 0; i--) {
+                    const score = scores[i];
+                    try {
+                        const payload = {
+                            uid: score.uid,
+                            userName: score.userName,
+                            score: score.score,
+                            timeSpentMs: score.timeSpentMs,
+                            startedAt: score.startedAt,
+                            correctCount: score.correctCount,
+                            questionCount: score.questionCount,
+                            examType: score.examType,
+                            submittedAt: serverTimestamp(),
+                            clientInfo: {
+                                appVersion: 'quiz v1.0.0',
+                                ua: navigator.userAgent,
+                                timestamp: Date.now()
+                            }
+                        };
+                        
+                        await createSequentialScore(payload);
+                        scores.splice(i, 1);
+                        syncedCount++;
+                        log(`✅ 同步第 ${syncedCount} 筆成績成功`);
+                        
+                    } catch (error) {
+                        log(`❌ 同步第 ${i + 1} 筆成績失敗: ${error.message}`);
+                    }
+                }
+                
+                localStorage.setItem('pbls_local_scores', JSON.stringify(scores));
+                log(`🎉 同步完成！成功 ${syncedCount} 筆，剩餘 ${scores.length} 筆`);
+                
+                loadLocalScores();
+                
+            } catch (error) {
+                log(`❌ 同步過程發生錯誤: ${error.message}`);
+            }
+        };
+        
+        window.deleteScore = function(index) {
+            if (!confirm('確定要刪除這筆成績嗎？')) return;
+            
+            const scores = JSON.parse(localStorage.getItem('pbls_local_scores') || '[]');
+            if (index >= scores.length) return;
+            
+            const score = scores[index];
+            scores.splice(index, 1);
+            localStorage.setItem('pbls_local_scores', JSON.stringify(scores));
+            
+            log(`🗑️ 已刪除成績: ${score.score}分`);
+            loadLocalScores();
+        };
+        
+        window.exportScores = function() {
+            const scores = JSON.parse(localStorage.getItem('pbls_local_scores') || '[]');
+            if (scores.length === 0) {
+                log('📋 沒有成績可以匯出');
+                return;
+            }
+            
+            const csvContent = [
+                '日期時間,用戶,分數,正確題數,總題數,耗時(秒),測驗類型',
+                ...scores.map(score => 
+                    `${formatDate(score.createdAt)},${score.userName || '未命名使用者'},${score.score},${score.correctCount || '未知'},${score.questionCount || '未知'},${Math.round((score.timeSpentMs || 0) / 1000)},${score.examType}`
+                )
+            ].join('\n');
+            
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            const url = URL.createObjectURL(blob);
+            link.setAttribute('href', url);
+            link.setAttribute('download', `pbls_scores_${new Date().toISOString().split('T')[0]}.csv`);
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            log(`💾 已匯出 ${scores.length} 筆成績`);
+        };
+        
+        window.clearAllScores = function() {
+            if (!confirm('確定要清除所有本地成績嗎？此操作無法復原！')) return;
+            
+            localStorage.removeItem('pbls_local_scores');
+            log('🗑️ 已清除所有本地成績');
+            loadLocalScores();
+        };
+        
+        // 頁面載入時初始化
+        window.addEventListener('load', () => {
+            log('📄 本地成績管理工具已載入');
+            loadLocalScores();
+        });
+    </script>
+</body>
+</html>
