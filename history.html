@@ -1137,9 +1137,52 @@
                 const historyList = document.getElementById('historyList');
                 historyList.innerHTML = '<div class="loading-message"><i class="fas fa-spinner fa-spin"></i> 載入成績中...</div>';
                 
-                // 使用統一的歷史資料服務
-                const { loadMyScores } = await import('./js/history-data.js');
-                historyScores = await loadMyScores(50);
+                // 等待認證完成
+                const { auth, db, authReady } = await import('./js/firebase.js');
+                await authReady;
+                
+                if (!auth.currentUser) {
+                    console.log('❌ 用戶未登入');
+                    loadLocalScores();
+                    return;
+                }
+                
+                // 查詢成績
+                const { collection, query, where, getDocs, orderBy, limit } = await import('https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore.js');
+                
+                let snap;
+                try {
+                    // 嘗試使用 orderBy 查詢
+                    const q1 = query(
+                        collection(db, 'scores'),
+                        where('uid', '==', auth.currentUser.uid),
+                        orderBy('submittedAt', 'desc'),
+                        limit(50)
+                    );
+                    snap = await getDocs(q1);
+                } catch (e) {
+                    // submittedAt 若是字串會在 orderBy 報錯，退回不排序
+                    console.log('⚠️ orderBy 失敗，使用基本查詢:', e.message);
+                    const q2 = query(
+                        collection(db, 'scores'),
+                        where('uid', '==', auth.currentUser.uid),
+                        limit(50)
+                    );
+                    snap = await getDocs(q2);
+                }
+                
+                historyScores = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+                
+                // 客戶端排序（處理不同時間格式）
+                historyScores.sort((a, b) => {
+                    const ta = Date.parse(a.submittedAt) || 
+                              a.submittedAt?.seconds * 1000 || 
+                              a.submittedAt?.toDate?.().getTime?.() || 0;
+                    const tb = Date.parse(b.submittedAt) || 
+                              b.submittedAt?.seconds * 1000 || 
+                              b.submittedAt?.toDate?.().getTime?.() || 0;
+                    return tb - ta;
+                });
                 
                 console.log(`✅ 載入了 ${historyScores.length} 筆成績`);
                 
@@ -1148,12 +1191,6 @@
                     loadLocalScores();
                     return;
                 }
-                
-                // 處理時間戳記
-                historyScores = historyScores.map(score => ({
-                    ...score,
-                    submittedAt: score.submittedAt?.toDate?.() || new Date()
-                }));
                 
                 displayHistoryScores(historyScores);
                 updateStatistics(historyScores);
@@ -1336,8 +1373,36 @@
         // 頁面載入時自動載入成績
         document.addEventListener('DOMContentLoaded', function() {
             console.log('📊 歷史成績頁面已載入');
-            loadHistoryScores();
+            // 等待 Firebase 認證還原完成後再載入成績
+            initHistoryPage();
         });
+        
+        // 初始化歷史頁面
+        async function initHistoryPage() {
+            try {
+                // 等待 Firebase 認證還原完成
+                const { auth, authReady } = await import('./js/firebase.js');
+                await authReady;
+                
+                // 除錯：看當前使用者
+                console.log('auth.currentUser =', auth.currentUser?.uid || null);
+                
+                // 未登入就帶回登入頁，並把下一跳帶上
+                if (!auth.currentUser) {
+                    const next = encodeURIComponent(location.pathname + location.search + location.hash);
+                    location.href = `login.html?next=${next}`;
+                    return;
+                }
+                
+                // 已登入才開始載入成績
+                await loadHistoryScores();
+                
+            } catch (error) {
+                console.error('❌ 初始化歷史頁面失敗:', error);
+                // 載入本地成績作為備用
+                loadLocalScores();
+            }
+        }
 
         // 語言切換功能已移至 enhanced-language-manager.js
     </script>
@@ -1346,5 +1411,8 @@
     <script type="module">
         import './src/js/enhanced-language-manager.js';
     </script>
+    
+    <!-- Firebase 初始化 - 必須在所有腳本之前 -->
+    <script type="module" src="./js/firebase.js"></script>
 </body>
 </html>
