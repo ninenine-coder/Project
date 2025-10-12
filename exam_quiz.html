@@ -39,8 +39,16 @@
         
         // 捕獲未處理的 Promise 拒絕
         window.addEventListener('unhandledrejection', function(e) {
+            // 忽略 Babel 相關錯誤
             if (e.reason && e.reason.message && e.reason.message.includes('@babel/runtime')) {
                 console.warn('Babel Promise 錯誤已忽略:', e.reason.message);
+                e.preventDefault();
+            }
+            // 忽略瀏覽器擴展相關的異步錯誤
+            else if (e.reason && e.reason.message && 
+                    (e.reason.message.includes('message channel closed') || 
+                     e.reason.message.includes('asynchronous response'))) {
+                console.warn('瀏覽器擴展相關錯誤已忽略:', e.reason.message);
                 e.preventDefault();
             }
         });
@@ -1347,7 +1355,7 @@
                 <i class="fas fa-info-circle"></i>
                 <span>資訊</span>
             </div>
-            <div class="sidebar-icon" onclick="window.location.href='index.html'">
+            <div class="sidebar-icon" onclick="window.location.href='practice.html'">
                 <i class="fas fa-play-circle"></i>
                 <span>練習專區</span>
             </div>

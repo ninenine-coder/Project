@@ -1,0 +1,1757 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>練習專區 - PBLS VR教學平台</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <!-- Glass System CSS -->
+    <link rel="stylesheet" href="assets/css/glass-system.css">
+    <!-- i18next -->
+    <script src="https://unpkg.com/i18next@23.7.6/i18next.min.js"></script>
+    <script src="https://unpkg.com/i18next-browser-languagedetector@7.2.0/i18nextBrowserLanguageDetector.min.js"></script>
+    
+    <!-- Glass System Feature Detection -->
+    <script src="src/js/feature-detect.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* 讓 backdrop-filter 看到的背景永遠在最底層這一層 */
+        .global-bg {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            background: url("./assets/背景.png") center calc(50% + 58px) / cover no-repeat;
+            /* 如果想跟你之前一樣高度微移，用上面這行；想更淡可以疊白漸層： */
+            /* background:
+                linear-gradient(to bottom, rgba(255,255,255,.85), rgba(255,255,255,.9)),
+                url("./assets/背景.png") center calc(50% + 58px) / cover no-repeat; */
+            pointer-events: none;
+        }
+
+        /* 讓內容都在背景之上 */
+        body {
+            font-family: 'Microsoft JhengHei', sans-serif;
+            background: transparent;           /* ← 改透明，避免"模糊到白色空氣" */
+            min-height: 100vh;
+            color: #333;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* 主要内容区域 */
+        .main-content {
+            position: relative;
+            z-index: 1;
+            min-height: calc(100vh - 80px); /* 减去header高度 */
+            padding-left: 0; /* 确保左边不被遮挡 */
+            margin-left: 0; /* 确保左边不被遮挡 */
+        }
+
+        /* 最上層內容 z-index 拉高一點，確保在 .global-bg 之上 */
+        #root, .main-content, .header, .marquee, .sidebar {
+            position: relative;
+            z-index: 1;
+        }
+
+        /* 練習首頁容器不要再有背景色，以免被當成 backdrop 的"背景" */
+        .practice-homepage,
+        .practice-options {
+            background: transparent;
+        }
+
+        /* 内容容器，确保内容在背景之上 */
+        .content-container {
+            position: relative;
+            z-index: 1;
+        }
+
+
+        /* 顶部间距变量 */
+        :root {
+            --masthead-h: 80px;                /* 顶部导航栏高度 */
+            --section-gap: 60px;               /* 额外上方留白 */
+        }
+
+        /* 毛玻璃卡片样式 */
+        :root {
+            --glass-alpha: .65;                /* 透明度 */
+            --glass-border: rgba(255,255,255,.35);
+            --glass-shadow: 0 10px 30px rgba(16,24,40,.12);
+            --glass-radius: 20px;
+            --glass-blur: 14px;
+            --glass-bg: rgba(255,255,255,var(--glass-alpha));
+        }
+
+        /* 统一顶部间距 */
+        .section-offset {
+            padding-top: calc(var(--masthead-h) + var(--section-gap));
+        }
+
+        .glass-card {
+            background: var(--glass-bg);
+            -webkit-backdrop-filter: saturate(160%) blur(var(--glass-blur));
+            backdrop-filter: saturate(160%) blur(var(--glass-blur));
+            border: 1px solid var(--glass-border);
+            border-radius: var(--glass-radius);
+            box-shadow: var(--glass-shadow);
+        }
+
+        /* 内容排版建议 */
+        .glass-padding { padding: 28px; }
+        .glass-title { font-size: 24px; font-weight: 800; color:#1f2937; }
+        .glass-sub { font-size: 14px; color:#4b5563; }
+
+        /* 兼容性/效能：若不支援 backdrop-filter 改高透明白 */
+        @supports not ((-webkit-backdrop-filter: blur(1px)) or (backdrop-filter: blur(1px))) {
+            .glass-card { background: rgba(255,255,255,.85); }
+        }
+
+        /* 减少动效需求者降低透明特效 */
+        @media (prefers-reduced-motion: reduce) {
+            .glass-card { backdrop-filter: none; -webkit-backdrop-filter: none; }
+        }
+
+        /* === 水流波紋效果 === */
+        .liquid-glass {
+            position: relative;
+            border-radius: 28px;
+            overflow: hidden;
+            background: transparent;
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            box-shadow:
+                inset 0 0 18px rgba(255,255,255,0.25),
+                0 8px 25px rgba(0,0,0,0.25);
+            transition: transform .35s ease, box-shadow .35s ease;
+            perspective: 1000px;
+            width: 300px; /* 确保左右宽度一致，与考试专区一致 */
+        }
+
+        /* 折射光層 + 水紋 */
+        .liquid-glass::before {
+            content: "";
+            position: absolute;
+            inset: -20%;
+            background:
+                radial-gradient(circle at var(--x, 50%) var(--y, 50%), rgba(255,255,255,0.6) 0%, rgba(255,255,255,0.15) 50%, transparent 80%),
+                url("./assets/背景.png"); /* 半透明水紋圖案 */
+            background-size: 200% 200%;
+            background-blend-mode: overlay;
+            opacity: var(--opacity, 0.8);
+            filter: blur(15px) saturate(130%);
+            transition: opacity 0.3s ease;
+            pointer-events: none;
+            animation: waterIdle 10s ease-in-out infinite alternate;
+        }
+
+        @keyframes waterIdle {
+            0%   { background-position: 0% 0%; }
+            50%  { background-position: 50% 100%; }
+            100% { background-position: 0% 0%; }
+        }
+
+        /* 滑鼠移入時加速波紋流動 */
+        .liquid-glass:hover::before {
+            animation: waterFlow 3s ease-in-out infinite;
+            filter: blur(10px) brightness(1.1);
+        }
+
+        @keyframes waterFlow {
+            0%   { background-position: 0% 0%; }
+            25%  { background-position: 100% 50%; }
+            50%  { background-position: 50% 100%; }
+            75%  { background-position: 0% 50%; }
+            100% { background-position: 0% 0%; }
+        }
+
+        .liquid-content {
+            position: relative;
+            z-index: 2;
+            padding: 2rem;
+            text-align: center;
+            background: rgba(255,255,255,0.03);
+            border-radius: inherit;
+        }
+
+        /* 頂部標題欄 */
+        .header {
+            position: fixed;
+            top: 0;
+            left: 80px; /* 側邊對齊 */
+            right: 0;
+            height: 80px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 30px;
+            z-index: 999;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            transition: left 0.3s ease; /* 側邊欄同步一下 */
+        }
+
+        .sidebar:hover ~ .header {
+            left: 180px; /* 側邊欄展開時，header也一起動 */
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .header-title {
+            color: white;
+            font-size: 24px;
+            font-weight: bold;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .user-info {
+            background: transparent;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 14px;
+            color: #333;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #3498db;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .user-avatar:hover {
+            transform: scale(1.1);
+        }
+
+        .logout-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #e74c3c;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .logout-btn:hover {
+            transform: scale(1.1);
+        }
+
+        /* 跑馬燈 */
+        /* === 液態玻璃膠囊跑馬燈 === */
+        :root {
+            --pill-h: 56px;
+            --pill-radius: 9999px;
+            --pill-bg: rgba(255, 255, 255, 0.16);
+            --pill-border: rgba(255, 255, 255, 0.28);
+            --pill-shadow: 0 10px 30px rgba(0, 0, 0, 0.18);
+            --pill-blur: 18px;
+            --pill-pad-x: 18px;
+        }
+
+        /* 外層容器：固定在 header 下方，水平置中 */
+        .marquee.glass-pill {
+            position: fixed;
+            top: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 999;
+            height: var(--pill-h);
+            min-width: min(92vw, 1200px);
+            max-width: min(92vw, 1200px);
+            display: flex;
+            align-items: center;
+            padding: 0 calc(var(--pill-pad-x) + 8px);
+            border-radius: var(--pill-radius);
+            
+            /* 液態玻璃核心 */
+            background: var(--pill-bg);
+            -webkit-backdrop-filter: blur(var(--pill-blur)) saturate(160%);
+            backdrop-filter: blur(var(--pill-blur)) saturate(160%);
+            border: 1px solid var(--pill-border);
+            box-shadow: var(--pill-shadow);
+            
+            /* 防止混色污染整頁 */
+            isolation: isolate;
+        }
+
+        /* 內部滾動軌道 */
+        .marquee .marquee-track {
+            display: flex;
+            align-items: center;
+            gap: 28px;
+            white-space: nowrap;
+            will-change: transform;
+            animation: marqueeScroll 26s linear infinite;
+        }
+
+        /* 滑過暫停 */
+        .marquee:hover .marquee-track {
+            animation-play-state: paused;
+        }
+
+        /* 單一公告項目 */
+        .marquee .marquee-item {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            color: #1f2937;
+            font-size: 15px;
+            font-weight: 600;
+            letter-spacing: 0.2px;
+            opacity: 0.9;
+        }
+
+        .marquee .marquee-item i {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+
+        /* 左側藍色高光 */
+        .marquee .pill-highlight {
+            position: absolute;
+            left: 6px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 96px;
+            height: calc(var(--pill-h) - 12px);
+            border-radius: var(--pill-radius);
+            background:
+                radial-gradient(100px 60px at 20% 50%, rgba(0, 170, 255, 0.55), transparent 60%),
+                radial-gradient(120px 80px at 45% 40%, rgba(64, 224, 255, 0.35), transparent 65%);
+            filter: blur(6px) saturate(140%);
+            mix-blend-mode: screen;
+            pointer-events: none;
+        }
+
+        /* 動畫定義 */
+        @keyframes marqueeScroll {
+            0%   { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+
+        /* 適配窄螢幕 */
+        @media (max-width: 768px) {
+            :root {
+                --pill-h: 50px;
+                --pill-pad-x: 14px;
+            }
+            .marquee .marquee-item {
+                font-size: 14px;
+            }
+            .marquee .pill-highlight {
+                width: 84px;
+            }
+        }
+
+        /* 登入/註冊頁面隱藏 */
+        body.auth .marquee {
+            display: none !important;
+        }
+
+        /* 跑馬燈暫停效果 */
+        .marquee:hover .marquee-content {
+            animation-play-state: paused;
+        }
+
+        /* 側邊欄樣式 */
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 80px;
+            height: 100vh;
+            background: rgba(147, 112, 219, 0.85);
+            backdrop-filter: blur(20px);
+            transition: width 0.3s ease;
+            box-shadow: 4px 0 20px rgba(0, 0, 0, 0.3), 
+                         0 0 40px rgba(0, 0, 0, 0.1);
+            border-right: 1px solid rgba(255, 255, 255, 0.1);
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar:hover {
+            width: 180px;
+        }
+
+        .sidebar-top {
+            padding: 20px 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .logo-container {
+            width: 60px;
+            height: 60px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+
+        .logo-image {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+            filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+            transition: all 0.3s ease;
+        }
+
+        .sidebar:hover .logo-container {
+            transform: scale(1.82);
+        }
+
+        .logo-container:hover .logo-image {
+            filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
+        }
+
+        .sidebar-menu {
+            padding: 20px 0;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar-icon {
+            display: flex;
+            align-items: center;
+            padding: 15px 20px;
+            margin: 5px 10px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2),
+                        inset 0 1px 0 rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .sidebar-icon:hover,
+        .sidebar-icon.active {
+            background: rgba(52, 152, 219, 0.8);
+            box-shadow: 0 6px 20px rgba(52, 152, 219, 0.4),
+                        inset 0 1px 0 rgba(255, 255, 255, 0.3);
+        }
+
+        .sidebar-icon i {
+            font-size: 20px;
+            color: white;
+            min-width: 20px;
+            margin-right: 15px;
+        }
+
+        .sidebar-icon span {
+            color: white;
+            font-weight: 500;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            white-space: nowrap;
+        }
+
+        /* 語言切換按鈕容器 - 固定在底部 */
+        .language-switcher-container {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 10px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* 語言切換按鈕特殊樣式 */
+        .language-switcher {
+            background: rgba(46, 204, 113, 0.8) !important;
+            border: 2px solid rgba(46, 204, 113, 0.6) !important;
+            margin: 0;
+        }
+
+        .language-switcher:hover {
+            background: rgba(39, 174, 96, 0.9) !important;
+            border-color: rgba(39, 174, 96, 0.8) !important;
+            transform: translateX(5px);
+        }
+
+        .language-switcher i {
+            color: white !important;
+        }
+
+        .language-switcher span {
+            color: white !important;
+        }
+
+        .sidebar:hover .sidebar-icon span {
+            opacity: 1;
+        }
+
+        /* 主要內容區域 */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            margin-left: 0; /* 改为0，让背景从左边开始 */
+            margin-top: 140px; /* 与历史成绩页面对齐 */
+            padding: 20px 30px 40px 100px; /* 内容从侧边栏右边开始，但背景覆盖全屏 */
+            min-height: calc(100vh - 100px);
+        }
+
+        .sidebar:hover ~ .main-content {
+            padding-left: 200px; /* 侧边栏展开时，内容向右移动 */
+        }
+
+        /* 練習專區首頁樣式 */
+        .practice-homepage {
+            padding: 20px 30px 40px 30px;
+            min-height: calc(100vh - 180px);
+        }
+
+        .practice-homepage h1 {
+            font-size: 2.5rem;
+            color: #333;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-align: center !important;
+            width: 100%;
+        }
+
+        .practice-homepage p {
+            color: #666;
+            font-size: 1.1rem;
+            text-align: center !important;
+            margin-bottom: 40px;
+            width: 100%;
+        }
+
+        /* 360實境教學影片樣式 */
+        .vr-video-section {
+            max-width: 800px;
+            margin: 0 auto 40px auto;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            overflow: hidden;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .vr-video-section:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+        }
+
+        .vr-video-header {
+            padding: 30px 30px 20px 30px;
+            text-align: center;
+        }
+
+        .video-title {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 10px;
+        }
+
+        .video-title i {
+            font-size: 24px;
+            color: #3498db;
+        }
+
+        .video-title span {
+            font-size: 24px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .video-subtitle {
+            font-size: 14px;
+            color: #7f8c8d;
+            margin: 0;
+            line-height: 1.5;
+        }
+
+        .video-player-container {
+            padding: 0 30px 30px 30px;
+        }
+
+        .video-player {
+            position: relative;
+            width: 100%;
+            height: 400px;
+            background: linear-gradient(135deg, #9370db 0%, #3498db 100%);
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .video-player:hover {
+            transform: scale(1.02);
+            box-shadow: 0 10px 30px rgba(52, 152, 219, 0.3);
+        }
+
+        .play-button-center {
+            width: 80px;
+            height: 80px;
+            background: transparent;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .play-button-center:hover {
+            transform: scale(1.1);
+            box-shadow: 0 12px 25px rgba(0, 0, 0, 0.3);
+        }
+
+        .play-button-center i {
+            font-size: 28px;
+            color: #3498db;
+            margin-left: 4px;
+        }
+
+        .video-duration {
+            position: absolute;
+            bottom: 15px;
+            right: 15px;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        /* 虛擬人互動樣式 */
+        .virtual-human-section {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .section-header h2 {
+            font-size: 24px;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+
+        .section-header h2 i {
+            color: #3498db;
+            margin-right: 10px;
+        }
+
+        .section-header p {
+            color: #7f8c8d;
+            font-size: 14px;
+        }
+
+        .virtual-human-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .virtual-human-card {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            transition: transform 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            min-height: 200px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            border: 2px solid transparent;
+        }
+
+        .virtual-human-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+            border-color: #3498db;
+        }
+
+        .virtual-human-card h3 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+
+        .virtual-human-card p {
+            color: #7f8c8d;
+            font-size: 14px;
+            margin-bottom: 15px;
+            flex-grow: 1;
+        }
+
+        /* 練習選項卡片樣式 */
+        .practice-options {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            flex-wrap: wrap;
+            margin-top: 40px;
+        }
+
+        .practice-option-card {
+            background: rgba(255, 255, 255, 0.1) !important;
+            -webkit-backdrop-filter: blur(20px) saturate(180%) !important;
+            backdrop-filter: blur(20px) saturate(180%) !important;
+            border: 1px solid rgba(255, 255, 255, 0.2) !important;
+            border-radius: 20px !important;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1) !important;
+            padding: 40px 30px;
+            transition: all 0.3s ease;
+            width: 300px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .practice-option-card:hover {
+            transform: translateY(-10px);
+            background: rgba(255, 255, 255, 0.15) !important;
+            -webkit-backdrop-filter: blur(25px) saturate(200%) !important;
+            backdrop-filter: blur(25px) saturate(200%) !important;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2) !important;
+            border: 1px solid rgba(255, 255, 255, 0.3) !important;
+        }
+
+        .practice-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px auto;
+            box-shadow: 0 10px 24px rgba(99,102,241,0.35);
+            position: relative;
+            z-index: 1;
+        }
+
+        .practice-icon i {
+            font-size: 32px;
+            color: white;
+        }
+
+        .practice-option-card h3 {
+            font-size: 24px;
+            color: #2c3e50;
+            margin-bottom: 15px;
+        }
+
+        .practice-option-card p {
+            font-size: 16px;
+            color: #7f8c8d;
+            margin-bottom: 25px;
+            line-height: 1.5;
+        }
+
+        .practice-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 25px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 22px rgba(99,102,241,0.35);
+            position: relative;
+            z-index: 1;
+        }
+
+        .practice-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        /* 內容頁面樣式 */
+        .content-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .back-btn {
+            background: #6c757d;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 20px;
+        }
+
+        .back-btn:hover {
+            background: #5a6268;
+            transform: translateY(-2px);
+        }
+
+        .content-header h2 {
+            font-size: 28px;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+
+        .content-header p {
+            font-size: 16px;
+            color: #7f8c8d;
+        }
+
+        .content-footer {
+            text-align: center;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #e0e0e0;
+        }
+
+        /* 情境選擇下拉選單樣式 */
+        .scenario-selector {
+            max-width: 600px;
+            margin: 40px auto;
+            text-align: center;
+        }
+
+        .selector-container {
+            background: var(--glass-bg);
+            -webkit-backdrop-filter: saturate(160%) blur(var(--glass-blur));
+            backdrop-filter: saturate(160%) blur(var(--glass-blur));
+            border: 1px solid var(--glass-border);
+            border-radius: var(--glass-radius);
+            box-shadow: var(--glass-shadow);
+            padding: 30px;
+        }
+
+        .selector-label {
+            display: block;
+            font-size: 18px;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 15px;
+        }
+
+        .scenario-select {
+            width: 100%;
+            max-width: 400px;
+            padding: 12px 20px;
+            border: 2px solid #e0e0e0;
+            border-radius: 25px;
+            font-size: 16px;
+            background: transparent;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .scenario-select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .scenario-select:hover {
+            border-color: #667eea;
+        }
+
+        /* 單一情境詳細內容樣式 */
+        .scenario-detail {
+            max-width: 800px;
+            margin: 40px auto;
+        }
+
+        .scenario-detail-content {
+            background: var(--glass-bg);
+            -webkit-backdrop-filter: saturate(160%) blur(var(--glass-blur));
+            backdrop-filter: saturate(160%) blur(var(--glass-blur));
+            border: 1px solid var(--glass-border);
+            border-radius: var(--glass-radius);
+            box-shadow: var(--glass-shadow);
+            padding: 40px;
+            display: flex;
+            gap: 30px;
+            align-items: center;
+        }
+
+        .scenario-detail-image {
+            flex: 1;
+            max-width: 400px;
+        }
+
+        .scenario-detail-image img {
+            width: 100%;
+            height: 300px;
+            object-fit: cover;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .scenario-detail-image div {
+            width: 100%;
+            height: 300px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .scenario-detail-image div img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .scenario-detail-info {
+            flex: 1;
+        }
+
+        .scenario-detail-info h3 {
+            font-size: 28px;
+            color: #2c3e50;
+            margin-bottom: 20px;
+        }
+
+        .scenario-detail-info p {
+            font-size: 16px;
+            color: #7f8c8d;
+            line-height: 1.6;
+            margin-bottom: 30px;
+        }
+
+        .scenario-detail-actions {
+            text-align: center;
+        }
+
+        .start-scenario-btn {
+            background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 25px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(39, 174, 96, 0.3);
+        }
+
+        .start-scenario-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(39, 174, 96, 0.4);
+        }
+
+        .start-scenario-btn i {
+            margin-right: 10px;
+        }
+
+        /* YouTube 360度影片樣式 */
+        .yt-wrap {
+            position: relative;
+            padding-top: 56.25%;
+            max-width: 1200px;
+            margin: 12px auto;
+        }
+
+        .yt-wrap iframe {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            border: 0;
+            border-radius: 12px;
+        }
+
+        .youtube-360-note {
+            font-size: 12px;
+            color: #666;
+            margin-top: 8px;
+            text-align: center;
+            line-height: 1.4;
+        }
+
+        .card-icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 50%;
+            margin: 0 auto 15px auto;
+            color: white;
+            font-size: 24px;
+        }
+
+        .scenario-image {
+            width: 100%;
+            height: 200px;
+            border-radius: 15px;
+            margin-bottom: 15px;
+            background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .scenario-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 15px;
+            transition: transform 0.3s ease;
+        }
+
+        .virtual-human-card:hover .scenario-image img {
+            transform: scale(1.05);
+        }
+
+        .scenario-btn {
+            background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 15px;
+            box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3);
+        }
+
+        .scenario-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(52, 152, 219, 0.4);
+        }
+
+        .scenario-btn:active {
+            transform: translateY(0);
+        }
+
+        /* 響應式設計 */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 60px;
+            }
+
+            .sidebar:hover {
+                width: 160px;
+            }
+
+            .main-content {
+                margin-left: 0; /* 移动设备也让背景从左边开始 */
+                margin-top: 120px; /* 与历史成绩页面对齐 */
+                padding-left: 80px; /* 内容从侧边栏右边开始 */
+            }
+
+            .sidebar:hover ~ .main-content {
+                padding-left: 160px; /* 侧边栏展开时，内容向右移动 */
+            }
+
+            .virtual-human-grid {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+
+            .card-icon {
+                width: 50px;
+                height: 50px;
+                font-size: 20px;
+            }
+
+            .scenario-image {
+                height: 160px;
+            }
+
+            .scenario-btn {
+                font-size: 12px;
+                padding: 8px 16px;
+            }
+
+            .practice-options {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .liquid-glass {
+                width: 280px; /* 移动端稍小一点，与考试专区一致 */
+            }
+
+            .scenario-detail-content {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .scenario-detail-image {
+                max-width: 100%;
+            }
+
+            .scenario-detail-image img {
+                height: 250px;
+            }
+
+            .scenario-detail-image div {
+                height: 250px;
+            }
+
+            .selector-container {
+                padding: 20px;
+            }
+
+            .scenario-select {
+                max-width: 100%;
+            }
+
+            .yt-wrap {
+                margin: 15px auto;
+            }
+
+            .yt-wrap iframe {
+                border-radius: 8px;
+            }
+
+            .youtube-360-note {
+                font-size: 11px;
+                margin-top: 6px;
+            }
+        }
+    </style>
+    
+    <!-- 語言切換功能 -->
+    <script src="src/js/language-switcher.js"></script>
+    <!-- 用戶資料服務 -->
+    <script type="module" src="src/services/userDataService.js"></script>
+    <!-- 學習時間服務 -->
+    <script type="module" src="src/services/learningTimeService.js"></script>
+    
+    <!-- 錯誤處理腳本 -->
+    <script>
+        // 捕獲並忽略 Babel 相關錯誤
+        window.addEventListener('error', function(e) {
+            if (e.message && (e.message.includes('@babel/runtime') || e.message.includes('babel'))) {
+                console.warn('Babel 相關錯誤已忽略:', e.message);
+                e.preventDefault();
+                return false;
+            }
+        });
+        
+        // 捕獲未處理的 Promise 拒絕
+        window.addEventListener('unhandledrejection', function(e) {
+            // 忽略 Babel 相關錯誤
+            if (e.reason && e.reason.message && e.reason.message.includes('@babel/runtime')) {
+                console.warn('Babel Promise 錯誤已忽略:', e.reason.message);
+                e.preventDefault();
+            }
+            // 忽略瀏覽器擴展相關的異步錯誤
+            else if (e.reason && e.reason.message && 
+                    (e.reason.message.includes('message channel closed') || 
+                     e.reason.message.includes('asynchronous response'))) {
+                console.warn('瀏覽器擴展相關錯誤已忽略:', e.reason.message);
+                e.preventDefault();
+            }
+        });
+        
+        // 捕獲圖片載入錯誤
+        window.addEventListener('error', function(e) {
+            if (e.target && e.target.tagName === 'IMG') {
+                console.warn('圖片載入失敗:', e.target.src);
+                e.preventDefault();
+                return false;
+            }
+        }, true);
+        
+        // 360 實境教學影片錯誤處理
+        window.addEventListener('error', function(e) {
+            if (e.target && e.target.tagName === 'IFRAME') {
+                console.warn('YouTube 影片載入失敗:', e.target.src);
+                // 可以添加備用方案
+                e.preventDefault();
+                return false;
+            }
+        }, true);
+        
+        // 確保 enterPractice 函數存在
+        window.enterPractice = window.enterPractice || function(practiceType) {
+            console.log('進入練習模式:', practiceType);
+            const homepage = document.getElementById('practiceHomepage');
+            const vrVideoContent = document.getElementById('vrVideoContent');
+            const virtualHumanContent = document.getElementById('virtualHumanContent');
+            
+            if (!homepage || !vrVideoContent || !virtualHumanContent) {
+                console.error('找不到練習內容元素');
+                return;
+            }
+            
+            // 隱藏首頁
+            homepage.style.display = 'none';
+            
+            // 根據類型顯示對應內容
+            if (practiceType === 'vr-video') {
+                vrVideoContent.style.display = 'block';
+                console.log('✅ 360實境教學影片已載入');
+            } else if (practiceType === 'virtual-human') {
+                virtualHumanContent.style.display = 'block';
+                console.log('✅ 虛擬人模擬已載入');
+            }
+        };
+    </script>
+</head>
+<body>
+    <!-- 固定底圖，讓 backdrop-filter 一定有東西可以"透視＋模糊" -->
+    <div class="global-bg" aria-hidden="true"></div>
+    
+    <!-- 側邊欄 -->
+            <div class="sidebar">
+        <!-- 頂部：Logo -->
+                <div class="sidebar-top">
+            <div class="logo-container">
+                <img src="assets/logo.png" alt="PBLS Logo" class="logo-image">
+                    </div>
+                </div>
+                
+        <!-- 選單 -->
+        <div class="sidebar-menu">
+            <div class="sidebar-icon" onclick="window.location.href='info.html'">
+                <i class="fas fa-info-circle"></i>
+                <span>資訊</span>
+            </div>
+            <div class="sidebar-icon active" onclick="window.location.href='practice.html'">
+                <i class="fas fa-play-circle"></i>
+                <span>練習專區</span>
+            </div>
+            <div class="sidebar-icon" onclick="window.location.href='exam.html'">
+                <i class="fas fa-clipboard-list"></i>
+                <span>考試專區</span>
+            </div>
+            <div class="sidebar-icon" onclick="window.location.href='history.html'">
+                <i class="fas fa-chart-line"></i>
+                <span>歷史成績</span>
+            </div>
+            <div class="sidebar-icon" onclick="window.location.href='team.html'">
+                <i class="fas fa-users"></i>
+                <span>團隊</span>
+            </div>
+        </div>
+
+        <!-- 語言切換按鈕 - 固定在底部 -->
+        <div class="language-switcher-container">
+            <div class="sidebar-icon language-switcher" onclick="toggleLanguage()">
+                <i class="fas fa-globe"></i>
+                <span id="language-text">中文</span>
+            </div>
+        </div>
+            </div>
+
+            <!-- 頂部標題欄 -->
+            <div class="header">
+                <div class="header-left">
+            <h1 class="header-title">歡迎使用PBLS教學平台</h1>
+                </div>
+                <div class="header-right">
+            <div class="user-info" id="user-info-display">載入中...</div>
+            <div class="user-avatar" onclick="showUserProfile()">
+                                <i class="fas fa-user"></i>
+                            </div>
+            <div class="logout-btn" onclick="logout()">
+                            <i class="fas fa-sign-out-alt"></i>
+                    </div>
+                </div>
+            </div>
+
+    <!-- 跑馬燈 -->
+    <!-- 液態玻璃膠囊跑馬燈 -->
+    <div class="marquee glass-pill" role="marquee" aria-label="最新公告">
+        <div class="marquee-track">
+            <div class="marquee-item">
+                <i class="fas fa-bullhorn"></i> 歡迎使用PBLS VR教學平台！
+        </div>
+            <div class="marquee-item">
+                <i class="fas fa-vr-cardboard"></i> 360°實境教學影片，身臨其境的學習體驗
+            </div>
+            <div class="marquee-item">
+                <i class="fas fa-comments"></i> 虛擬人互動，提升急救溝通技巧
+            </div>
+            <div class="marquee-item">
+                <i class="fas fa-gamepad"></i> VR實際操作，模擬真實急救情境
+            </div>
+            <div class="marquee-item">
+                <i class="fas fa-chart-line"></i> 即時成績追蹤，掌握學習進度
+            </div>
+            <div class="marquee-item">
+                <i class="fas fa-lightbulb"></i> 問題導向學習法，提升急救技能
+            </div>
+        </div>
+        <!-- 左側藍色高光 -->
+        <span class="pill-highlight" aria-hidden="true"></span>
+    </div>
+
+            <!-- 主要內容區域 -->
+            <div class="main-content">
+                <!-- 練習專區首頁內容 -->
+                <div class="practice-homepage content-container" id="practiceHomepage">
+                    <h1>練習專區</h1>
+                    <p>這裡提供360°實境教學影片與虛擬人互動學習。</p>
+                    
+                    <!-- 練習選項按鈕 -->
+                    <div class="practice-options">
+                        <div class="liquid-glass" id="liquid-glass-1">
+                            <div class="liquid-content">
+                                <div class="practice-icon" style="margin: 0 auto 20px auto;">
+                                    <i class="fas fa-play-circle"></i>
+                                </div>
+                                <h3 style="font-size: 24px; font-weight: 800; color: #1e293b; margin: 14px 0 8px;">360實境教學影片</h3>
+                                <p style="color: #64748b; line-height: 1.6; margin-bottom: 20px;">沉浸式VR學習體驗，讓您身臨其境地學習急救技能</p>
+                                <button class="practice-btn" onclick="enterPractice('vr-video')">
+                                    進入360實境教學
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="liquid-glass" id="liquid-glass-2">
+                            <div class="liquid-content">
+                                <div class="practice-icon" style="margin: 0 auto 20px auto;">
+                                    <i class="fas fa-comment-dots"></i>
+                                </div>
+                                <h3 style="font-size: 24px; font-weight: 800; color: #1e293b; margin: 14px 0 8px;">虛擬人模擬</h3>
+                                <p style="color: #64748b; line-height: 1.6; margin-bottom: 20px;">與AI驅動的虛擬患者進行對話練習，提升溝通技巧</p>
+                                <button class="practice-btn" onclick="enterPractice('virtual-human')">
+                                    進入虛擬人模擬
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                                        </div>
+
+                <!-- 360實境教學影片內容 -->
+                <div class="vr-video-content content-container" id="vrVideoContent" style="display: none;">
+                    <div class="content-header">
+                        <h2><i class="fas fa-play-circle"></i> 360實境教學影片</h2>
+                        <p>沉浸式VR學習體驗，讓您身臨其境地學習急救技能</p>
+                    </div>
+                    
+                    <div class="vr-video-section">
+                        <div class="yt-wrap">
+                            <iframe
+                                src="https://www.youtube.com/embed/cmB1iCKigWg?rel=0&modestbranding=1&playsinline=1&iv_load_policy=3&fs=1&controls=1"
+                                title="360 video"
+                                frameborder="0"
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                                allowfullscreen
+                                loading="lazy"
+                                referrerpolicy="origin-when-cross-origin">
+                            </iframe>
+                        </div>
+                        <p class="youtube-360-note">
+                            支援滑鼠拖曳與手機陀螺儀（影片需為 360 equirectangular 2:1 並含 360 metadata）。
+                        </p>
+                    </div>
+                    
+                    <div class="content-footer">
+                        <button class="back-btn" onclick="goBackToHomepage()">
+                            <i class="fas fa-arrow-left"></i> 返回練習專區
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 虛擬人模擬內容 -->
+                <div class="virtual-human-content content-container" id="virtualHumanContent" style="display: none;">
+                    <div class="content-header">
+                        <h2><i class="fas fa-comment-dots"></i> 虛擬人模擬</h2>
+                            <p>與AI驅動的虛擬患者進行對話練習，提升溝通技巧</p>
+                        </div>
+                    
+                    <!-- 情境選擇下拉選單 -->
+                    <div class="scenario-selector">
+                        <div class="selector-container">
+                            <label for="scenarioSelect" class="selector-label">選擇情境模擬：</label>
+                            <select id="scenarioSelect" class="scenario-select" onchange="selectScenario()">
+                                <option value="">請選擇情境...</option>
+                                <option value="cardiac">心臟驟停</option>
+                                <option value="poisoning">食物中毒</option>
+                                <option value="drowning">溺水</option>
+                                <option value="fire">火災嗆傷</option>
+                                <option value="trauma">外傷</option>
+                            </select>
+                            </div>
+                            </div>
+                    
+                    <!-- 單一情境詳細內容 -->
+                    <div class="scenario-detail" id="scenarioDetail" style="display: none;">
+                        <div class="scenario-detail-content">
+                            <div class="scenario-detail-image">
+                                <img id="scenarioDetailImg" src="" alt="" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                                <div id="scenarioDetailIcon" style="display: none; align-items: center; justify-content: center; width: 100%; height: 100%;">
+                                    <i class="fas fa-heartbeat"></i>
+                                    </div>
+                </div>
+                            <div class="scenario-detail-info">
+                                <h3 id="scenarioDetailTitle">情境標題</h3>
+                                <p id="scenarioDetailDescription">情境描述</p>
+                                <div class="scenario-detail-actions">
+                                    <button class="start-scenario-btn" onclick="startScenario()">
+                                        <i class="fas fa-play"></i> 開始情境模擬
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="content-footer">
+                        <button class="back-btn" onclick="goBackToHomepage()">
+                            <i class="fas fa-arrow-left"></i> 返回練習專區
+                        </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 頁面載入時檢查登入狀態
+        document.addEventListener('DOMContentLoaded', function() {
+            checkLoginStatus();
+            
+            // 更新用戶資訊顯示
+            setTimeout(() => {
+                updateUserInfoDisplay();
+            }, 1000);
+            
+            // 確保跑馬燈正常顯示
+            const marquee = document.querySelector('.marquee');
+            if (marquee) {
+                console.log('✅ 跑馬燈元素已找到');
+                marquee.style.display = 'flex';
+            } else {
+                console.error('❌ 找不到跑馬燈元素');
+            }
+        });
+
+        // 檢查登入狀態
+        function checkLoginStatus() {
+            console.log('檢查登入狀態');
+            
+            // 從localStorage獲取用戶信息
+            const savedUser = localStorage.getItem('pbls_user');
+            
+            if (savedUser) {
+                try {
+                    const userData = JSON.parse(savedUser);
+                    console.log('用戶已登入:', userData);
+                    
+                    // 顯示用戶信息
+                    displayUserInfo(userData);
+                    
+                } catch (error) {
+                    console.error('解析用戶數據失敗:', error);
+                    redirectToLogin();
+                }
+            } else {
+                console.log('用戶未登入，跳轉到登入頁面');
+                redirectToLogin();
+            }
+        }
+
+        // 顯示用戶信息
+        function displayUserInfo(userData) {
+            const userName = document.getElementById('user-name');
+            const userPhoto = document.getElementById('user-photo');
+            
+            if (userName && userPhoto) {
+                userName.textContent = userData.name || userData.displayName || '用戶';
+                userPhoto.src = userData.photoURL || userData.photo || 'https://via.placeholder.com/40/667eea/ffffff?text=U';
+                userPhoto.alt = userData.name || '用戶頭像';
+                
+                console.log('用戶信息已顯示');
+            }
+        }
+
+        // 跳轉到登入頁面
+        function redirectToLogin() {
+            console.log('跳轉到登入頁面');
+            window.location.href = 'login.html';
+        }
+
+        // 語言切換功能已移至 language-switcher.js
+
+        // YouTube 360度影片已直接嵌入，無需額外播放函數
+
+        // 水流波紋效果交互
+        function initLiquidGlassEffect() {
+            const cards = document.querySelectorAll('.liquid-glass');
+            
+            cards.forEach(card => {
+                const handleMove = (e) => {
+                    const rect = card.getBoundingClientRect();
+                    const x = ((e.clientX - rect.left) / rect.width) * 100;
+                    const y = ((e.clientY - rect.top) / rect.height) * 100;
+                    card.style.setProperty('--x', `${x}%`);
+                    card.style.setProperty('--y', `${y}%`);
+                    card.style.setProperty('--opacity', '1');
+                };
+
+                const handleLeave = () => {
+                    card.style.setProperty('--opacity', '0.8');
+                };
+
+                card.addEventListener('mousemove', handleMove);
+                card.addEventListener('mouseleave', handleLeave);
+            });
+        }
+
+        // 液態玻璃膠囊跑馬燈初始化
+        function initGlassMarquee() {
+            document.querySelectorAll('.marquee.glass-pill').forEach($m => {
+                const track = $m.querySelector('.marquee-track');
+                if (!track) return;
+
+                // 無縫：內容複製一份，寬度超過容器才能循環
+                if (!track.dataset.cloned) {
+                    track.innerHTML = track.innerHTML + track.innerHTML;
+                    track.dataset.cloned = '1';
+                }
+
+                // 依內容長度調整動畫時長（越長越慢，避免太快）
+                const totalWidth = Array.from(track.children)
+                    .reduce((w, el) => w + el.getBoundingClientRect().width + 28, 0);
+                const sec = Math.max(18, Math.min(36, Math.round(totalWidth / 80)));
+                track.style.animationDuration = sec + 's';
+
+                // 輕量：視窗大小改變時重算一次
+                let tid;
+                window.addEventListener('resize', () => {
+                    clearTimeout(tid);
+                    tid = setTimeout(() => initGlassMarquee(), 200);
+                }, { once: true });
+            });
+        }
+
+        // 页面加载完成后初始化液态玻璃效果
+        document.addEventListener('DOMContentLoaded', function() {
+            initLiquidGlassEffect();
+            initGlassMarquee();
+        });
+
+        // 進入練習內容
+        function enterPractice(practiceType) {
+            const homepage = document.getElementById('practiceHomepage');
+            const vrVideoContent = document.getElementById('vrVideoContent');
+            const virtualHumanContent = document.getElementById('virtualHumanContent');
+            
+            // 隱藏首頁
+            homepage.style.display = 'none';
+            
+            // 根據類型顯示對應內容
+            if (practiceType === 'vr-video') {
+                vrVideoContent.style.display = 'block';
+            } else if (practiceType === 'virtual-human') {
+                virtualHumanContent.style.display = 'block';
+            }
+        }
+
+        // 返回首頁
+        function goBackToHomepage() {
+            const homepage = document.getElementById('practiceHomepage');
+            const vrVideoContent = document.getElementById('vrVideoContent');
+            const virtualHumanContent = document.getElementById('virtualHumanContent');
+            
+            // 隱藏所有內容頁面
+            vrVideoContent.style.display = 'none';
+            virtualHumanContent.style.display = 'none';
+            
+            // 顯示首頁
+            homepage.style.display = 'block';
+        }
+
+        // 情境資料
+        const scenarioData = {
+            'cardiac': {
+                name: '心臟驟停',
+                image: 'assets/心臟驟停情境.png',
+                iconImage: 'assets/心臟驟停情境.png',
+                description: '傍晚18點30分，客廳忽然安靜下來，一位5歲、110公分、18公斤的男童倒地，毫無反應。現場做了急救措施，患者OHCA，家屬在外等待。你只需要說出「下一步要做什麼」處理方式，系統就會即時呈現團隊/旁人依你指令採取的處置與生理變化；你的目標，是把時間贏回來!'
+            },
+            'poisoning': {
+                name: '食物中毒',
+                image: 'assets/食物中毒情境.png',
+                iconImage: 'assets/食物中毒情境.png',
+                description: '下午16點12分，5歲小孩（103公分／25公斤）在餐桌旁突然倒下，四周留有嘔吐物與食物殘渣。家人驚慌失措，患者OHCA，家屬在外等待。你只需要說出「下一步要做什麼」處理措施，系統就會即時呈現團隊/旁人依你指令採取的處置與生理變化；你的目標，是把時間贏回來!'
+            },
+            'drowning': {
+                name: '溺水',
+                image: 'assets/溺水情境.png',
+                iconImage: 'assets/溺水情境.png',
+                description: '下午3點20分的游泳池旁傳來呼喊——5歲小孩（105公分／20公斤）被拉上岸時已無反應。患者OHCA，家屬在外等待。你只需要說出「下一步要做什麼」的處理措施，系統就會即時呈現團隊/旁人依你指令採取的處置與生理變化；你的目標，是把時間贏回來!'
+            },
+            'fire': {
+                name: '火災嗆傷',
+                image: 'assets/火災嗆傷情境.png',
+                iconImage: 'assets/火災嗆傷情境.png',
+                description: '文化三路住宅區發生一起火災，現場一位8歲兒童（125公分／27公斤）被推進急診，患者OHCA。你只需要說出「下一步要做什麼」的處理措施，系統就會即時呈現團隊/旁人依你指令採取的處置與生理變化；你的目標，是把時間贏回來!'
+            },
+            'trauma': {
+                name: '外傷',
+                image: 'assets/外傷情境.png',
+                iconImage: 'assets/外傷情境.png',
+                description: '下午16點12分，一位6歲男童（100公分／22公斤）因打碎玻璃造成明顯撕裂傷，血迅速滲透衣物；他意識模糊、哭喊聲微弱、四肢冰冷，經家人發現後急救並送往醫院。患者OHCA。你只需要說出「下一步要做什麼」處理措施，系統就會即時呈現團隊/旁人依你指令採取的處置與生理變化；你的目標，是把時間贏回來！!'
+            }
+        };
+
+        // 選擇情境
+        function selectScenario() {
+            const select = document.getElementById('scenarioSelect');
+            const scenarioType = select.value;
+            const scenarioDetail = document.getElementById('scenarioDetail');
+            
+            if (scenarioType) {
+                const scenario = scenarioData[scenarioType];
+                
+                // 更新情境詳細內容
+                document.getElementById('scenarioDetailTitle').textContent = scenario.name;
+                document.getElementById('scenarioDetailDescription').textContent = scenario.description;
+                document.getElementById('scenarioDetailImg').src = scenario.image;
+                document.getElementById('scenarioDetailImg').alt = scenario.name;
+                
+                // 更新圖標為圖片
+                const iconElement = document.getElementById('scenarioDetailIcon');
+                iconElement.innerHTML = `<img src="${scenario.iconImage}" alt="${scenario.name}圖示" onerror="this.style.display='none'; this.parentElement.innerHTML='<i class=\'fas fa-heartbeat\'></i>';">`;
+                
+                // 顯示情境詳細內容
+                scenarioDetail.style.display = 'block';
+            } else {
+                // 隱藏情境詳細內容
+                scenarioDetail.style.display = 'none';
+            }
+        }
+
+        // 開始情境模擬
+        function startScenario() {
+            const select = document.getElementById('scenarioSelect');
+            const scenarioType = select.value;
+            const scenario = scenarioData[scenarioType];
+            
+            if (scenario) {
+                // 顯示載入動畫
+                const button = event.target;
+                const originalText = button.innerHTML;
+                button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 載入中...';
+                button.disabled = true;
+                
+                // 模擬載入過程
+                setTimeout(() => {
+                    alert(`${scenario.name}情境模擬功能開發中，敬請期待！\n\n這將是一個AI驅動的虛擬情境模擬，讓您能夠：\n• 與虛擬患者進行真實對話\n• 練習醫療溝通技巧\n• 獲得即時反饋和建議\n• 提升專業溝通能力`);
+                    
+                    // 恢復按鈕狀態
+                    button.innerHTML = originalText;
+                    button.disabled = false;
+                }, 1000);
+            }
+        }
+
+        // 用戶頭像功能
+        function showUserProfile() {
+            const savedUser = localStorage.getItem('pbls_user');
+            if (savedUser) {
+                const userData = JSON.parse(savedUser);
+                alert(`用戶資料：\n\n姓名：${userData.name || '未設定'}\n電子郵件：${userData.email || '未設定'}\n登入時間：${new Date(userData.loginTime).toLocaleString()}`);
+            } else {
+                alert('無法獲取用戶資料');
+            }
+        }
+
+        // 更新用戶資訊顯示
+        function updateUserInfoDisplay() {
+            if (window.userDataService && window.userDataService.isLoggedIn()) {
+                const userInfoDisplay = document.getElementById('user-info-display');
+                if (userInfoDisplay) {
+                    userInfoDisplay.textContent = window.userDataService.getUserInfo();
+                }
+            }
+        }
+
+        // 登出功能
+        async function logout() {
+            if (confirm('確定要登出嗎？')) {
+                try {
+                    // 保存學習時間到Firebase
+                    if (window.learningTimeService && window.learningTimeService.isInitialized) {
+                        console.log('正在保存學習時間...');
+                        await window.learningTimeService.handleLogout();
+                    }
+                    
+                    // 清除本地儲存
+                    localStorage.removeItem('pbls_user');
+                    localStorage.removeItem('pbls_user_profile');
+                    
+                    console.log('用戶已登出');
+                
+                    // 跳轉到登入頁面
+                    window.location.href = 'login.html';
+                } catch (error) {
+                    console.error('登出過程中發生錯誤:', error);
+                    alert('登出時發生錯誤，請重試');
+                }
+            }
+        }
+    </script>
+    
+    <!-- 載入增強的語言管理器 -->
+    <script type="module">
+        import './src/js/enhanced-language-manager.js';
+    </script>
+</body>
+</html>
