@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8" />
+  <title>PBLS VR教學平台 - 正在跳轉...</title>
+  <!-- 立即導向 login.html（相對路徑） -->
+  <meta http-equiv="refresh" content="0; url=./login.html">
+  <link rel="canonical" href="./login.html">
+  <script>
+    // JS 後備，避免某些瀏覽器忽略 meta refresh
+    window.location.replace('./login.html');
+  </script>
+  <style>
+    body {
+      font-family: 'Microsoft JhengHei', 'Microsoft YaHei', system-ui, sans-serif;
+      margin: 0;
+      padding: 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+    }
+    .container {
+      text-align: center;
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      padding: 3rem;
+      border-radius: 20px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    }
+    .spinner {
+      border: 3px solid rgba(255, 255, 255, 0.3);
+      border-top: 3px solid white;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 1rem;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    a {
+      color: white;
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="spinner"></div>
+    <h2>PBLS VR教學平台</h2>
+    <p>正在前往登入頁面...</p>
+    <p style="font-size: 0.9rem; margin-top: 1rem;">
+      若未自動跳轉，請<a href="./login.html">點擊這裡</a>
+    </p>
+  </div>
+</body>
+</html>

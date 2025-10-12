@@ -28,11 +28,8 @@ class UserFieldManager {
         if (this.isInitialized) return;
 
         try {
-            const { initializeApp } = await import("https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js");
-            const { getFirestore } = await import("https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js");
-            
-            const app = initializeApp(firebaseConfig);
-            this.db = getFirestore(app);
+            const { db } = await import("../../js/firebase.js");
+            this.db = db;
             
             this.isInitialized = true;
             console.log('用戶字段管理服務已初始化');
@@ -53,7 +50,7 @@ class UserFieldManager {
                 await this.initialize();
             }
 
-            const { doc, setDoc, serverTimestamp } = await import("https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js");
+            const { doc, setDoc, serverTimestamp } = await import("https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore.js");
             
             // 準備完整的用戶數據
             const completeUserData = {
@@ -98,7 +95,7 @@ class UserFieldManager {
                 await this.initialize();
             }
 
-            const { doc, updateDoc, serverTimestamp } = await import("https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js");
+            const { doc, updateDoc, serverTimestamp } = await import("https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore.js");
             
             const userRef = doc(this.db, 'user', userId);
             
@@ -128,7 +125,7 @@ class UserFieldManager {
                 await this.initialize();
             }
 
-            const { doc, getDoc } = await import("https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js");
+            const { doc, getDoc } = await import("https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore.js");
             
             const userRef = doc(this.db, 'user', userId);
             const userSnap = await getDoc(userRef);
@@ -157,7 +154,7 @@ class UserFieldManager {
                 await this.initialize();
             }
 
-            const { doc, getDoc } = await import("https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js");
+            const { doc, getDoc } = await import("https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore.js");
             
             const userRef = doc(this.db, 'user', userId);
             const userSnap = await getDoc(userRef);
@@ -216,7 +213,7 @@ class UserFieldManager {
 
             console.log('開始遷移用戶文檔:', userId, migrationInfo);
 
-            const { doc, getDoc, updateDoc, serverTimestamp } = await import("https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js");
+            const { doc, getDoc, updateDoc, serverTimestamp } = await import("https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore.js");
             
             const userRef = doc(this.db, 'user', userId);
             const userSnap = await getDoc(userRef);

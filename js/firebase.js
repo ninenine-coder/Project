@@ -22,3 +22,8 @@ export const authReady = new Promise((resolve) => {
 
 // 方便除錯
 window.__FB__ = { app, auth, db, authReady };
+
+// 認證狀態監控（除錯用）
+onAuthStateChanged(auth, u => {
+  console.log('[auth] state ->', u ? (u.email || (u.isAnonymous?'匿名':'') + u.uid) : 'null');
+});

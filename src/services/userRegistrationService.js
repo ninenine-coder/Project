@@ -3,11 +3,8 @@
  * 支援多種註冊方式：電子郵件、學號/工號等
  */
 
-import { 
-  initializeApp 
-} from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+import { db } from '../../js/firebase.js';
 import {
-  getFirestore, 
   doc, 
   setDoc, 
   getDoc, 
@@ -17,25 +14,11 @@ import {
   where, 
   getDocs,
   updateDoc
-} from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
+} from "https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore.js";
 import { ValidationUtils, ErrorHandler } from '../utils/validationUtils.js';
 import { applyDefaults, getAllDefaults } from '../schemas/userSchema.js';
 
-// Firebase 配置
-const firebaseConfig = {
-  apiKey: "AIzaSyBuWO8hFVjjTUe2tqJDrqdbeGTrp4PoT5Q",
-  authDomain: "progect-115a5.firebaseapp.com",
-  databaseURL: "https://progect-115a5-default-rtdb.firebaseio.com",
-  projectId: "progect-115a5",
-  storageBucket: "progect-115a5.firebasestorage.app",
-  messagingSenderId: "109099222287",
-  appId: "1:109099222287:web:4f7b56a1eebe5abbfaaa7a",
-  measurementId: "G-DZVNBQ3G6S"
-};
-
-// 初始化 Firebase
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
+// 使用統一的 Firebase 實例（已在 js/firebase.js 中初始化）
 
 /**
  * 用戶註冊數據結構

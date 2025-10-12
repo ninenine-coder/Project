@@ -18,13 +18,11 @@ class QuizResultService {
         if (this.isInitialized) return;
 
         try {
-            // 動態導入 Firebase Firestore
-            const { initializeApp } = await import("https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js");
-            const { getFirestore, doc, updateDoc, increment, serverTimestamp, arrayUnion } = await import("https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js");
+            // 使用統一的 Firebase 實例
+            const { db } = await import("../../js/firebase.js");
+            const { doc, updateDoc, increment, serverTimestamp, arrayUnion } = await import("https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore.js");
             
-            // 初始化 Firebase
-            const app = initializeApp(firebaseConfig);
-            this.db = getFirestore(app);
+            this.db = db;
             
             this.isInitialized = true;
             console.log('測驗結果服務已初始化');
@@ -123,7 +121,7 @@ class QuizResultService {
      */
     async saveDetailedQuizResult(userId, resultData) {
         try {
-            const { collection, addDoc } = await import("https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js");
+            const { collection, addDoc } = await import("https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore.js");
             
             // 保存到 quizResults 子集合
             const quizResultsRef = collection(this.db, 'user', userId, 'quizResults');
@@ -154,7 +152,7 @@ class QuizResultService {
                 return null;
             }
 
-            const { doc, getDoc } = await import("https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js");
+            const { doc, getDoc } = await import("https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore.js");
             const userRef = doc(this.db, 'user', currentUser.uid);
             const userSnap = await getDoc(userRef);
 

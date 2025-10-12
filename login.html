@@ -516,9 +516,9 @@
             }, 3000);
         }
 
-        // 登入處理
+        // 登入處理 - 使用統一認證服務
         document.getElementById('login-form').addEventListener('submit', async function(e) {
-    e.preventDefault();
+            e.preventDefault();
             
             const account = document.getElementById('account').value.trim();
             const password = document.getElementById('password').value;
@@ -527,68 +527,29 @@
 
             if (!account || !password) {
                 showMessage('請輸入帳號和密碼', 'error');
-        return;
-      }
+                return;
+            }
 
             // 顯示載入狀態
             loginBtn.disabled = true;
             loginBtn.innerHTML = '<span class="loading"></span>登入中...';
 
             try {
-                // 先查詢用戶帳號是否存在
-                const q = query(
-                    collection(db, "user"),
-                    where("account", "==", account)
-                );
-                const querySnapshot = await getDocs(q);
+                // 使用統一認證服務登入
+                const { unifiedLogin } = await import('./js/unifiedAuthService.js');
+                const result = await unifiedLogin(account, password);
 
-                if (!querySnapshot.empty) {
-                    const userDoc = querySnapshot.docs[0];
-                    const userData = userDoc.data();
+                if (result.success) {
+                    console.log('✅ 統一認證登入成功');
+                    console.log('📊 用戶資料:', result.userData);
                     
-                    // 驗證密碼
-                    if (userData.password !== password) {
-                        showMessage('帳號或密碼錯誤，請重新輸入', 'error');
-                        return;
-                    }
-                    
-                    // 更新最後登入時間
-                    await updateDoc(doc(db, "user", userDoc.id), {
-                        lastLogin: serverTimestamp()
-                    });
-        
-        // 保存用戶資料到localStorage（包含從Firestore獲取的完整資料）
-            const loginUserData = {
-          uid: userDoc.id,
-          email: account,
-          name: userData["姓名"] || userData.name,
-          displayName: userData["姓名"] || userData.name,
-          photoURL: 'https://via.placeholder.com/40/17a2b8/ffffff?text=' + (userData["姓名"] || userData.name || 'U').charAt(0),
-                loginTime: new Date().toISOString(),
-          loginMethod: 'firebase',
-          where: userData["school/hospital"] || userData.school || userData.where,
-                department: userData.department,
-                phone: userData.phone,
-                // 從Firestore獲取的統計資料
-                totalTests: userData.totalTests || 0,
-                totalTimeSpent: userData.totalTimeSpent || 0,
-                studentId: userData.studentId,
-                createdAt: userData.createdAt,
-                lastLogin: userData.lastLogin,
-                isActive: userData.isActive
-            };
-            
-            localStorage.setItem('pbls_user', JSON.stringify(loginUserData));
-            
-            // 確保學習時間時鐘服務能正確載入總時間
-            console.log(`登入成功，用戶總學習時間: ${userData.totalTimeSpent || 0} 秒`);
-            
-                    // 登入成功後，學習時間時鐘服務會自動啟動
+                    // 確保學習時間時鐘服務能正確載入總時間
+                    console.log(`登入成功，用戶總學習時間: ${result.userData.totalTimeSpent || 0} 秒`);
                     console.log('✅ 學習時間時鐘服務將自動啟動');
-            
-                    // 登入成功後……
+                    
+                    // 處理記住密碼
                     if (remember) {
-                        rememberSave(account, password);       // ← 改用新的記住邏輯
+                        rememberSave(account, password);
                         console.log('💾 已記住帳號密碼（本機）');
                     } else {
                         rememberClear();
@@ -604,8 +565,8 @@
                     setTimeout(() => {
                         window.location.href = next;
                     }, 1000);
-      } else {
-                    showMessage('帳號或密碼錯誤，請重新輸入', 'error');
+                } else {
+                    showMessage(result.error || '帳號或密碼錯誤，請重新輸入', 'error');
                 }
             } catch (error) {
                 console.error('登入錯誤:', error);

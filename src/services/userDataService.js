@@ -3,7 +3,7 @@
  * 用於管理用戶登入、登出、以及載入 Firestore 中的姓名資料
  */
 
-import { auth, db } from '../../js/firebase.js';
+import { auth, db, authReady } from '../../js/firebase.js';
 import {
   doc, getDoc, collection, query, where, limit, getDocs, setDoc
 } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore.js";
@@ -18,6 +18,9 @@ export const userDataService = {
    * 初始化使用者狀態監聽
    */
   async initialize() {
+    // 等待 Firebase 認證還原完成
+    await authReady;
+    
     return new Promise((resolve) => {
       onAuthStateChanged(auth, async (user) => {
         if (user) {

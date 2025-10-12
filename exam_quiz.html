@@ -3156,14 +3156,23 @@
       import { createSequentialScore } from './src/services/scoreSeqService.js';
 
       function resolveUserName() {
-        // 优先使用学号/工号
-        const userKey = getUserKey();
-        if (userKey) return userKey;
+        // 從 localStorage 獲取用戶資料
+        try {
+          const localUserData = localStorage.getItem('pbls_user');
+          if (localUserData) {
+            const userData = JSON.parse(localUserData);
+            // 優先使用姓名
+            if (userData.name) return userData.name;
+            if (userData.displayName) return userData.displayName;
+            // 其次使用帳號
+            if (userData.account) return userData.account;
+          }
+        } catch (error) {
+          console.warn('獲取本地用戶資料失敗:', error);
+        }
         
-        // 从全局变量获取
+        // 從全域變數獲取
         if (window.currentUserName) return window.currentUserName;
-        
-        // 从 Firestore user 文档获取
         if (window.currentUserDisplayName) return window.currentUserDisplayName;
         
         return "未命名使用者";
@@ -3178,10 +3187,23 @@
             alert('請先登入以保存成績');
             return;
           }
+          
+          // 獲取統一的 UID
+          const { getUnifiedUID } = await import('./js/unifiedAuthService.js');
+          const currentUID = await getUnifiedUID();
+          
+          if (!currentUID) {
+            console.error('❌ 無法獲取統一 UID');
+            alert('請重新登入以保存成績');
+            return;
+          }
+          
+          console.log('📊 使用統一 UID 保存成績:', currentUID);
+          
           const userName = resolveUserName();
 
           const payload = {
-            uid: user.uid,                                     // ★ 規則要求
+            uid: currentUID,                                   // ★ 使用統一 UID
             userName: userName ?? '未命名使用者',
             score: Math.round(Number(finalScore)),
             timeSpentMs: Math.max(0, Math.floor(timeSpentMs || 0)),
@@ -3212,8 +3234,10 @@
           
           // 備用方案：保存到本地存儲
           try {
+            const { getUnifiedUID } = await import('./js/unifiedAuthService.js');
+            const currentUID = await getUnifiedUID();
             const localScore = {
-              uid: auth.currentUser?.uid || 'anonymous',
+              uid: currentUID || 'anonymous',
               userName: resolveUserName() || '未命名使用者',
               score: Math.round(Number(finalScore)),
               timeSpentMs: Math.max(0, Math.floor(timeSpentMs || 0)),
@@ -3339,10 +3363,19 @@
                   console.error("❌ 用戶未登入，無法同步本地成績");
                   return;
                 }
-                const userName = window.currentUserName || "未命名使用者";
+                // 使用統一 UID
+                const { getUnifiedUID } = await import('./js/unifiedAuthService.js');
+                const currentUID = await getUnifiedUID();
+                
+                if (!currentUID) {
+                  console.error("❌ 無法獲取統一 UID");
+                  return false;
+                }
+                
+                const userName = resolveUserName();
                 
                 console.log("👤 使用者：", userName, "｜分數：", finalScore);
-                console.log("🔐 用戶 UID：", user.uid);
+                console.log("🔐 統一 UID：", currentUID);
                 console.log("🔐 用戶是否匿名：", user.isAnonymous);
                 console.log("🔐 Auth 狀態：", !!auth.currentUser);
                 
@@ -3350,7 +3383,7 @@
                 const { collection, addDoc, serverTimestamp } = await import("https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore.js");
                 
                 const payload = {
-                  uid: user.uid,                      // ★ 必填，且要等於目前登入者
+                  uid: currentUID,                    // ★ 使用統一 UID
                   userName: userName ?? '未命名使用者',
                   score: Math.round(Number(finalScore)),
                   timeSpentMs: Math.max(0, Math.floor(timeSpentMs || 0)),

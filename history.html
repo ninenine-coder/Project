@@ -345,7 +345,7 @@
                 --pill-pad-x: 14px;
             }
             .marquee .marquee-item {
-                font-size: 14px;
+            font-size: 14px;
             }
             .marquee .pill-highlight {
                 width: 84px;
@@ -890,8 +890,8 @@
             <div class="sidebar-icon" onclick="window.location.href='team.html'">
                 <i class="fas fa-users"></i>
                 <span>團隊</span>
-            </div>
         </div>
+    </div>
 
         <!-- 語言切換按鈕 - 固定在底部 -->
         <div class="language-switcher-container">
@@ -1154,17 +1154,17 @@
                 try {
                     // 嘗試使用 orderBy 查詢
                     const q1 = query(
-                        collection(db, 'scores'),
+            collection(db, 'scores'),
                         where('uid', '==', auth.currentUser.uid),
-                        orderBy('submittedAt', 'desc'),
+            orderBy('submittedAt', 'desc'),
                         limit(50)
                     );
                     snap = await getDocs(q1);
-                } catch (e) {
+        } catch (e) {
                     // submittedAt 若是字串會在 orderBy 報錯，退回不排序
                     console.log('⚠️ orderBy 失敗，使用基本查詢:', e.message);
                     const q2 = query(
-                        collection(db, 'scores'),
+            collection(db, 'scores'),
                         where('uid', '==', auth.currentUser.uid),
                         limit(50)
                     );
@@ -1230,9 +1230,9 @@
             
             if (scores.length === 0) {
                 displayNoScores();
-                return;
-            }
-            
+            return;
+          }
+          
             const historyHTML = scores.map(score => {
                 const date = new Date(score.submittedAt).toLocaleString('zh-TW');
                 const timeSpent = Math.round((score.timeSpentMs || 0) / 60000); // 轉換為分鐘
