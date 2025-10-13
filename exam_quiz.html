@@ -123,9 +123,6 @@
         .content-container {
             position: relative;
             z-index: 1;
-            background: rgba(255, 255, 255, 0.85); /* 半透明白色背景，确保内容可读性 */
-            backdrop-filter: blur(5px);
-            border-radius: 15px;
             padding: 20px;
             margin: 20px;
         }
@@ -415,12 +412,6 @@
         #quiz-container {
             padding: 30px;
             min-height: calc(100vh - 180px);
-            background: rgba(255, 255, 255, 0.1) !important;
-            -webkit-backdrop-filter: blur(20px) saturate(180%) !important;
-            backdrop-filter: blur(20px) saturate(180%) !important;
-            border: 1px solid rgba(255, 255, 255, 0.2) !important;
-            border-radius: 20px !important;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1) !important;
             max-width: 800px;
             margin: 0 auto;
             position: relative; /* 添加相對定位，讓倒數動畫能正確定位 */
@@ -2256,56 +2247,84 @@
 
         // 隨機選擇問題（確保不重複）
         function getRandomBilingualQuestions(count) {
+            console.log(`🎯 開始選擇 ${count} 題，題庫總數: ${allQuestionsBilingual.length}`);
+            
             // 如果要求的題目數量超過可用題目總數，則返回所有題目
             if (count >= allQuestionsBilingual.length) {
                 console.log(`要求 ${count} 題，但只有 ${allQuestionsBilingual.length} 題可用，返回所有題目`);
                 return [...allQuestionsBilingual]; // 返回所有題目的副本
             }
             
-            // 使用 Fisher-Yates 洗牌算法確保真正的隨機性和不重複
+            // 使用當前時間戳作為額外的隨機種子，確保每次考試都不同
+            const timeSeed = Date.now() % 1000000;
+            console.log(`🔄 使用時間種子: ${timeSeed} 確保隨機性`);
+            
+            // 創建帶有額外隨機因子的洗牌算法
             const shuffled = [...allQuestionsBilingual];
+            
+            // 使用 Fisher-Yates 洗牌算法 + 時間種子確保真正的隨機性和不重複
             for (let i = shuffled.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
+                // 結合 Math.random() 和時間種子確保更強的隨機性
+                const randomFactor = (Math.random() + (timeSeed / 1000000)) % 1;
+                const j = Math.floor(randomFactor * (i + 1));
                 [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
             }
             
             // 返回前 count 個題目
             const selected = shuffled.slice(0, count);
-            console.log(`從 ${allQuestionsBilingual.length} 題中隨機選擇了 ${selected.length} 題（雙語言版本）`);
+            console.log(`✅ 從 ${allQuestionsBilingual.length} 題中隨機選擇了 ${selected.length} 題（雙語言版本）`);
+            console.log(`📋 選中的題目ID: [${selected.map(q => q.id).join(', ')}]`);
             
             // 確保沒有重複的題目
             const questionIds = selected.map(q => q.id);
             const uniqueIds = [...new Set(questionIds)];
             if (uniqueIds.length !== questionIds.length) {
-                console.warn('發現重複的題目ID，這不應該發生');
+                console.warn('⚠️ 發現重複的題目ID，這不應該發生');
+                console.log('重複的ID:', questionIds.filter((id, index) => questionIds.indexOf(id) !== index));
+            } else {
+                console.log('✅ 確認沒有重複題目');
             }
             
             return selected;
         }
 
         function getRandomQuestions(count) {
+            console.log(`🎯 開始選擇 ${count} 題，題庫總數: ${allQuestions.length}`);
+            
             // 如果要求的題目數量超過可用題目總數，則返回所有題目
             if (count >= allQuestions.length) {
                 console.log(`要求 ${count} 題，但只有 ${allQuestions.length} 題可用，返回所有題目`);
                 return [...allQuestions]; // 返回所有題目的副本
             }
             
-            // 使用 Fisher-Yates 洗牌算法確保真正的隨機性和不重複
+            // 使用當前時間戳作為額外的隨機種子，確保每次考試都不同
+            const timeSeed = Date.now() % 1000000;
+            console.log(`🔄 使用時間種子: ${timeSeed} 確保隨機性`);
+            
+            // 創建帶有額外隨機因子的洗牌算法
             const shuffled = [...allQuestions];
+            
+            // 使用 Fisher-Yates 洗牌算法 + 時間種子確保真正的隨機性和不重複
             for (let i = shuffled.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
+                // 結合 Math.random() 和時間種子確保更強的隨機性
+                const randomFactor = (Math.random() + (timeSeed / 1000000)) % 1;
+                const j = Math.floor(randomFactor * (i + 1));
                 [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
             }
             
             // 返回前 count 個題目
             const selected = shuffled.slice(0, count);
-            console.log(`從 ${allQuestions.length} 題中隨機選擇了 ${selected.length} 題`);
+            console.log(`✅ 從 ${allQuestions.length} 題中隨機選擇了 ${selected.length} 題（單語言版本）`);
+            console.log(`📋 選中的題目ID: [${selected.map(q => q.id).join(', ')}]`);
             
             // 確保沒有重複的題目
             const questionIds = selected.map(q => q.id);
             const uniqueIds = [...new Set(questionIds)];
             if (questionIds.length !== uniqueIds.length) {
-                console.error('警告：發現重複題目！');
+                console.warn('⚠️ 發現重複的題目ID，這不應該發生');
+                console.log('重複的ID:', questionIds.filter((id, index) => questionIds.indexOf(id) !== index));
+            } else {
+                console.log('✅ 確認沒有重複題目');
             }
             
             return selected;

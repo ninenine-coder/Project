@@ -1252,7 +1252,25 @@
           }
           
             const historyHTML = scores.map(score => {
-                const date = new Date(score.submittedAt).toLocaleString('zh-TW');
+                // 正確處理 Firestore Timestamp 對象
+                let date;
+                try {
+                    if (score.submittedAt && typeof score.submittedAt.toDate === 'function') {
+                        // Firestore Timestamp 對象
+                        date = score.submittedAt.toDate().toLocaleString('zh-TW');
+                    } else if (score.submittedAt && score.submittedAt.seconds) {
+                        // Firestore Timestamp 的 seconds 屬性
+                        date = new Date(score.submittedAt.seconds * 1000).toLocaleString('zh-TW');
+                    } else if (score.submittedAt) {
+                        // 普通日期字符串或 Date 對象
+                        date = new Date(score.submittedAt).toLocaleString('zh-TW');
+                    } else {
+                        date = '未知日期';
+                    }
+                } catch (error) {
+                    console.error('日期格式化錯誤:', error, score.submittedAt);
+                    date = '日期錯誤';
+                }
                 const timeSpent = Math.round((score.timeSpentMs || 0) / 60000); // 轉換為分鐘
                 const scoreClass = getScoreClass(score.score);
                 const localBadge = score.isLocal ? '<span style="color: #ff9800; font-size: 12px;">(本地)</span>' : '';
@@ -1341,7 +1359,21 @@
             const csvContent = [
                 '日期時間,用戶,分數,正確題數,總題數,耗時(分鐘),測驗類型',
                 ...historyScores.map(score => {
-                    const date = new Date(score.submittedAt).toLocaleString('zh-TW');
+                    // 正確處理 Firestore Timestamp 對象
+                    let date;
+                    try {
+                        if (score.submittedAt && typeof score.submittedAt.toDate === 'function') {
+                            date = score.submittedAt.toDate().toLocaleString('zh-TW');
+                        } else if (score.submittedAt && score.submittedAt.seconds) {
+                            date = new Date(score.submittedAt.seconds * 1000).toLocaleString('zh-TW');
+                        } else if (score.submittedAt) {
+                            date = new Date(score.submittedAt).toLocaleString('zh-TW');
+                        } else {
+                            date = '未知日期';
+                        }
+                    } catch (error) {
+                        date = '日期錯誤';
+                    }
                     const timeSpent = Math.round((score.timeSpentMs || 0) / 60000);
                     return `${date},${score.userName || '未知'},${score.score},${score.correctCount || '未知'},${score.questionCount || '未知'},${timeSpent},${score.examType || '筆試測驗'}`;
                 })

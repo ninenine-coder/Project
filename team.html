@@ -28,22 +28,6 @@
             position: relative;
         }
 
-        /* 全局背景 */
-        .global-bg {
-            position: fixed;
-            inset: 0; /* top, right, bottom, left 全为 0 */
-            z-index: -1; /* 最底层 */
-            pointer-events: none; /* 不阻挡点击 */
-            background-image: url("./assets/背景.png");
-            background-position: center calc(50% + 58px); /* 往下移2.3公分 */
-            background-repeat: no-repeat;
-            background-size: contain; /* 改为contain确保完整显示 */
-            opacity: 0.9; /* 可依需求调整淡化程度 */
-        }
-
-        @media print {
-            .global-bg { display: none; }
-        }
 
         /* 毛玻璃卡片样式 */
         :root {
@@ -450,14 +434,8 @@
             margin-left: 180px;
         }
 
-        /* 團隊頁面樣式 */
-        .team-page {
-            padding: 20px 30px 40px 30px;
-            min-height: calc(100vh - 180px);
-        }
-
         /* 團隊頁面標題居中 */
-        .team-page h1 {
+        .main-content h1 {
             font-size: 2.5rem;
             color: #333;
             margin-bottom: 10px;
@@ -468,7 +446,7 @@
             text-align: center;
         }
 
-        .team-page p {
+        .main-content p {
             color: #666;
             font-size: 1.1rem;
             text-align: center;
@@ -1000,11 +978,8 @@
          });
      </script>
  </head>
-<body>
-    <!-- 全局背景 -->
-    <div class="global-bg" aria-hidden="true"></div>
-    
-    <!-- 側邊欄 -->
+ <body>
+     <!-- 側邊欄 -->
     <div class="sidebar">
         <!-- 頂部：Logo -->
         <div class="sidebar-top">
@@ -1075,12 +1050,11 @@
     <!-- 主要內容區域 -->
     <div class="main-content">
         <!-- 團隊成員頁面內容 -->
-        <div class="team-page" id="teamPage">
-            <h1>團隊成員</h1>
-            <p>這裡展示團隊成員、角色與聯絡方式。</p>
-            
-            <!-- 團隊成員卡片 -->
-            <div class="team-members-grid">
+        <h1>團隊成員</h1>
+        <p>這裡展示團隊成員、角色與聯絡方式。</p>
+        
+        <!-- 團隊成員卡片 -->
+        <div class="team-members-grid">
                 <!-- 周哲旭 - 有照片 -->
                 <div class="team-member-card liquid-glass">
                     <div class="liquid-content">
@@ -1242,7 +1216,6 @@
                     </div>
                 </div>
             </div>
-        </div>
     </div>
 
     <script>
