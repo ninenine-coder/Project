@@ -29,13 +29,20 @@
 
   <script>
     const video = document.getElementById('vid');
-    const src = './assets/360/hls/index.m3u8'; // 你的 HLS 清單路徑
+    const src = './assets/360/hls-master/index.m3u8'; // 你的 HLS 清單路徑
 
     // Safari 原生支援 HLS
     if (video.canPlayType('application/vnd.apple.mpegurl')) {
       video.src = src;
     } else if (window.Hls?.isSupported()) {
-      const hls = new Hls({ lowLatencyMode: false });
+      const hls = new Hls({
+        lowLatencyMode: false,
+        capLevelToPlayerSize: true,
+        maxBufferLength: 15,
+        backBufferLength: 15,
+        enableWorker: true,
+        startLevel: -1
+      });
       hls.loadSource(src);
       hls.attachMedia(video); // Chrome/Edge
     } else {
