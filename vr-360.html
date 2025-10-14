@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>360° 影片 VR 播放</title>
+  <!-- A-Frame：提供 <a-videosphere> 與 Enter VR 按鈕 -->
+  <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
+  <!-- hls.js：讓 Chrome/Edge 也能播放 .m3u8 -->
+  <script src="https://cdn.jsdelivr.net/npm/hls.js@1"></script>
+  <style>
+    html,body{height:100%;margin:0;background:#000}
+    #hint{position:fixed;left:12px;bottom:12px;color:#fff;font:14px/1.4 system-ui;opacity:.85}
+  </style>
+</head>
+<body>
+  <!-- 真正播放的 <video>，由 hls.js 掛載 HLS -->
+  <video id="vid" muted playsinline webkit-playsinline loop preload="auto" style="display:none"></video>
+
+  <!-- 把影片貼在球體內側；右下自帶 Enter VR 按鈕 -->
+  <a-scene renderer="colorManagement: true" vr-mode-ui="enabled: true">
+    <a-videosphere src="#vid" rotation="0 180 0"></a-videosphere>
+    <a-entity position="0 1.6 -1"
+              text="value: 點右下 Enter VR 進入頭盔; color: #fff; align: center; width: 1.6;">
+    </a-entity>
+  </a-scene>
+
+  <div id="hint">提示：點一下頁面解除靜音與播放</div>
+
+  <script>
+    const video = document.getElementById('vid');
+    const src = './assets/360/hls/index.m3u8'; // 你的 HLS 清單路徑
+
+    // Safari 原生支援 HLS
+    if (video.canPlayType('application/vnd.apple.mpegurl')) {
+      video.src = src;
+    } else if (window.Hls?.isSupported()) {
+      const hls = new Hls({ lowLatencyMode: false });
+      hls.loadSource(src);
+      hls.attachMedia(video); // Chrome/Edge
+    } else {
+      alert('此瀏覽器不支援 HLS 播放');
+    }
+
+    // 使用者手勢後開聲音/播放（符合自動播放政策）
+    window.addEventListener('click', () => {
+      video.muted = false;
+      video.play().catch(()=>{});
+      document.getElementById('hint')?.remove();
+    }, { once:true });
+  </script>
+</body>
+</html>
