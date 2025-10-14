@@ -37,6 +37,19 @@
     🖱️ 用滑鼠拖曳環顧四周 | 📱 轉動裝置查看 360° | 🎮 有 VR 頭盔？點右下角進入
   </div>
 
+  <!-- 桌面模式：全螢幕點擊啟動（備用方案） -->
+  <div id="clickToStart" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; 
+       background:rgba(0,0,0,0.8); z-index:200; cursor:pointer; 
+       display:flex; align-items:center; justify-content:center; flex-direction:column;">
+    <div style="background:#26a69a; color:#fff; padding:20px 40px; border-radius:12px; 
+         font:24px/1.5 system-ui; text-align:center; box-shadow:0 4px 20px rgba(0,0,0,0.5);">
+      ▶ 點擊任意處開始播放
+    </div>
+    <div style="color:#ccc; margin-top:20px; font:16px system-ui;">
+      播放後可用滑鼠拖曳環顧 360°
+    </div>
+  </div>
+
   <a-scene
     renderer="antialias:false; precision:mediump; colorManagement:true; powerPreference:high-performance; sortObjects:false"
     vr-mode-ui="enabled:true">
@@ -84,9 +97,11 @@
   const playHint = document.getElementById('playHint');
   const desktopHint = document.getElementById('desktopHint');
   const desktopCursor = document.getElementById('desktopCursor');
+  const clickToStart = document.getElementById('clickToStart');
   const SRC = './assets/360/hls-master/index.m3u8';
 
   let isVRMode = false;
+  let videoReady = false;
 
   // 1) 偵測是否有 VR 裝置
   (async () => {
@@ -133,13 +148,18 @@
 
   // 3) 影片載入完成，顯示播放按鈕
   function showPlay(){
-    loader.setAttribute('visible', 'false');
-    playUI.setAttribute('visible', 'true');
+    if (videoReady) return; // 避免重複觸發
+    videoReady = true;
     
-    // 桌面模式：再次顯示操作提示
+    loader.setAttribute('visible', 'false');
+    
+    // 桌面模式：顯示全螢幕點擊提示（更容易點到）
     if (!isVRMode) {
-      desktopHint.classList.add('show');
-      setTimeout(() => desktopHint.classList.remove('show'), 5000);
+      clickToStart.style.display = 'flex';
+      desktopHint.classList.remove('show');
+    } else {
+      // VR 模式：顯示 3D 播放按鈕
+      playUI.setAttribute('visible', 'true');
     }
   }
   video.addEventListener('canplay', showPlay);
@@ -148,16 +168,26 @@
   // 4) 播放邏輯（支援桌面點擊和 VR 手把）
   function tryPlay(){
     playUI.setAttribute('visible','false');
+    clickToStart.style.display = 'none';
     video.muted = false;
     video.play().catch(err=>{
       console.warn('自動播放被擋，請再點一次', err);
-      playUI.setAttribute('visible','true');
+      if (!isVRMode) {
+        clickToStart.style.display = 'flex';
+      } else {
+        playUI.setAttribute('visible','true');
+      }
     });
     
-    // 隱藏桌面提示
+    // 隱藏所有提示
     desktopHint.classList.remove('show');
   }
+  
+  // VR 模式：A-Frame 按鈕點擊
   playBtn.addEventListener('click', tryPlay);
+  
+  // 桌面模式：全螢幕點擊
+  clickToStart.addEventListener('click', tryPlay);
 
   // 5) VR 手把支援
   const sceneEl = document.querySelector('a-scene');
@@ -174,25 +204,32 @@
   // 6) 進入/離開 VR 模式
   sceneEl.addEventListener('enter-vr', ()=> {
     isVRMode = true;
+    clickToStart.style.display = 'none'; // 隱藏桌面點擊區
     desktopHint.classList.remove('show');
-    desktopCursor.setAttribute('visible', 'false'); // VR 模式隱藏桌面游標
+    desktopCursor.setAttribute('visible', 'false');
     playHint.setAttribute('text', 'value: 用手把雷射點擊開始; align:center; color:#ccc; width:2');
+    
+    // 如果影片已準備好，顯示 VR 播放按鈕
+    if (videoReady && !video.paused === false) {
+      playUI.setAttribute('visible', 'true');
+    }
     window.focus();
   });
 
   sceneEl.addEventListener('exit-vr', ()=> {
     isVRMode = false;
-    desktopCursor.setAttribute('visible', 'true'); // 恢復桌面游標
+    playUI.setAttribute('visible', 'false'); // 隱藏 VR 按鈕
+    desktopCursor.setAttribute('visible', 'true');
     playHint.setAttribute('text', 'value: 桌面：點擊播放 | VR：用手把雷射點擊; align:center; color:#ccc; width:2.5');
   });
 
-  // 7) 行動裝置：顯示陀螺儀提示
+  // 7) 行動裝置：更新提示文字
   if ('ontouchstart' in window) {
-    setTimeout(() => {
-      desktopHint.innerHTML = '📱 轉動裝置環顧 360° | 👆 點擊播放';
-      desktopHint.classList.add('show');
-      setTimeout(() => desktopHint.classList.remove('show'), 6000);
-    }, 1500);
+    // 等影片載入後，會顯示全螢幕點擊區域
+    const startBtn = clickToStart.querySelector('div:first-child');
+    if (startBtn) {
+      startBtn.innerHTML = '▶ 點擊播放<br><small style="font-size:16px; opacity:0.9;">播放後可轉動裝置環顧 360°</small>';
+    }
   }
   </script>
 </body>
