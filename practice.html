@@ -999,15 +999,16 @@
             margin-right: 10px;
         }
 
-        /* YouTube 360度影片樣式 */
-        .yt-wrap {
+        /* VR 360度影片播放器樣式 */
+        .vr-player-container {
             position: relative;
             padding-top: 56.25%;
             max-width: 1200px;
             margin: 12px auto;
+            background: #000;
         }
 
-        .yt-wrap iframe {
+        .vr-player-container iframe {
             position: absolute;
             inset: 0;
             width: 100%;
@@ -1016,7 +1017,7 @@
             border-radius: 12px;
         }
 
-        .youtube-360-note {
+        .vr-360-note {
             font-size: 12px;
             color: #666;
             margin-top: 8px;
@@ -1159,15 +1160,15 @@
                 max-width: 100%;
             }
 
-            .yt-wrap {
+            .vr-player-container {
                 margin: 15px auto;
             }
 
-            .yt-wrap iframe {
+            .vr-player-container iframe {
                 border-radius: 8px;
             }
 
-            .youtube-360-note {
+            .vr-360-note {
                 font-size: 11px;
                 margin-top: 6px;
             }
@@ -1217,10 +1218,10 @@
             }
         }, true);
         
-        // 360 實境教學影片錯誤處理
+        // VR 360 實境教學影片錯誤處理
         window.addEventListener('error', function(e) {
             if (e.target && e.target.tagName === 'IFRAME') {
-                console.warn('YouTube 影片載入失敗:', e.target.src);
+                console.warn('VR 影片載入失敗:', e.target.src);
                 // 可以添加備用方案
                 e.preventDefault();
                 return false;
@@ -1387,19 +1388,19 @@
                     </div>
                     
                     <div class="vr-video-section">
-                        <div class="yt-wrap">
+                        <div class="vr-player-container">
                             <iframe
-                                src="https://www.youtube.com/embed/cmB1iCKigWg?rel=0&modestbranding=1&playsinline=1&iv_load_policy=3&fs=1&controls=1"
-                                title="360 video"
+                                src="vr-360.html"
+                                title="360° VR 影片播放器"
                                 frameborder="0"
-                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share; vr"
                                 allowfullscreen
                                 loading="lazy"
                                 referrerpolicy="origin-when-cross-origin">
                             </iframe>
                         </div>
-                        <p class="youtube-360-note">
-                            支援滑鼠拖曳與手機陀螺儀（影片需為 360 equirectangular 2:1 並含 360 metadata）。
+                        <p class="vr-360-note">
+                            支援 VR 頭盔、滑鼠拖曳與手機陀螺儀。點擊右下角 "Enter VR" 進入 VR 模式。
                         </p>
                     </div>
                     
@@ -1528,7 +1529,7 @@
 
         // 語言切換功能已移至 language-switcher.js
 
-        // YouTube 360度影片已直接嵌入，無需額外播放函數
+        // VR 360度影片已直接嵌入，使用 A-Frame 播放器
 
         // 水流波紋效果交互
         function initLiquidGlassEffect() {
