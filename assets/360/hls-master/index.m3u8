@@ -1,8 +1,8 @@
 #EXTM3U
 #EXT-X-VERSION:3
-# ?????? 6K?????? assets/360/hls?
+# 高畫質（你的 6K，那個原本在 assets/360/hls）
 #EXT-X-STREAM-INF:BANDWIDTH=14000000,AVERAGE-BANDWIDTH=12000000,RESOLUTION=5760x2880
 ../hls/index.m3u8
-# ????? 4K?? assets/360/hls4k?
+# 次高（你的 4K，在 assets/360/hls4k）
 #EXT-X-STREAM-INF:BANDWIDTH=10000000,AVERAGE-BANDWIDTH=8000000,RESOLUTION=3840x1920
 ../hls4k/index.m3u8
