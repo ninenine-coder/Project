@@ -50,6 +50,19 @@
     </div>
   </div>
 
+  <!-- 桌面模式：重播按鈕 -->
+  <div id="clickToReplay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; 
+       background:rgba(0,0,0,0.8); z-index:200; cursor:pointer; 
+       display:flex; align-items:center; justify-content:center; flex-direction:column;">
+    <div style="background:#FF9800; color:#fff; padding:20px 40px; border-radius:12px; 
+         font:24px/1.5 system-ui; text-align:center; box-shadow:0 4px 20px rgba(0,0,0,0.5);">
+      🔄 點擊重新播放
+    </div>
+    <div style="color:#ccc; margin-top:20px; font:16px system-ui;">
+      重新觀看 360° 影片
+    </div>
+  </div>
+
   <a-scene
     renderer="antialias:false; precision:mediump; colorManagement:true; powerPreference:high-performance; sortObjects:false"
     vr-mode-ui="enabled:true">
@@ -77,13 +90,25 @@
         text="value: 桌面：點擊播放 | VR：用手把雷射點擊; align:center; color:#ccc; width:2.5"></a-entity>
     </a-entity>
 
+    <!-- 重播按鈕（影片播完後顯示） -->
+    <a-entity id="replayUI" visible="false" position="0 1.6 -2">
+      <a-plane id="replayBtn" width="1.2" height="0.4" color="#FF9800"
+               event-set__enter="_event:mouseenter; color:#FFB74D"
+               event-set__leave="_event:mouseleave; color:#FF9800">
+        <a-entity position="0 0 0.01"
+          text="value: 🔄 重播; align: center; color:#fff; width: 1.8"></a-entity>
+      </a-plane>
+      <a-entity position="0 -0.5 0" 
+        text="value: 點擊重新觀看; align:center; color:#ccc; width:2"></a-entity>
+    </a-entity>
+
     <!-- 右手雷射（Vive/Index/通用 WebXR） -->
-    <a-entity laser-controls="hand: right" raycaster="objects: #playBtn"></a-entity>
+    <a-entity laser-controls="hand: right" raycaster="objects: #playBtn, #replayBtn"></a-entity>
     
     <!-- 攝影機 + 控制（桌面滑鼠拖曳、行動陀螺儀、VR 頭盔追蹤） -->
     <a-entity camera look-controls="touchEnabled:true; mouseEnabled:true" wasd-controls>
       <!-- 桌面/行動模式：注視游標 -->
-      <a-cursor id="desktopCursor" raycaster="objects: #playBtn" 
+      <a-cursor id="desktopCursor" raycaster="objects: #playBtn, #replayBtn" 
                 fuse="false" 
                 color="#4CAF50"></a-cursor>
     </a-entity>
@@ -98,6 +123,9 @@
   const desktopHint = document.getElementById('desktopHint');
   const desktopCursor = document.getElementById('desktopCursor');
   const clickToStart = document.getElementById('clickToStart');
+  const clickToReplay = document.getElementById('clickToReplay');
+  const replayUI = document.getElementById('replayUI');
+  const replayBtn = document.getElementById('replayBtn');
   const SRC = './assets/360/hls-master/index.m3u8';
 
   let isVRMode = false;
@@ -189,7 +217,36 @@
   // 桌面模式：全螢幕點擊
   clickToStart.addEventListener('click', tryPlay);
 
-  // 5) VR 手把支援
+  // 5) 重播邏輯
+  function showReplay(){
+    if (!isVRMode) {
+      // 桌面模式：顯示全螢幕重播按鈕
+      clickToReplay.style.display = 'flex';
+    } else {
+      // VR 模式：顯示 3D 重播按鈕
+      replayUI.setAttribute('visible', 'true');
+    }
+  }
+
+  function doReplay(){
+    clickToReplay.style.display = 'none';
+    replayUI.setAttribute('visible', 'false');
+    video.currentTime = 0;  // 重設到開頭
+    video.play().catch(err=>{
+      console.warn('重播失敗', err);
+    });
+  }
+
+  // 影片播放結束時顯示重播按鈕
+  video.addEventListener('ended', showReplay);
+
+  // VR 模式：A-Frame 重播按鈕點擊
+  replayBtn.addEventListener('click', doReplay);
+  
+  // 桌面模式：全螢幕重播點擊
+  clickToReplay.addEventListener('click', doReplay);
+
+  // 6) VR 手把支援
   const sceneEl = document.querySelector('a-scene');
   sceneEl.addEventListener('controllerconnected', (e) => {
     console.log('VR 控制器已連接');
@@ -197,14 +254,16 @@
       ctrl.addEventListener('triggerdown', () => {
         const intersects = ctrl.components.raycaster?.intersections || [];
         if (intersects.some(i => i.el === playBtn)) tryPlay();
+        if (intersects.some(i => i.el === replayBtn)) doReplay();
       });
     });
   });
 
-  // 6) 進入/離開 VR 模式
+  // 7) 進入/離開 VR 模式
   sceneEl.addEventListener('enter-vr', ()=> {
     isVRMode = true;
     clickToStart.style.display = 'none'; // 隱藏桌面點擊區
+    clickToReplay.style.display = 'none'; // 隱藏桌面重播按鈕
     desktopHint.classList.remove('show');
     desktopCursor.setAttribute('visible', 'false');
     playHint.setAttribute('text', 'value: 用手把雷射點擊開始; align:center; color:#ccc; width:2');
@@ -219,11 +278,12 @@
   sceneEl.addEventListener('exit-vr', ()=> {
     isVRMode = false;
     playUI.setAttribute('visible', 'false'); // 隱藏 VR 按鈕
+    replayUI.setAttribute('visible', 'false'); // 隱藏 VR 重播按鈕
     desktopCursor.setAttribute('visible', 'true');
     playHint.setAttribute('text', 'value: 桌面：點擊播放 | VR：用手把雷射點擊; align:center; color:#ccc; width:2.5');
   });
 
-  // 7) 行動裝置：更新提示文字
+  // 8) 行動裝置：更新提示文字
   if ('ontouchstart' in window) {
     // 等影片載入後，會顯示全螢幕點擊區域
     const startBtn = clickToStart.querySelector('div:first-child');
