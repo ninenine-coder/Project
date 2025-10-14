@@ -532,42 +532,43 @@
             margin-right: auto;
         }
 
+        .history-header {
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+            margin-bottom: 30px;
+            gap: 8px;
+        }
+
         .history-section h2 {
             font-size: 2rem;
             color: #333;
-            margin-bottom: 20px;
-            text-align: center;
+            margin: 0;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
         }
 
-        .history-controls {
-            display: flex;
-            justify-content: center;
-            gap: 15px;
-            margin-bottom: 30px;
-        }
-
-        .refresh-btn, .export-btn {
+        .export-btn-small {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             border: none;
-            padding: 12px 24px;
-            border-radius: 25px;
+            padding: 4px 8px;
+            border-radius: 12px;
             cursor: pointer;
-            font-size: 14px;
+            font-size: 10px;
             font-weight: 500;
             transition: all 0.3s ease;
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 4px;
+            margin-bottom: 2px;
         }
 
-        .refresh-btn:hover, .export-btn:hover {
+        .export-btn-small:hover {
             transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+            box-shadow: 0 6px 15px rgba(102, 126, 234, 0.3);
         }
 
         /* 成績列表樣式 */
@@ -1003,16 +1004,10 @@
 
             <!-- 成績列表 -->
             <div class="history-section">
-                <h2>成績記錄</h2>
-                <div class="history-controls">
-                    <button class="refresh-btn" onclick="loadHistoryScores()">
-                        <i class="fas fa-sync-alt"></i> 重新整理
-                    </button>
-                    <button class="export-btn" onclick="exportScores()">
+                <div class="history-header">
+                    <h2>成績記錄</h2>
+                    <button class="export-btn-small" onclick="exportScores()">
                         <i class="fas fa-download"></i> 匯出成績
-                    </button>
-                    <button class="refresh-btn" onclick="testFirebaseQuery()" style="background: linear-gradient(135deg, #ff9800, #f57c00);">
-                        <i class="fas fa-database"></i> 測試查詢
                     </button>
                 </div>
                 <div id="historyList" class="history-list">
@@ -1392,33 +1387,6 @@
             console.log('✅ 成績匯出完成');
         }
         
-        // 測試 Firebase 查詢
-        async function testFirebaseQuery() {
-            try {
-                console.log('🧪 開始測試 Firebase 查詢...');
-                
-                // 使用統一的歷史資料服務
-                const { loadMyScores } = await import('./js/history-data.js');
-                const scores = await loadMyScores(10);
-                
-                console.log(`✅ 查詢成功，找到 ${scores.length} 筆成績`);
-                
-                if (scores.length > 0) {
-                    console.log('📊 成績範例:');
-                    scores.slice(0, 3).forEach((score, index) => {
-                        console.log(`  ${index + 1}. ${score.score}分 (${score.examType || '筆試測驗'})`);
-                    });
-                } else {
-                    console.log('📋 該用戶尚未有成績記錄');
-                }
-                
-                alert(`測試完成！找到 ${scores.length} 筆成績記錄`);
-                
-            } catch (error) {
-                console.error('❌ 測試查詢失敗:', error);
-                alert(`測試失敗: ${error.message}`);
-            }
-        }
         
         // 頁面載入時自動載入成績
         document.addEventListener('DOMContentLoaded', function() {
