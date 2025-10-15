@@ -7,7 +7,7 @@
   <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/hls.js@1"></script>
   <style>
-    html,body{margin:0;min-height:100%;background:#f5f5f5}
+    html,body{margin:0;height:100%;background:#000}
     /* 桌面提示 */
     #desktopHint{
       position:fixed;
@@ -67,7 +67,7 @@
   <a-scene
     renderer="antialias:false; precision:mediump; colorManagement:true; powerPreference:high-performance; sortObjects:false"
     vr-mode-ui="enabled:true"
-    style="height:60vh; width:100%; position:relative; margin:20px auto 40px; border-radius:12px; overflow:hidden; box-shadow:0 8px 32px rgba(0,0,0,0.3);">
+    style="height:60vh; position:relative; margin-bottom:20px;">
 
     <!-- 360 球幕 -->
     <a-videosphere src="#vid" rotation="0 250 0"></a-videosphere>
@@ -110,23 +110,23 @@
   </a-scene>
 
   <!-- 討論區 -->
-  <section id="discussion" style="max-width:1200px;margin:0 auto 40px;padding:24px;color:#eee;font-family:system-ui;background:#1a1a1a;border-radius:12px;position:relative;z-index:10;box-shadow:0 4px 20px rgba(0,0,0,0.3);">
-    <h2 style="margin:8px 0 12px;color:#fff;">討論區</h2>
+  <section id="discussion" style="max-width:1000px;margin:0 auto 40px;padding:20px;color:#333;font-family:system-ui;background:#f8f9fa;border-radius:12px;position:relative;z-index:10;box-shadow:0 4px 12px rgba(0,0,0,0.1);">
+    <h2 style="margin:8px 0 16px;color:#2c3e50;font-size:24px;font-weight:600;">討論區</h2>
 
     <!-- 發文 -->
-    <div style="background:#111;padding:12px;border-radius:10px;margin-bottom:16px;">
+    <div style="background:#fff;padding:16px;border-radius:10px;margin-bottom:16px;border:1px solid #e9ecef;">
       <textarea id="newComment" rows="3" placeholder="留下想法或提問（Shift+Enter 換行，Enter 送出）"
-        style="width:100%;background:#000;color:#fff;border:1px solid #333;border-radius:8px;padding:10px;"></textarea>
-      <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:8px;">
-        <button id="postBtn" style="padding:8px 14px;border:1px solid #26a69a;color:#26a69a;background:transparent;border-radius:8px;">
+        style="width:100%;background:#fff;color:#333;border:1px solid #ddd;border-radius:8px;padding:12px;font-size:14px;resize:vertical;"></textarea>
+      <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:12px;">
+        <button id="postBtn" style="padding:10px 20px;border:1px solid #26a69a;color:#26a69a;background:transparent;border-radius:8px;font-size:14px;cursor:pointer;transition:all 0.3s;">
           發佈
         </button>
       </div>
-      <div id="whoami" style="font-size:12px;color:#aaa;margin-top:6px;"></div>
+      <div id="whoami" style="font-size:12px;color:#6c757d;margin-top:8px;"></div>
     </div>
 
     <!-- 留言列表 -->
-    <div id="commentList" style="display:flex;flex-direction:column;gap:12px;"></div>
+    <div id="commentList" style="display:flex;flex-direction:column;gap:16px;background:#fff;padding:16px;border-radius:10px;border:1px solid #e9ecef;"></div>
   </section>
 
   <script>
@@ -542,31 +542,31 @@
     function renderComment(msg, replies=[]) {
       const t = msg.createdAt?.toDate ? msg.createdAt.toDate().toLocaleString() : '';
       return `
-        <div class="cmt" data-id="${msg.id}" style="background:#0b0b0b;border:1px solid #222;border-radius:10px;padding:12px;">
-          <div style="font-size:12px;color:#9ec">${esc(msg.authorDept)}｜${esc(msg.authorName)} <span style="color:#999">・${t}</span></div>
-          <div style="white-space:pre-wrap;margin:6px 0 8px;">${esc(msg.text)}</div>
+        <div class="cmt" data-id="${msg.id}" style="background:#fff;border:1px solid #e9ecef;border-radius:10px;padding:16px;margin-bottom:8px;">
+          <div style="font-size:12px;color:#26a69a;font-weight:600">${esc(msg.authorDept)}｜${esc(msg.authorName)} <span style="color:#6c757d">・${t}</span></div>
+          <div style="white-space:pre-wrap;margin:8px 0 12px;color:#333;line-height:1.5;">${esc(msg.text)}</div>
           <div style="display:flex;gap:10px;">
-            <button class="replyBtn" data-id="${msg.id}" style="font-size:12px;color:#26a69a;background:transparent;border:1px solid #26a69a;border-radius:6px;padding:4px 8px;">回覆</button>
-            ${msg.uid === auth.currentUser?.uid ? `<button class="delBtn" data-id="${msg.id}" style="font-size:12px;color:#f66;background:transparent;border:1px solid #f66;border-radius:6px;padding:4px 8px;">刪除</button>` : ``}
+            <button class="replyBtn" data-id="${msg.id}" style="font-size:12px;color:#26a69a;background:transparent;border:1px solid #26a69a;border-radius:6px;padding:6px 12px;cursor:pointer;">回覆</button>
+            ${msg.uid === auth.currentUser?.uid ? `<button class="delBtn" data-id="${msg.id}" style="font-size:12px;color:#dc3545;background:transparent;border:1px solid #dc3545;border-radius:6px;padding:6px 12px;cursor:pointer;">刪除</button>` : ``}
           </div>
 
-          <div class="replies" style="margin-left:12px;border-left:2px solid #222;padding-left:12px;margin-top:8px;">
+          <div class="replies" style="margin-left:16px;border-left:2px solid #e9ecef;padding-left:16px;margin-top:12px;">
             ${replies.map(r=>{
               const rt = r.createdAt?.toDate ? r.createdAt.toDate().toLocaleString() : '';
               return `
-                <div class="reply" data-id="${r.id}" style="padding:8px 0;border-bottom:1px dashed #222;">
-                  <div style="font-size:12px;color:#9ec">${esc(r.authorDept)}｜${esc(r.authorName)} <span style="color:#999">・${rt}</span></div>
-                  <div style="white-space:pre-wrap;margin-top:4px;">${esc(r.text)}</div>
-                  ${r.uid === auth.currentUser?.uid ? `<button class="delBtn" data-id="${r.id}" style="margin-top:4px;font-size:12px;color:#f66;background:transparent;border:1px solid #f66;border-radius:6px;padding:2px 6px;">刪除</button>` : ``}
+                <div class="reply" data-id="${r.id}" style="padding:12px 0;border-bottom:1px dashed #e9ecef;">
+                  <div style="font-size:12px;color:#26a69a;font-weight:600">${esc(r.authorDept)}｜${esc(r.authorName)} <span style="color:#6c757d">・${rt}</span></div>
+                  <div style="white-space:pre-wrap;margin-top:6px;color:#333;line-height:1.5;">${esc(r.text)}</div>
+                  ${r.uid === auth.currentUser?.uid ? `<button class="delBtn" data-id="${r.id}" style="margin-top:6px;font-size:12px;color:#dc3545;background:transparent;border:1px solid #dc3545;border-radius:6px;padding:4px 8px;cursor:pointer;">刪除</button>` : ``}
                 </div>
               `;
             }).join('')}
           </div>
 
-          <div class="replyBox" style="display:none;margin-top:8px;">
-            <textarea rows="2" class="replyText" placeholder="回覆內容…" style="width:100%;background:#000;color:#fff;border:1px solid #333;border-radius:8px;padding:8px;"></textarea>
-            <div style="text-align:right;margin-top:6px;">
-              <button class="sendReplyBtn" data-parent="${msg.id}" style="padding:6px 10px;border:1px solid #26a69a;color:#26a69a;background:transparent;border-radius:8px;">送出回覆</button>
+          <div class="replyBox" style="display:none;margin-top:12px;">
+            <textarea rows="2" class="replyText" placeholder="回覆內容…" style="width:100%;background:#fff;color:#333;border:1px solid #ddd;border-radius:8px;padding:10px;font-size:14px;"></textarea>
+            <div style="text-align:right;margin-top:8px;">
+              <button class="sendReplyBtn" data-parent="${msg.id}" style="padding:8px 16px;border:1px solid #26a69a;color:#26a69a;background:transparent;border-radius:8px;cursor:pointer;font-size:14px;">送出回覆</button>
             </div>
           </div>
         </div>
