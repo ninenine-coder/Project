@@ -1025,6 +1025,23 @@
             line-height: 1.4;
         }
 
+        /* 討論區樣式 */
+        .discussion-section {
+            max-width: 1000px;
+            margin: 40px auto;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .discussion-container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
         .card-icon {
             display: flex;
             align-items: center;
@@ -1403,6 +1420,28 @@
                             支援 VR 頭盔、滑鼠拖曳與手機陀螺儀。點擊右下角 "Enter VR" 進入 VR 模式。
                         </p>
                     </div>
+
+                    <!-- 討論區 -->
+                    <div class="discussion-section">
+                        <div class="discussion-container">
+                            <h2 style="margin:0 0 20px;color:#2c3e50;font-size:24px;font-weight:600;text-align:center;">討論區</h2>
+
+                            <!-- 發文 -->
+                            <div style="background:#fff;padding:20px;border-radius:15px;margin-bottom:20px;border:1px solid #e9ecef;box-shadow:0 2px 8px rgba(0,0,0,0.1);">
+                                <textarea id="newComment" rows="3" placeholder="留下想法或提問（Shift+Enter 換行，Enter 送出）"
+                                    style="width:100%;background:#fff;color:#333;border:1px solid #ddd;border-radius:8px;padding:12px;font-size:14px;resize:vertical;font-family:inherit;"></textarea>
+                                <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:12px;">
+                                    <button id="postBtn" style="padding:10px 20px;border:1px solid #26a69a;color:#26a69a;background:transparent;border-radius:8px;font-size:14px;cursor:pointer;transition:all 0.3s;">
+                                        發佈
+                                    </button>
+                                </div>
+                                <div id="whoami" style="font-size:12px;color:#6c757d;margin-top:8px;"></div>
+                            </div>
+
+                            <!-- 留言列表 -->
+                            <div id="commentList" style="display:flex;flex-direction:column;gap:16px;background:#fff;padding:20px;border-radius:15px;border:1px solid #e9ecef;box-shadow:0 2px 8px rgba(0,0,0,0.1);"></div>
+                        </div>
+                    </div>
                     
                     <div class="content-footer">
                         <button class="back-btn" onclick="goBackToHomepage()">
@@ -1752,6 +1791,223 @@
                 }
             }
         }
+
+        // 討論區功能初始化
+        function initDiscussionForum() {
+            // 檢查是否在 VR 影片頁面
+            const vrVideoContent = document.getElementById('vrVideoContent');
+            if (!vrVideoContent || vrVideoContent.style.display === 'none') {
+                return;
+            }
+
+            // 動態導入 Firebase 模組
+            import('https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js').then(module => {
+                const { initializeApp, getApps, getApp } = module;
+                return Promise.all([
+                    import('https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore.js'),
+                    import('https://www.gstatic.com/firebasejs/10.13.1/firebase-auth.js'),
+                    Promise.resolve({ initializeApp, getApps, getApp })
+                ]);
+            }).then(([firestoreModule, authModule, appModule]) => {
+                const { getFirestore, collection, addDoc, serverTimestamp, query, where, orderBy, onSnapshot, getDocs, limit, doc, getDoc, deleteDoc } = firestoreModule;
+                const { getAuth, onAuthStateChanged, signInAnonymously } = authModule;
+                const { initializeApp, getApps, getApp } = appModule;
+
+                // Firebase 配置
+                const firebaseConfig = {
+                    apiKey: "AIzaSyBuWO8hFVjjTUe2tqJDrqdbeGTrp4PoT5Q",
+                    authDomain: "progect-115a5.firebaseapp.com",
+                    projectId: "progect-115a5"
+                };
+
+                // 初始化 Firebase
+                const app = getApps().length ? getApp() : initializeApp(firebaseConfig);
+                const db = getFirestore(app);
+                const auth = getAuth(app);
+
+                // 影片 ID
+                const VIDEO_ID = 'lesson-360-1';
+
+                // 確保登入
+                async function ensureLogin() {
+                    await new Promise(resolve => {
+                        onAuthStateChanged(auth, async u => {
+                            if (u) return resolve();
+                            await signInAnonymously(auth);
+                            resolve();
+                        });
+                    });
+                }
+
+                // 取使用者顯示資訊
+                async function getUserProfile(uid) {
+                    try {
+                        const snap = await getDoc(doc(db, 'user', uid));
+                        const u = snap.exists() ? snap.data() : {};
+                        const name = u?.学号 || u?.工号 || u?.name || '未命名';
+                        const dept = u?.部门 || u?.dept || u?.college || '-';
+                        return { authorName: name, authorDept: dept };
+                    } catch {
+                        return { authorName: '未命名', authorDept: '-' };
+                    }
+                }
+
+                // 渲染留言
+                const esc = s => String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+                function renderComment(msg, replies=[]) {
+                    const t = msg.createdAt?.toDate ? msg.createdAt.toDate().toLocaleString() : '';
+                    return `
+                        <div class="cmt" data-id="${msg.id}" style="background:#fff;border:1px solid #e9ecef;border-radius:10px;padding:16px;margin-bottom:8px;">
+                            <div style="font-size:12px;color:#26a69a;font-weight:600">${esc(msg.authorDept)}｜${esc(msg.authorName)} <span style="color:#6c757d">・${t}</span></div>
+                            <div style="white-space:pre-wrap;margin:8px 0 12px;color:#333;line-height:1.5;">${esc(msg.text)}</div>
+                            <div style="display:flex;gap:10px;">
+                                <button class="replyBtn" data-id="${msg.id}" style="font-size:12px;color:#26a69a;background:transparent;border:1px solid #26a69a;border-radius:6px;padding:6px 12px;cursor:pointer;">回覆</button>
+                                ${msg.uid === auth.currentUser?.uid ? `<button class="delBtn" data-id="${msg.id}" style="font-size:12px;color:#dc3545;background:transparent;border:1px solid #dc3545;border-radius:6px;padding:6px 12px;cursor:pointer;">刪除</button>` : ``}
+                            </div>
+                            <div class="replies" style="margin-left:16px;border-left:2px solid #e9ecef;padding-left:16px;margin-top:12px;">
+                                ${replies.map(r=>{
+                                    const rt = r.createdAt?.toDate ? r.createdAt.toDate().toLocaleString() : '';
+                                    return `
+                                        <div class="reply" data-id="${r.id}" style="padding:12px 0;border-bottom:1px dashed #e9ecef;">
+                                            <div style="font-size:12px;color:#26a69a;font-weight:600">${esc(r.authorDept)}｜${esc(r.authorName)} <span style="color:#6c757d">・${rt}</span></div>
+                                            <div style="white-space:pre-wrap;margin-top:6px;color:#333;line-height:1.5;">${esc(r.text)}</div>
+                                            ${r.uid === auth.currentUser?.uid ? `<button class="delBtn" data-id="${r.id}" style="margin-top:6px;font-size:12px;color:#dc3545;background:transparent;border:1px solid #dc3545;border-radius:6px;padding:4px 8px;cursor:pointer;">刪除</button>` : ``}
+                                        </div>
+                                    `;
+                                }).join('')}
+                            </div>
+                            <div class="replyBox" style="display:none;margin-top:12px;">
+                                <textarea rows="2" class="replyText" placeholder="回覆內容…" style="width:100%;background:#fff;color:#333;border:1px solid #ddd;border-radius:8px;padding:10px;font-size:14px;"></textarea>
+                                <div style="text-align:right;margin-top:8px;">
+                                    <button class="sendReplyBtn" data-parent="${msg.id}" style="padding:8px 16px;border:1px solid #26a69a;color:#26a69a;background:transparent;border-radius:8px;cursor:pointer;font-size:14px;">送出回覆</button>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }
+
+                // 即時監聽留言
+                async function subscribeThread() {
+                    const box = document.getElementById('commentList');
+                    if (!box) return;
+
+                    const qTop = query(
+                        collection(db, 'comments'),
+                        where('videoId', '==', VIDEO_ID),
+                        where('parentId', '==', null),
+                        orderBy('createdAt', 'desc'),
+                        limit(100)
+                    );
+
+                    onSnapshot(qTop, async snap => {
+                        const tops = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+                        const html = [];
+                        for (const m of tops) {
+                            const qRep = query(
+                                collection(db, 'comments'),
+                                where('videoId', '==', VIDEO_ID),
+                                where('parentId', '==', m.id),
+                                orderBy('createdAt', 'asc')
+                            );
+                            const repSnap = await getDocs(qRep);
+                            const replies = repSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+                            html.push(renderComment(m, replies));
+                        }
+                        box.innerHTML = html.join('');
+
+                        // 綁定事件
+                        box.querySelectorAll('.replyBtn').forEach(btn=>{
+                            btn.onclick = () => {
+                                const card = btn.closest('.cmt');
+                                const area = card.querySelector('.replyBox');
+                                area.style.display = (area.style.display === 'none' ? 'block' : 'none');
+                            };
+                        });
+                        box.querySelectorAll('.sendReplyBtn').forEach(btn=>{
+                            btn.onclick = async () => {
+                                const parentId = btn.dataset.parent;
+                                const card = btn.closest('.cmt');
+                                const text = card.querySelector('.replyText').value.trim();
+                                if (!text) return;
+                                const profile = await getUserProfile(auth.currentUser.uid);
+                                await addDoc(collection(db, 'comments'), {
+                                    videoId: VIDEO_ID,
+                                    parentId,
+                                    text,
+                                    uid: auth.currentUser.uid,
+                                    authorName: profile.authorName,
+                                    authorDept: profile.authorDept,
+                                    createdAt: serverTimestamp()
+                                });
+                                card.querySelector('.replyText').value = '';
+                                card.querySelector('.replyBox').style.display = 'none';
+                            };
+                        });
+                        box.querySelectorAll('.delBtn').forEach(btn=>{
+                            btn.onclick = async () => {
+                                try { await deleteDoc(doc(db, 'comments', btn.dataset.id)); }
+                                catch (e) { alert('刪除失敗：' + e.message); }
+                            };
+                        });
+                    });
+                }
+
+                // 設置發文功能
+                async function setupPosting() {
+                    const who = document.getElementById('whoami');
+                    const postBtn = document.getElementById('postBtn');
+                    const ta = document.getElementById('newComment');
+
+                    if (!who || !postBtn || !ta) return;
+
+                    const profile = await getUserProfile(auth.currentUser.uid);
+                    who.textContent = `以 ${profile.authorDept}｜${profile.authorName} 身份發言`;
+
+                    ta.addEventListener('keydown', e => {
+                        if (e.key === 'Enter' && !e.shiftKey) {
+                            e.preventDefault();
+                            postBtn.click();
+                        }
+                    });
+
+                    postBtn.onclick = async () => {
+                        const text = ta.value.trim();
+                        if (!text) return;
+                        await addDoc(collection(db, 'comments'), {
+                            videoId: VIDEO_ID,
+                            parentId: null,
+                            text,
+                            uid: auth.currentUser.uid,
+                            authorName: profile.authorName,
+                            authorDept: profile.authorDept,
+                            createdAt: serverTimestamp()
+                        });
+                        ta.value = '';
+                    };
+                }
+
+                // 啟動討論區
+                ensureLogin().then(() => {
+                    setupPosting();
+                    subscribeThread();
+                });
+            }).catch(error => {
+                console.error('討論區初始化失敗:', error);
+            });
+        }
+
+        // 修改 enterPractice 函數以初始化討論區
+        const originalEnterPractice = window.enterPractice;
+        window.enterPractice = function(practiceType) {
+            originalEnterPractice(practiceType);
+            
+            // 如果是 VR 影片，初始化討論區
+            if (practiceType === 'vr-video') {
+                setTimeout(() => {
+                    initDiscussionForum();
+                }, 500);
+            }
+        };
     </script>
     
     <!-- 載入增強的語言管理器 -->
