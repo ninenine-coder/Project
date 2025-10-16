@@ -1844,11 +1844,12 @@
                     try {
                         const snap = await getDoc(doc(db, 'user', uid));
                         const u = snap.exists() ? snap.data() : {};
-                        const name = u?.学号 || u?.工号 || u?.name || '未命名';
+                        // 優先使用 username 欄位，避免匿名
+                        const name = u?.username || u?.学号 || u?.工号 || u?.name || '未命名用戶';
                         const dept = u?.部门 || u?.dept || u?.college || '-';
                         return { authorName: name, authorDept: dept };
                     } catch {
-                        return { authorName: '未命名', authorDept: '-' };
+                        return { authorName: '未命名用戶', authorDept: '-' };
                     }
                 }
 
@@ -1885,18 +1886,22 @@
                                     <button class="likeBtn" data-id="${msg.id}" style="background:none;border:none;color:#606060;font-size:14px;cursor:pointer;padding:4px 0;">
                                         <i class="fas fa-thumbs-up" style="margin-right:4px;"></i>讚
                                     </button>
-                                    ${msg.uid === auth.currentUser?.uid ? `
-                                        <div style="position:relative;margin-left:auto;">
-                                            <button class="moreBtn" data-id="${msg.id}" style="background:none;border:none;color:#606060;cursor:pointer;padding:4px 8px;border-radius:50%;transition:background-color 0.2s;" onmouseover="this.style.backgroundColor='rgba(0,0,0,0.1)'" onmouseout="this.style.backgroundColor='transparent'">
-                                                <i class="fas fa-ellipsis-v"></i>
-                                            </button>
-                                            <div class="dropdown-menu" style="position:absolute;right:0;top:100%;background:white;border:1px solid #ddd;border-radius:8px;box-shadow:0 2px 10px rgba(0,0,0,0.1);z-index:1000;display:none;min-width:120px;">
+                                    <div style="position:relative;margin-left:auto;">
+                                        <button class="moreBtn" data-id="${msg.id}" style="background:none;border:none;color:#606060;cursor:pointer;padding:4px 8px;border-radius:50%;transition:background-color 0.2s;" onmouseover="this.style.backgroundColor='rgba(0,0,0,0.1)'" onmouseout="this.style.backgroundColor='transparent'">
+                                            <i class="fas fa-ellipsis-v"></i>
+                                        </button>
+                                        <div class="dropdown-menu" style="position:absolute;right:0;top:100%;background:white;border:1px solid #ddd;border-radius:8px;box-shadow:0 2px 10px rgba(0,0,0,0.1);z-index:1000;display:none;min-width:120px;">
+                                            ${msg.uid === auth.currentUser?.uid ? `
                                                 <button class="delBtn" data-id="${msg.id}" style="width:100%;padding:8px 12px;background:none;border:none;text-align:left;color:#cc0000;cursor:pointer;font-size:14px;" onmouseover="this.style.backgroundColor='rgba(204,0,0,0.1)'" onmouseout="this.style.backgroundColor='transparent'">
                                                     <i class="fas fa-trash" style="margin-right:8px;"></i>刪除留言
                                                 </button>
-                                            </div>
+                                            ` : `
+                                                <div style="padding:8px 12px;color:#666;font-size:14px;text-align:center;">
+                                                    無法刪除他人留言
+                                                </div>
+                                            `}
                                         </div>
-                                    ` : ''}
+                                    </div>
                                 </div>
                                 
                                 <!-- 回覆數量 -->
@@ -1928,18 +1933,22 @@
                                                         <button class="likeBtn" data-id="${r.id}" style="background:none;border:none;color:#606060;font-size:14px;cursor:pointer;padding:4px 0;">
                                                             <i class="fas fa-thumbs-up" style="margin-right:4px;"></i>讚
                                                         </button>
-                                                        ${r.uid === auth.currentUser?.uid ? `
-                                                            <div style="position:relative;margin-left:auto;">
-                                                                <button class="moreBtn" data-id="${r.id}" style="background:none;border:none;color:#606060;cursor:pointer;padding:4px 8px;border-radius:50%;" onmouseover="this.style.backgroundColor='rgba(0,0,0,0.1)'" onmouseout="this.style.backgroundColor='transparent'">
-                                                                    <i class="fas fa-ellipsis-v"></i>
-                                                                </button>
-                                                                <div class="dropdown-menu" style="position:absolute;right:0;top:100%;background:white;border:1px solid #ddd;border-radius:8px;box-shadow:0 2px 10px rgba(0,0,0,0.1);z-index:1000;display:none;min-width:120px;">
+                                                        <div style="position:relative;margin-left:auto;">
+                                                            <button class="moreBtn" data-id="${r.id}" style="background:none;border:none;color:#606060;cursor:pointer;padding:4px 8px;border-radius:50%;" onmouseover="this.style.backgroundColor='rgba(0,0,0,0.1)'" onmouseout="this.style.backgroundColor='transparent'">
+                                                                <i class="fas fa-ellipsis-v"></i>
+                                                            </button>
+                                                            <div class="dropdown-menu" style="position:absolute;right:0;top:100%;background:white;border:1px solid #ddd;border-radius:8px;box-shadow:0 2px 10px rgba(0,0,0,0.1);z-index:1000;display:none;min-width:120px;">
+                                                                ${r.uid === auth.currentUser?.uid ? `
                                                                     <button class="delBtn" data-id="${r.id}" style="width:100%;padding:8px 12px;background:none;border:none;text-align:left;color:#cc0000;cursor:pointer;font-size:14px;" onmouseover="this.style.backgroundColor='rgba(204,0,0,0.1)'" onmouseout="this.style.backgroundColor='transparent'">
                                                                         <i class="fas fa-trash" style="margin-right:8px;"></i>刪除回覆
                                                                     </button>
-                                                                </div>
+                                                                ` : `
+                                                                    <div style="padding:8px 12px;color:#666;font-size:14px;text-align:center;">
+                                                                        無法刪除他人回覆
+                                                                    </div>
+                                                                `}
                                                             </div>
-                                                        ` : ''}
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
