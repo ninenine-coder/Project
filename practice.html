@@ -1889,7 +1889,12 @@
                 // 即時監聽留言
                 async function subscribeThread() {
                     const box = document.getElementById('commentList');
-                    if (!box) return;
+                    if (!box) {
+                        console.error('找不到 commentList 元素');
+                        return;
+                    }
+
+                    console.log('開始監聽留言，VIDEO_ID:', VIDEO_ID);
 
                     const qTop = query(
                         collection(db, 'comments'),
@@ -1899,8 +1904,17 @@
                         limit(100)
                     );
 
-                    onSnapshot(qTop, async snap => {
+                    onSnapshot(qTop, async (snap) => {
+                        console.log('收到留言更新，文檔數量:', snap.docs.length);
+                        
+                        if (snap.docs.length === 0) {
+                            box.innerHTML = '<div style="text-align:center;color:#666;padding:20px;">暫無留言，快來搶沙發吧！</div>';
+                            return;
+                        }
+
                         const tops = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+                        console.log('主留言:', tops);
+                        
                         const html = [];
                         for (const m of tops) {
                             const qRep = query(
@@ -1911,44 +1925,57 @@
                             );
                             const repSnap = await getDocs(qRep);
                             const replies = repSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+                            console.log(`留言 ${m.id} 的回覆:`, replies);
                             html.push(renderComment(m, replies));
                         }
+                        
                         box.innerHTML = html.join('');
+                        console.log('留言渲染完成，HTML 長度:', html.join('').length);
 
                         // 綁定事件
-                        box.querySelectorAll('.replyBtn').forEach(btn=>{
-                            btn.onclick = () => {
-                                const card = btn.closest('.cmt');
-                                const area = card.querySelector('.replyBox');
-                                area.style.display = (area.style.display === 'none' ? 'block' : 'none');
-                            };
-                        });
-                        box.querySelectorAll('.sendReplyBtn').forEach(btn=>{
-                            btn.onclick = async () => {
-                                const parentId = btn.dataset.parent;
-                                const card = btn.closest('.cmt');
-                                const text = card.querySelector('.replyText').value.trim();
-                                if (!text) return;
-                                const profile = await getUserProfile(auth.currentUser.uid);
-                                await addDoc(collection(db, 'comments'), {
-                                    videoId: VIDEO_ID,
-                                    parentId,
-                                    text,
-                                    uid: auth.currentUser.uid,
-                                    authorName: profile.authorName,
-                                    authorDept: profile.authorDept,
-                                    createdAt: serverTimestamp()
-                                });
-                                card.querySelector('.replyText').value = '';
-                                card.querySelector('.replyBox').style.display = 'none';
-                            };
-                        });
-                        box.querySelectorAll('.delBtn').forEach(btn=>{
-                            btn.onclick = async () => {
-                                try { await deleteDoc(doc(db, 'comments', btn.dataset.id)); }
-                                catch (e) { alert('刪除失敗：' + e.message); }
-                            };
-                        });
+                        bindCommentEvents(box);
+                    }, (error) => {
+                        console.error('監聽留言時發生錯誤:', error);
+                        box.innerHTML = '<div style="text-align:center;color:#dc3545;padding:20px;">載入留言失敗，請重新整理頁面</div>';
+                    });
+                }
+
+                // 綁定留言事件
+                function bindCommentEvents(box) {
+                    box.querySelectorAll('.replyBtn').forEach(btn=>{
+                        btn.onclick = () => {
+                            const card = btn.closest('.cmt');
+                            const area = card.querySelector('.replyBox');
+                            area.style.display = (area.style.display === 'none' ? 'block' : 'none');
+                        };
+                    });
+                    
+                    box.querySelectorAll('.sendReplyBtn').forEach(btn=>{
+                        btn.onclick = async () => {
+                            const parentId = btn.dataset.parent;
+                            const card = btn.closest('.cmt');
+                            const text = card.querySelector('.replyText').value.trim();
+                            if (!text) return;
+                            const profile = await getUserProfile(auth.currentUser.uid);
+                            await addDoc(collection(db, 'comments'), {
+                                videoId: VIDEO_ID,
+                                parentId,
+                                text,
+                                uid: auth.currentUser.uid,
+                                authorName: profile.authorName,
+                                authorDept: profile.authorDept,
+                                createdAt: serverTimestamp()
+                            });
+                            card.querySelector('.replyText').value = '';
+                            card.querySelector('.replyBox').style.display = 'none';
+                        };
+                    });
+                    
+                    box.querySelectorAll('.delBtn').forEach(btn=>{
+                        btn.onclick = async () => {
+                            try { await deleteDoc(doc(db, 'comments', btn.dataset.id)); }
+                            catch (e) { alert('刪除失敗：' + e.message); }
+                        };
                     });
                 }
 
@@ -1958,9 +1985,14 @@
                     const postBtn = document.getElementById('postBtn');
                     const ta = document.getElementById('newComment');
 
-                    if (!who || !postBtn || !ta) return;
+                    if (!who || !postBtn || !ta) {
+                        console.error('找不到討論區元素:', { who, postBtn, ta });
+                        return;
+                    }
 
+                    console.log('設置發文功能，當前用戶:', auth.currentUser?.uid);
                     const profile = await getUserProfile(auth.currentUser.uid);
+                    console.log('用戶資料:', profile);
                     who.textContent = `以 ${profile.authorDept}｜${profile.authorName} 身份發言`;
 
                     ta.addEventListener('keydown', e => {
@@ -1973,21 +2005,62 @@
                     postBtn.onclick = async () => {
                         const text = ta.value.trim();
                         if (!text) return;
-                        await addDoc(collection(db, 'comments'), {
+                        
+                        console.log('發送留言:', {
                             videoId: VIDEO_ID,
-                            parentId: null,
-                            text,
+                            text: text,
                             uid: auth.currentUser.uid,
                             authorName: profile.authorName,
-                            authorDept: profile.authorDept,
-                            createdAt: serverTimestamp()
+                            authorDept: profile.authorDept
                         });
-                        ta.value = '';
+                        
+                        try {
+                            const docRef = await addDoc(collection(db, 'comments'), {
+                                videoId: VIDEO_ID,
+                                parentId: null,
+                                text,
+                                uid: auth.currentUser.uid,
+                                authorName: profile.authorName,
+                                authorDept: profile.authorDept,
+                                createdAt: serverTimestamp()
+                            });
+                            console.log('留言發送成功，ID:', docRef.id);
+                            ta.value = '';
+                        } catch (error) {
+                            console.error('發送留言失敗:', error);
+                            alert('發送失敗，請重試');
+                        }
                     };
                 }
 
+                // 測試資料庫連接
+                async function testDatabaseConnection() {
+                    try {
+                        console.log('測試資料庫連接...');
+                        const testQuery = query(collection(db, 'comments'), limit(1));
+                        const testSnap = await getDocs(testQuery);
+                        console.log('資料庫連接成功，測試查詢返回:', testSnap.docs.length, '個文檔');
+                        
+                        // 顯示現有的留言數量
+                        const allCommentsQuery = query(
+                            collection(db, 'comments'),
+                            where('videoId', '==', VIDEO_ID)
+                        );
+                        const allCommentsSnap = await getDocs(allCommentsQuery);
+                        console.log(`資料庫中 VIDEO_ID='${VIDEO_ID}' 的留言總數:`, allCommentsSnap.docs.length);
+                        
+                        if (allCommentsSnap.docs.length > 0) {
+                            console.log('現有留言:', allCommentsSnap.docs.map(d => ({ id: d.id, ...d.data() })));
+                        }
+                    } catch (error) {
+                        console.error('資料庫連接測試失敗:', error);
+                    }
+                }
+
                 // 啟動討論區
-                ensureLogin().then(() => {
+                ensureLogin().then(async () => {
+                    console.log('用戶登入成功，開始初始化討論區');
+                    await testDatabaseConnection();
                     setupPosting();
                     subscribeThread();
                 });
