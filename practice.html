@@ -1809,7 +1809,7 @@
                     Promise.resolve({ initializeApp, getApps, getApp })
                 ]);
             }).then(([firestoreModule, authModule, appModule]) => {
-                const { getFirestore, collection, addDoc, serverTimestamp, query, where, orderBy, onSnapshot, getDocs, limit, doc, getDoc, deleteDoc } = firestoreModule;
+                const { getFirestore, collection, addDoc, serverTimestamp, query, where, orderBy, onSnapshot, getDocs, limit, doc, getDoc, deleteDoc, updateDoc } = firestoreModule;
                 const { getAuth, onAuthStateChanged, signInAnonymously } = authModule;
                 const { initializeApp, getApps, getApp } = appModule;
 
@@ -1948,8 +1948,8 @@
                                     <button class="replyBtn" data-id="${msg.id}" style="background:none;border:none;color:#065fd4;font-size:14px;font-weight:500;cursor:pointer;padding:4px 0;">
                                         <i class="fas fa-reply" style="margin-right:4px;"></i>回覆
                                     </button>
-                                    <button class="likeBtn" data-id="${msg.id}" style="background:none;border:none;color:#606060;font-size:14px;cursor:pointer;padding:4px 0;">
-                                        <i class="fas fa-thumbs-up" style="margin-right:4px;"></i>讚
+                                    <button class="likeBtn" data-id="${msg.id}" data-liked="${msg.likedBy && msg.likedBy.includes(auth.currentUser?.uid) ? 'true' : 'false'}" style="background:none;border:none;color:${msg.likedBy && msg.likedBy.includes(auth.currentUser?.uid) ? '#065fd4' : '#606060'};font-size:14px;cursor:pointer;padding:4px 0;">
+                                        <i class="fas fa-thumbs-up" style="margin-right:4px;"></i>讚 ${msg.likeCount || 0}
                                     </button>
                                     <div style="position:relative;margin-left:auto;">
                                         <button class="moreBtn" data-id="${msg.id}" style="background:none;border:none;color:#606060;cursor:pointer;padding:4px 8px;border-radius:50%;transition:background-color 0.2s;" onmouseover="this.style.backgroundColor='rgba(0,0,0,0.1)'" onmouseout="this.style.backgroundColor='transparent'">
@@ -1995,8 +1995,8 @@
                                                     </div>
                                                     <div style="color:#0f0f0f;line-height:1.4;margin-bottom:6px;white-space:pre-wrap;word-break:break-word;">${esc(r.text)}</div>
                                                     <div style="display:flex;align-items:center;gap:16px;">
-                                                        <button class="likeBtn" data-id="${r.id}" style="background:none;border:none;color:#606060;font-size:14px;cursor:pointer;padding:4px 0;">
-                                                            <i class="fas fa-thumbs-up" style="margin-right:4px;"></i>讚
+                                                        <button class="likeBtn" data-id="${r.id}" data-liked="${r.likedBy && r.likedBy.includes(auth.currentUser?.uid) ? 'true' : 'false'}" style="background:none;border:none;color:${r.likedBy && r.likedBy.includes(auth.currentUser?.uid) ? '#065fd4' : '#606060'};font-size:14px;cursor:pointer;padding:4px 0;">
+                                                            <i class="fas fa-thumbs-up" style="margin-right:4px;"></i>讚 ${r.likeCount || 0}
                                                         </button>
                                                         <div style="position:relative;margin-left:auto;">
                                                             <button class="moreBtn" data-id="${r.id}" style="background:none;border:none;color:#606060;cursor:pointer;padding:4px 8px;border-radius:50%;" onmouseover="this.style.backgroundColor='rgba(0,0,0,0.1)'" onmouseout="this.style.backgroundColor='transparent'">
@@ -2172,7 +2172,10 @@
                                     uid: auth.currentUser.uid,
                                     authorName: profile.authorName,
                                     authorDept: profile.authorDept,
-                                    createdAt: serverTimestamp()
+                                    createdAt: serverTimestamp(),
+                                    // 按讚功能
+                                    likeCount: 0,
+                                    likedBy: []
                                 });
                                 card.querySelector('.replyText').value = '';
                                 card.querySelector('.replyBox').style.display = 'none';
@@ -2241,6 +2244,59 @@
                             menu.style.display = 'none';
                         });
                     });
+                    
+                    // 按讚按鈕功能
+                    box.querySelectorAll('.likeBtn').forEach(btn => {
+                        btn.onclick = async () => {
+                            const commentId = btn.dataset.id;
+                            const isLiked = btn.dataset.liked === 'true';
+                            
+                            try {
+                                const commentRef = doc(db, 'comments', commentId);
+                                const commentDoc = await getDoc(commentRef);
+                                
+                                if (!commentDoc.exists()) {
+                                    console.error('留言不存在');
+                                    return;
+                                }
+                                
+                                const commentData = commentDoc.data();
+                                const currentLikedBy = commentData.likedBy || [];
+                                const currentLikeCount = commentData.likeCount || 0;
+                                const currentUserUid = auth.currentUser.uid;
+                                
+                                let newLikedBy, newLikeCount;
+                                
+                                if (isLiked) {
+                                    // 取消按讚
+                                    newLikedBy = currentLikedBy.filter(uid => uid !== currentUserUid);
+                                    newLikeCount = Math.max(0, currentLikeCount - 1);
+                                    console.log('取消按讚');
+                                } else {
+                                    // 按讚
+                                    if (!newLikedBy.includes(currentUserUid)) {
+                                        newLikedBy = [...currentLikedBy, currentUserUid];
+                                        newLikeCount = currentLikeCount + 1;
+                                        console.log('按讚');
+                                    } else {
+                                        return; // 已經按讚了
+                                    }
+                                }
+                                
+                                // 更新資料庫
+                                await updateDoc(commentRef, {
+                                    likedBy: newLikedBy,
+                                    likeCount: newLikeCount
+                                });
+                                
+                                console.log('按讚狀態更新成功');
+                                
+                            } catch (error) {
+                                console.error('按讚失敗:', error);
+                                alert('操作失敗，請重試');
+                            }
+                        };
+                    });
                 }
 
                 // 設置發文功能
@@ -2289,7 +2345,10 @@
                                 uid: auth.currentUser.uid,
                                 authorName: currentProfile.authorName,
                                 authorDept: currentProfile.authorDept,
-                                createdAt: serverTimestamp()
+                                createdAt: serverTimestamp(),
+                                // 按讚功能
+                                likeCount: 0,
+                                likedBy: []
                             });
                             console.log('留言發送成功，ID:', docRef.id);
                             ta.value = '';
