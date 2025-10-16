@@ -1844,12 +1844,12 @@
                     try {
                         const snap = await getDoc(doc(db, 'user', uid));
                         const u = snap.exists() ? snap.data() : {};
-                        // 優先使用 username 欄位，避免匿名
-                        const name = u?.username || u?.学号 || u?.工号 || u?.name || '未命名用戶';
-                        const dept = u?.部门 || u?.dept || u?.college || '-';
+                        // 只使用 username 欄位，確保實名制
+                        const name = u?.username || '未命名用戶';
+                        const dept = u?.部门 || u?.dept || u?.college || '';
                         return { authorName: name, authorDept: dept };
                     } catch {
-                        return { authorName: '未命名用戶', authorDept: '-' };
+                        return { authorName: '未命名用戶', authorDept: '' };
                     }
                 }
 
@@ -1870,10 +1870,10 @@
                             <!-- 留言內容 -->
                             <div style="flex:1;min-width:0;">
                                 <!-- 用戶名和時間 -->
-                                <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
-                                    <span style="font-weight:600;color:#0f0f0f;font-size:14px;">${esc(msg.authorDept)}｜${esc(msg.authorName)}</span>
-                                    <span style="color:#606060;font-size:12px;">${timeStr}</span>
-                                </div>
+                                    <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
+                                        <span style="font-weight:600;color:#0f0f0f;font-size:14px;">${esc(msg.authorName)}${msg.authorDept ? `｜${esc(msg.authorDept)}` : ''}</span>
+                                        <span style="color:#606060;font-size:12px;">${timeStr}</span>
+                                    </div>
                                 
                                 <!-- 留言文字 -->
                                 <div style="color:#0f0f0f;line-height:1.4;margin-bottom:8px;white-space:pre-wrap;word-break:break-word;">${esc(msg.text)}</div>
@@ -1925,7 +1925,7 @@
                                                 </div>
                                                 <div style="flex:1;min-width:0;">
                                                     <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
-                                                        <span style="font-weight:600;color:#0f0f0f;font-size:14px;">${esc(r.authorDept)}｜${esc(r.authorName)}</span>
+                                                        <span style="font-weight:600;color:#0f0f0f;font-size:14px;">${esc(r.authorName)}${r.authorDept ? `｜${esc(r.authorDept)}` : ''}</span>
                                                         <span style="color:#606060;font-size:12px;">${replyTimeStr}</span>
                                                     </div>
                                                     <div style="color:#0f0f0f;line-height:1.4;margin-bottom:6px;white-space:pre-wrap;word-break:break-word;">${esc(r.text)}</div>
@@ -2192,7 +2192,7 @@
                     console.log('設置發文功能，當前用戶:', auth.currentUser?.uid);
                     const profile = await getUserProfile(auth.currentUser.uid);
                     console.log('用戶資料:', profile);
-                    who.textContent = `以 ${profile.authorDept}｜${profile.authorName} 身份發言`;
+                    who.textContent = `以 ${profile.authorName}${profile.authorDept ? `｜${profile.authorDept}` : ''} 身份發言`;
 
                     ta.addEventListener('keydown', e => {
                         if (e.key === 'Enter' && !e.shiftKey) {
