@@ -1855,7 +1855,22 @@
                     try {
                         console.log('開始查詢用戶資料，UID:', uid);
                         
+                        // 方法0：優先從 localStorage 獲取（最快最準確）
+                        console.log('方法0：從 localStorage 獲取...');
+                        const localData = localStorage.getItem('pbls_user');
+                        if (localData) {
+                            const userData = JSON.parse(localData);
+                            console.log('從 localStorage 獲取用戶資料:', userData);
+                            
+                            const name = userData?.name || userData?.displayName || '未命名用戶';
+                            const dept = userData?.department || userData?.where || '';
+                            
+                            console.log('最終解析結果（從 localStorage）:', { authorName: name, authorDept: dept });
+                            return { authorName: name, authorDept: dept };
+                        }
+                        
                         // 方法1：嘗試通過 UID 映射查找真實用戶資料
+                        console.log('方法1：嘗試通過 UID 映射查找...');
                         const mappingDoc = await getDoc(doc(db, 'uid_mappings', uid));
                         if (mappingDoc.exists()) {
                             const mapping = mappingDoc.data();
@@ -1878,7 +1893,7 @@
                         }
                         
                         // 方法2：直接查詢 user 集合
-                        console.log('嘗試直接查詢 user 集合...');
+                        console.log('方法2：嘗試直接查詢 user 集合...');
                         const userDocRef = doc(db, 'user', uid);
                         const snap = await getDoc(userDocRef);
                         
@@ -1890,20 +1905,6 @@
                             const dept = u?.部门 || u?.dept || u?.college || u?.department || '';
                             
                             console.log('最終解析結果（直接查詢）:', { authorName: name, authorDept: dept });
-                            return { authorName: name, authorDept: dept };
-                        }
-                        
-                        // 方法3：從 localStorage 獲取
-                        console.log('嘗試從 localStorage 獲取...');
-                        const localData = localStorage.getItem('pbls_user');
-                        if (localData) {
-                            const userData = JSON.parse(localData);
-                            console.log('從 localStorage 獲取用戶資料:', userData);
-                            
-                            const name = userData?.name || userData?.displayName || '未命名用戶';
-                            const dept = userData?.department || userData?.where || '';
-                            
-                            console.log('最終解析結果（從 localStorage）:', { authorName: name, authorDept: dept });
                             return { authorName: name, authorDept: dept };
                         }
                         
@@ -2324,13 +2325,22 @@
                 }
 
                 // 啟動討論區
-                ensureLogin().then(async () => {
+                ensureLogin().then(async (user) => {
                     console.log('用戶登入成功，開始初始化討論區');
-                    console.log('當前用戶 UID:', auth.currentUser?.uid);
+                    console.log('當前用戶:', user);
+                    console.log('當前用戶 UID:', user?.uid);
+                    
+                    // 檢查 localStorage 中的用戶資料
+                    const localData = localStorage.getItem('pbls_user');
+                    if (localData) {
+                        console.log('localStorage 中的用戶資料:', JSON.parse(localData));
+                    } else {
+                        console.log('localStorage 中沒有 pbls_user 資料');
+                    }
                     
                     // 測試用戶資料查詢
                     console.log('測試用戶資料查詢...');
-                    const testProfile = await getUserProfile(auth.currentUser.uid);
+                    const testProfile = await getUserProfile(user?.uid);
                     console.log('測試結果:', testProfile);
                     
                     await testDatabaseConnection();
