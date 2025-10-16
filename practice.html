@@ -1844,11 +1844,16 @@
                     try {
                         const snap = await getDoc(doc(db, 'user', uid));
                         const u = snap.exists() ? snap.data() : {};
+                        console.log('用戶資料查詢結果:', { uid, userData: u });
+                        
                         // 只使用 username 欄位，確保實名制
                         const name = u?.username || '未命名用戶';
                         const dept = u?.部门 || u?.dept || u?.college || '';
+                        
+                        console.log('解析後的用戶資料:', { authorName: name, authorDept: dept });
                         return { authorName: name, authorDept: dept };
-                    } catch {
+                    } catch (error) {
+                        console.error('獲取用戶資料失敗:', error);
                         return { authorName: '未命名用戶', authorDept: '' };
                     }
                 }
@@ -2205,12 +2210,15 @@
                         const text = ta.value.trim();
                         if (!text) return;
                         
+                        // 每次發文時重新獲取最新的用戶資料
+                        const currentProfile = await getUserProfile(auth.currentUser.uid);
+                        
                         console.log('發送留言:', {
                             videoId: VIDEO_ID,
                             text: text,
                             uid: auth.currentUser.uid,
-                            authorName: profile.authorName,
-                            authorDept: profile.authorDept
+                            authorName: currentProfile.authorName,
+                            authorDept: currentProfile.authorDept
                         });
                         
                         try {
@@ -2219,8 +2227,8 @@
                                 parentId: null,
                                 text,
                                 uid: auth.currentUser.uid,
-                                authorName: profile.authorName,
-                                authorDept: profile.authorDept,
+                                authorName: currentProfile.authorName,
+                                authorDept: currentProfile.authorDept,
                                 createdAt: serverTimestamp()
                             });
                             console.log('留言發送成功，ID:', docRef.id);
