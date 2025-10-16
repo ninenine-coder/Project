@@ -1907,7 +1907,7 @@
                                 ` : ''}
                                 
                                 <!-- 回覆區域 -->
-                                <div class="replies" id="replies-${msg.id}" style="display:none;margin-left:0;">
+                                <div class="replies" id="replies-${msg.id}" style="display:none;margin-left:0;padding-left:0;">
                                     ${replies.map(r=>{
                                         const rt = r.createdAt?.toDate ? r.createdAt.toDate() : new Date();
                                         const replyTimeStr = formatTimeAgo(rt);
@@ -1986,19 +1986,6 @@
                     return date.toLocaleDateString('zh-TW');
                 }
 
-                // 切換回覆顯示
-                function toggleReplies(commentId) {
-                    const repliesDiv = document.getElementById(`replies-${commentId}`);
-                    const icon = repliesDiv.previousElementSibling.querySelector('i');
-                    
-                    if (repliesDiv.style.display === 'none') {
-                        repliesDiv.style.display = 'block';
-                        icon.className = 'fas fa-sort-up';
-                    } else {
-                        repliesDiv.style.display = 'none';
-                        icon.className = 'fas fa-sort-down';
-                    }
-                }
 
                 // 即時監聽留言（臨時方案：避免複合索引）
                 async function subscribeThread() {
@@ -2272,18 +2259,41 @@
             });
         }
 
-        // 修改 enterPractice 函數以初始化討論區
-        const originalEnterPractice = window.enterPractice;
-        window.enterPractice = function(practiceType) {
-            originalEnterPractice(practiceType);
-            
-            // 如果是 VR 影片，初始化討論區
-            if (practiceType === 'vr-video') {
-                setTimeout(() => {
-                    initDiscussionForum();
-                }, 500);
-            }
-        };
+                // 將 toggleReplies 函數添加到全局作用域
+                window.toggleReplies = function(commentId) {
+                    const repliesDiv = document.getElementById(`replies-${commentId}`);
+                    if (!repliesDiv) {
+                        console.error('找不到回覆區域:', commentId);
+                        return;
+                    }
+                    
+                    const toggleBtn = repliesDiv.previousElementSibling;
+                    const icon = toggleBtn.querySelector('i');
+                    
+                    if (repliesDiv.style.display === 'none' || repliesDiv.style.display === '') {
+                        repliesDiv.style.display = 'block';
+                        icon.className = 'fas fa-sort-up';
+                        toggleBtn.innerHTML = `<i class="fas fa-sort-up" style="margin-right:4px;"></i>隱藏回覆`;
+                    } else {
+                        repliesDiv.style.display = 'none';
+                        icon.className = 'fas fa-sort-down';
+                        const replyCount = repliesDiv.querySelectorAll('.reply').length;
+                        toggleBtn.innerHTML = `<i class="fas fa-sort-down" style="margin-right:4px;"></i>${replyCount} 則回覆`;
+                    }
+                };
+
+                // 修改 enterPractice 函數以初始化討論區
+                const originalEnterPractice = window.enterPractice;
+                window.enterPractice = function(practiceType) {
+                    originalEnterPractice(practiceType);
+                    
+                    // 如果是 VR 影片，初始化討論區
+                    if (practiceType === 'vr-video') {
+                        setTimeout(() => {
+                            initDiscussionForum();
+                        }, 500);
+                    }
+                };
     </script>
     
     <!-- 載入增強的語言管理器 -->
