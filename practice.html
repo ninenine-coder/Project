@@ -2274,7 +2274,7 @@
                                     console.log('取消按讚');
                                 } else {
                                     // 按讚
-                                    if (!newLikedBy.includes(currentUserUid)) {
+                                    if (!currentLikedBy.includes(currentUserUid)) {
                                         newLikedBy = [...currentLikedBy, currentUserUid];
                                         newLikeCount = currentLikeCount + 1;
                                         console.log('按讚');
