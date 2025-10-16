@@ -1852,38 +1852,152 @@
                     }
                 }
 
-                // 渲染留言
+                // 渲染留言（YouTube 風格）
                 const esc = s => String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
                 function renderComment(msg, replies=[]) {
-                    const t = msg.createdAt?.toDate ? msg.createdAt.toDate().toLocaleString() : '';
+                    const t = msg.createdAt?.toDate ? msg.createdAt.toDate() : new Date();
+                    const timeStr = formatTimeAgo(t);
+                    const avatar = msg.authorName ? msg.authorName.charAt(0).toUpperCase() : 'U';
+                    
                     return `
-                        <div class="cmt" data-id="${msg.id}" style="background:#fff;border:1px solid #e9ecef;border-radius:10px;padding:16px;margin-bottom:8px;">
-                            <div style="font-size:12px;color:#26a69a;font-weight:600">${esc(msg.authorDept)}｜${esc(msg.authorName)} <span style="color:#6c757d">・${t}</span></div>
-                            <div style="white-space:pre-wrap;margin:8px 0 12px;color:#333;line-height:1.5;">${esc(msg.text)}</div>
-                            <div style="display:flex;gap:10px;">
-                                <button class="replyBtn" data-id="${msg.id}" style="font-size:12px;color:#26a69a;background:transparent;border:1px solid #26a69a;border-radius:6px;padding:6px 12px;cursor:pointer;">回覆</button>
-                                ${msg.uid === auth.currentUser?.uid ? `<button class="delBtn" data-id="${msg.id}" style="font-size:12px;color:#dc3545;background:transparent;border:1px solid #dc3545;border-radius:6px;padding:6px 12px;cursor:pointer;">刪除</button>` : ``}
+                        <div class="cmt" data-id="${msg.id}" style="display:flex;gap:12px;margin-bottom:16px;padding:8px 0;">
+                            <!-- 頭像 -->
+                            <div style="width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);display:flex;align-items:center;justify-content:center;color:white;font-weight:bold;font-size:16px;flex-shrink:0;">
+                                ${avatar}
                             </div>
-                            <div class="replies" style="margin-left:16px;border-left:2px solid #e9ecef;padding-left:16px;margin-top:12px;">
-                                ${replies.map(r=>{
-                                    const rt = r.createdAt?.toDate ? r.createdAt.toDate().toLocaleString() : '';
-                                    return `
-                                        <div class="reply" data-id="${r.id}" style="padding:12px 0;border-bottom:1px dashed #e9ecef;">
-                                            <div style="font-size:12px;color:#26a69a;font-weight:600">${esc(r.authorDept)}｜${esc(r.authorName)} <span style="color:#6c757d">・${rt}</span></div>
-                                            <div style="white-space:pre-wrap;margin-top:6px;color:#333;line-height:1.5;">${esc(r.text)}</div>
-                                            ${r.uid === auth.currentUser?.uid ? `<button class="delBtn" data-id="${r.id}" style="margin-top:6px;font-size:12px;color:#dc3545;background:transparent;border:1px solid #dc3545;border-radius:6px;padding:4px 8px;cursor:pointer;">刪除</button>` : ``}
+                            
+                            <!-- 留言內容 -->
+                            <div style="flex:1;min-width:0;">
+                                <!-- 用戶名和時間 -->
+                                <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
+                                    <span style="font-weight:600;color:#0f0f0f;font-size:14px;">${esc(msg.authorDept)}｜${esc(msg.authorName)}</span>
+                                    <span style="color:#606060;font-size:12px;">${timeStr}</span>
+                                </div>
+                                
+                                <!-- 留言文字 -->
+                                <div style="color:#0f0f0f;line-height:1.4;margin-bottom:8px;white-space:pre-wrap;word-break:break-word;">${esc(msg.text)}</div>
+                                
+                                <!-- 互動按鈕 -->
+                                <div style="display:flex;align-items:center;gap:16px;margin-bottom:8px;">
+                                    <button class="replyBtn" data-id="${msg.id}" style="background:none;border:none;color:#065fd4;font-size:14px;font-weight:500;cursor:pointer;padding:4px 0;">
+                                        <i class="fas fa-reply" style="margin-right:4px;"></i>回覆
+                                    </button>
+                                    <button class="likeBtn" data-id="${msg.id}" style="background:none;border:none;color:#606060;font-size:14px;cursor:pointer;padding:4px 0;">
+                                        <i class="fas fa-thumbs-up" style="margin-right:4px;"></i>讚
+                                    </button>
+                                    ${msg.uid === auth.currentUser?.uid ? `
+                                        <div style="position:relative;margin-left:auto;">
+                                            <button class="moreBtn" data-id="${msg.id}" style="background:none;border:none;color:#606060;cursor:pointer;padding:4px 8px;border-radius:50%;transition:background-color 0.2s;" onmouseover="this.style.backgroundColor='rgba(0,0,0,0.1)'" onmouseout="this.style.backgroundColor='transparent'">
+                                                <i class="fas fa-ellipsis-v"></i>
+                                            </button>
+                                            <div class="dropdown-menu" style="position:absolute;right:0;top:100%;background:white;border:1px solid #ddd;border-radius:8px;box-shadow:0 2px 10px rgba(0,0,0,0.1);z-index:1000;display:none;min-width:120px;">
+                                                <button class="delBtn" data-id="${msg.id}" style="width:100%;padding:8px 12px;background:none;border:none;text-align:left;color:#cc0000;cursor:pointer;font-size:14px;" onmouseover="this.style.backgroundColor='rgba(204,0,0,0.1)'" onmouseout="this.style.backgroundColor='transparent'">
+                                                    <i class="fas fa-trash" style="margin-right:8px;"></i>刪除留言
+                                                </button>
+                                            </div>
                                         </div>
-                                    `;
-                                }).join('')}
-                            </div>
-                            <div class="replyBox" style="display:none;margin-top:12px;">
-                                <textarea rows="2" class="replyText" placeholder="回覆內容…" style="width:100%;background:#fff;color:#333;border:1px solid #ddd;border-radius:8px;padding:10px;font-size:14px;"></textarea>
-                                <div style="text-align:right;margin-top:8px;">
-                                    <button class="sendReplyBtn" data-parent="${msg.id}" style="padding:8px 16px;border:1px solid #26a69a;color:#26a69a;background:transparent;border-radius:8px;cursor:pointer;font-size:14px;">送出回覆</button>
+                                    ` : ''}
+                                </div>
+                                
+                                <!-- 回覆數量 -->
+                                ${replies.length > 0 ? `
+                                    <div style="color:#065fd4;font-size:14px;font-weight:500;cursor:pointer;margin-bottom:8px;" onclick="toggleReplies('${msg.id}')">
+                                        <i class="fas fa-sort-down" style="margin-right:4px;"></i>${replies.length} 則回覆
+                                    </div>
+                                ` : ''}
+                                
+                                <!-- 回覆區域 -->
+                                <div class="replies" id="replies-${msg.id}" style="display:none;margin-left:0;">
+                                    ${replies.map(r=>{
+                                        const rt = r.createdAt?.toDate ? r.createdAt.toDate() : new Date();
+                                        const replyTimeStr = formatTimeAgo(rt);
+                                        const replyAvatar = r.authorName ? r.authorName.charAt(0).toUpperCase() : 'U';
+                                        
+                                        return `
+                                            <div class="reply" data-id="${r.id}" style="display:flex;gap:12px;margin-bottom:12px;padding-left:8px;">
+                                                <div style="width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);display:flex;align-items:center;justify-content:center;color:white;font-weight:bold;font-size:14px;flex-shrink:0;">
+                                                    ${replyAvatar}
+                                                </div>
+                                                <div style="flex:1;min-width:0;">
+                                                    <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
+                                                        <span style="font-weight:600;color:#0f0f0f;font-size:14px;">${esc(r.authorDept)}｜${esc(r.authorName)}</span>
+                                                        <span style="color:#606060;font-size:12px;">${replyTimeStr}</span>
+                                                    </div>
+                                                    <div style="color:#0f0f0f;line-height:1.4;margin-bottom:6px;white-space:pre-wrap;word-break:break-word;">${esc(r.text)}</div>
+                                                    <div style="display:flex;align-items:center;gap:16px;">
+                                                        <button class="likeBtn" data-id="${r.id}" style="background:none;border:none;color:#606060;font-size:14px;cursor:pointer;padding:4px 0;">
+                                                            <i class="fas fa-thumbs-up" style="margin-right:4px;"></i>讚
+                                                        </button>
+                                                        ${r.uid === auth.currentUser?.uid ? `
+                                                            <div style="position:relative;margin-left:auto;">
+                                                                <button class="moreBtn" data-id="${r.id}" style="background:none;border:none;color:#606060;cursor:pointer;padding:4px 8px;border-radius:50%;" onmouseover="this.style.backgroundColor='rgba(0,0,0,0.1)'" onmouseout="this.style.backgroundColor='transparent'">
+                                                                    <i class="fas fa-ellipsis-v"></i>
+                                                                </button>
+                                                                <div class="dropdown-menu" style="position:absolute;right:0;top:100%;background:white;border:1px solid #ddd;border-radius:8px;box-shadow:0 2px 10px rgba(0,0,0,0.1);z-index:1000;display:none;min-width:120px;">
+                                                                    <button class="delBtn" data-id="${r.id}" style="width:100%;padding:8px 12px;background:none;border:none;text-align:left;color:#cc0000;cursor:pointer;font-size:14px;" onmouseover="this.style.backgroundColor='rgba(204,0,0,0.1)'" onmouseout="this.style.backgroundColor='transparent'">
+                                                                        <i class="fas fa-trash" style="margin-right:8px;"></i>刪除回覆
+                                                                    </button>
+                                                                </div>
+                                                            </div>
+                                                        ` : ''}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        `;
+                                    }).join('')}
+                                </div>
+                                
+                                <!-- 回覆輸入框 -->
+                                <div class="replyBox" style="display:none;margin-top:12px;">
+                                    <div style="display:flex;gap:12px;align-items:flex-start;">
+                                        <div style="width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);display:flex;align-items:center;justify-content:center;color:white;font-weight:bold;font-size:14px;flex-shrink:0;">
+                                            ${auth.currentUser?.displayName ? auth.currentUser.displayName.charAt(0).toUpperCase() : 'U'}
+                                        </div>
+                                        <div style="flex:1;">
+                                            <textarea rows="1" class="replyText" placeholder="新增回覆…" style="width:100%;background:#fff;color:#333;border:1px solid #ddd;border-radius:20px;padding:12px 16px;font-size:14px;resize:none;outline:none;min-height:20px;" oninput="this.style.height='auto';this.style.height=this.scrollHeight+'px'"></textarea>
+                                            <div style="display:flex;gap:8px;margin-top:8px;">
+                                                <button class="sendReplyBtn" data-parent="${msg.id}" style="background:#065fd4;color:white;border:none;padding:8px 16px;border-radius:18px;font-size:14px;font-weight:500;cursor:pointer;">
+                                                    回覆
+                                                </button>
+                                                <button class="cancelReplyBtn" data-parent="${msg.id}" style="background:none;color:#606060;border:none;padding:8px 16px;font-size:14px;cursor:pointer;">
+                                                    取消
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     `;
+                }
+
+                // 格式化時間
+                function formatTimeAgo(date) {
+                    const now = new Date();
+                    const diff = now - date;
+                    const minutes = Math.floor(diff / 60000);
+                    const hours = Math.floor(diff / 3600000);
+                    const days = Math.floor(diff / 86400000);
+                    
+                    if (minutes < 1) return '剛剛';
+                    if (minutes < 60) return `${minutes} 分鐘前`;
+                    if (hours < 24) return `${hours} 小時前`;
+                    if (days < 7) return `${days} 天前`;
+                    return date.toLocaleDateString('zh-TW');
+                }
+
+                // 切換回覆顯示
+                function toggleReplies(commentId) {
+                    const repliesDiv = document.getElementById(`replies-${commentId}`);
+                    const icon = repliesDiv.previousElementSibling.querySelector('i');
+                    
+                    if (repliesDiv.style.display === 'none') {
+                        repliesDiv.style.display = 'block';
+                        icon.className = 'fas fa-sort-up';
+                    } else {
+                        repliesDiv.style.display = 'none';
+                        icon.className = 'fas fa-sort-down';
+                    }
                 }
 
                 // 即時監聽留言（臨時方案：避免複合索引）
@@ -1954,40 +2068,117 @@
 
                 // 綁定留言事件
                 function bindCommentEvents(box) {
+                    // 回覆按鈕
                     box.querySelectorAll('.replyBtn').forEach(btn=>{
                         btn.onclick = () => {
                             const card = btn.closest('.cmt');
                             const area = card.querySelector('.replyBox');
                             area.style.display = (area.style.display === 'none' ? 'block' : 'none');
+                            
+                            // 聚焦到文字框
+                            if (area.style.display === 'block') {
+                                const textarea = area.querySelector('.replyText');
+                                setTimeout(() => textarea.focus(), 100);
+                            }
                         };
                     });
                     
+                    // 取消回覆按鈕
+                    box.querySelectorAll('.cancelReplyBtn').forEach(btn=>{
+                        btn.onclick = () => {
+                            const card = btn.closest('.cmt');
+                            const area = card.querySelector('.replyBox');
+                            const textarea = area.querySelector('.replyText');
+                            textarea.value = '';
+                            area.style.display = 'none';
+                        };
+                    });
+                    
+                    // 發送回覆按鈕
                     box.querySelectorAll('.sendReplyBtn').forEach(btn=>{
                         btn.onclick = async () => {
                             const parentId = btn.dataset.parent;
                             const card = btn.closest('.cmt');
                             const text = card.querySelector('.replyText').value.trim();
                             if (!text) return;
-                            const profile = await getUserProfile(auth.currentUser.uid);
-                            await addDoc(collection(db, 'comments'), {
-                                videoId: VIDEO_ID,
-                                parentId,
-                                text,
-                                uid: auth.currentUser.uid,
-                                authorName: profile.authorName,
-                                authorDept: profile.authorDept,
-                                createdAt: serverTimestamp()
-                            });
-                            card.querySelector('.replyText').value = '';
-                            card.querySelector('.replyBox').style.display = 'none';
+                            
+                            try {
+                                const profile = await getUserProfile(auth.currentUser.uid);
+                                await addDoc(collection(db, 'comments'), {
+                                    videoId: VIDEO_ID,
+                                    parentId,
+                                    text,
+                                    uid: auth.currentUser.uid,
+                                    authorName: profile.authorName,
+                                    authorDept: profile.authorDept,
+                                    createdAt: serverTimestamp()
+                                });
+                                card.querySelector('.replyText').value = '';
+                                card.querySelector('.replyBox').style.display = 'none';
+                            } catch (error) {
+                                console.error('發送回覆失敗:', error);
+                                alert('發送失敗，請重試');
+                            }
                         };
                     });
                     
+                    // 刪除按鈕（主留言和回覆）
                     box.querySelectorAll('.delBtn').forEach(btn=>{
                         btn.onclick = async () => {
-                            try { await deleteDoc(doc(db, 'comments', btn.dataset.id)); }
-                            catch (e) { alert('刪除失敗：' + e.message); }
+                            const commentId = btn.dataset.id;
+                            const isMainComment = btn.closest('.cmt').classList.contains('cmt');
+                            
+                            if (confirm(isMainComment ? '確定要刪除這則留言嗎？所有回覆也會被刪除。' : '確定要刪除這則回覆嗎？')) {
+                                try {
+                                    if (isMainComment) {
+                                        // 刪除主留言時，先刪除所有回覆
+                                        const allComments = await getDocs(query(
+                                            collection(db, 'comments'),
+                                            where('videoId', '==', VIDEO_ID)
+                                        ));
+                                        
+                                        const repliesToDelete = allComments.docs
+                                            .filter(doc => doc.data().parentId === commentId)
+                                            .map(doc => doc.id);
+                                        
+                                        // 刪除所有回覆
+                                        for (const replyId of repliesToDelete) {
+                                            await deleteDoc(doc(db, 'comments', replyId));
+                                        }
+                                        console.log(`刪除了 ${repliesToDelete.length} 則回覆`);
+                                    }
+                                    
+                                    // 刪除主留言或回覆
+                                    await deleteDoc(doc(db, 'comments', commentId));
+                                    console.log('刪除成功');
+                                } catch (e) {
+                                    console.error('刪除失敗:', e);
+                                    alert('刪除失敗：' + e.message);
+                                }
+                            }
                         };
+                    });
+                    
+                    // 更多選項按鈕
+                    box.querySelectorAll('.moreBtn').forEach(btn=>{
+                        btn.onclick = (e) => {
+                            e.stopPropagation();
+                            const dropdown = btn.nextElementSibling;
+                            
+                            // 關閉其他下拉選單
+                            box.querySelectorAll('.dropdown-menu').forEach(menu => {
+                                if (menu !== dropdown) menu.style.display = 'none';
+                            });
+                            
+                            dropdown.style.display = dropdown.style.display === 'none' ? 'block' : 'none';
+                        };
+                    });
+                    
+                    // 點擊其他地方關閉下拉選單
+                    document.addEventListener('click', () => {
+                        box.querySelectorAll('.dropdown-menu').forEach(menu => {
+                            menu.style.display = 'none';
+                        });
                     });
                 }
 
