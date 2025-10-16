@@ -2192,8 +2192,24 @@
                             const commentId = btn.dataset.id;
                             const isMainComment = btn.closest('.cmt').classList.contains('cmt');
                             
-                            if (confirm(isMainComment ? '確定要刪除這則留言嗎？所有回覆也會被刪除。' : '確定要刪除這則回覆嗎？')) {
-                                try {
+                            try {
+                                // 安全檢查：驗證用戶是否有權限刪除
+                                const commentDoc = await getDoc(doc(db, 'comments', commentId));
+                                if (!commentDoc.exists()) {
+                                    alert('留言不存在');
+                                    return;
+                                }
+                                
+                                const commentData = commentDoc.data();
+                                const currentUserUid = auth.currentUser?.uid;
+                                
+                                // 檢查是否為留言作者
+                                if (commentData.uid !== currentUserUid) {
+                                    alert('您沒有權限刪除他人的留言');
+                                    return;
+                                }
+                                
+                                if (confirm(isMainComment ? '確定要刪除這則留言嗎？所有回覆也會被刪除。' : '確定要刪除這則回覆嗎？')) {
                                     if (isMainComment) {
                                         // 刪除主留言時，先刪除所有回覆
                                         const allComments = await getDocs(query(
@@ -2215,10 +2231,10 @@
                                     // 刪除主留言或回覆
                                     await deleteDoc(doc(db, 'comments', commentId));
                                     console.log('刪除成功');
-                                } catch (e) {
-                                    console.error('刪除失敗:', e);
-                                    alert('刪除失敗：' + e.message);
                                 }
+                            } catch (e) {
+                                console.error('刪除失敗:', e);
+                                alert('刪除失敗：' + e.message);
                             }
                         };
                     });
