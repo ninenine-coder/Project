@@ -1842,18 +1842,32 @@
                 // 取使用者顯示資訊
                 async function getUserProfile(uid) {
                     try {
-                        const snap = await getDoc(doc(db, 'user', uid));
-                        const u = snap.exists() ? snap.data() : {};
-                        console.log('用戶資料查詢結果:', { uid, userData: u });
+                        console.log('開始查詢用戶資料，UID:', uid);
+                        const userDocRef = doc(db, 'user', uid);
+                        console.log('用戶文檔引用:', userDocRef.path);
+                        
+                        const snap = await getDoc(userDocRef);
+                        console.log('文檔存在:', snap.exists());
+                        
+                        if (!snap.exists()) {
+                            console.error('用戶文檔不存在，UID:', uid);
+                            return { authorName: '未命名用戶', authorDept: '' };
+                        }
+                        
+                        const u = snap.data();
+                        console.log('完整用戶資料:', u);
+                        console.log('username 欄位值:', u?.username);
+                        console.log('所有可用欄位:', Object.keys(u));
                         
                         // 只使用 username 欄位，確保實名制
                         const name = u?.username || '未命名用戶';
                         const dept = u?.部门 || u?.dept || u?.college || '';
                         
-                        console.log('解析後的用戶資料:', { authorName: name, authorDept: dept });
+                        console.log('最終解析結果:', { authorName: name, authorDept: dept });
                         return { authorName: name, authorDept: dept };
                     } catch (error) {
                         console.error('獲取用戶資料失敗:', error);
+                        console.error('錯誤詳情:', error.message, error.code);
                         return { authorName: '未命名用戶', authorDept: '' };
                     }
                 }
@@ -2267,6 +2281,13 @@
                 // 啟動討論區
                 ensureLogin().then(async () => {
                     console.log('用戶登入成功，開始初始化討論區');
+                    console.log('當前用戶 UID:', auth.currentUser?.uid);
+                    
+                    // 測試用戶資料查詢
+                    console.log('測試用戶資料查詢...');
+                    const testProfile = await getUserProfile(auth.currentUser.uid);
+                    console.log('測試結果:', testProfile);
+                    
                     await testDatabaseConnection();
                     setupPosting();
                     subscribeThread();
