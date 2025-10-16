@@ -1886,7 +1886,7 @@
                     `;
                 }
 
-                // 即時監聽留言
+                // 即時監聽留言（臨時方案：避免複合索引）
                 async function subscribeThread() {
                     const box = document.getElementById('commentList');
                     if (!box) {
@@ -1896,15 +1896,14 @@
 
                     console.log('開始監聽留言，VIDEO_ID:', VIDEO_ID);
 
-                    const qTop = query(
+                    // 臨時方案：只查詢 videoId，避免複合索引
+                    const qAll = query(
                         collection(db, 'comments'),
                         where('videoId', '==', VIDEO_ID),
-                        where('parentId', '==', null),
-                        orderBy('createdAt', 'desc'),
                         limit(100)
                     );
 
-                    onSnapshot(qTop, async (snap) => {
+                    onSnapshot(qAll, async (snap) => {
                         console.log('收到留言更新，文檔數量:', snap.docs.length);
                         
                         if (snap.docs.length === 0) {
@@ -1912,21 +1911,34 @@
                             return;
                         }
 
-                        const tops = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+                        // 手動分離主留言和回覆
+                        const allComments = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+                        const tops = allComments.filter(c => !c.parentId);
+                        const replies = allComments.filter(c => c.parentId);
+                        
                         console.log('主留言:', tops);
+                        console.log('所有回覆:', replies);
+                        
+                        // 按時間排序主留言
+                        tops.sort((a, b) => {
+                            const aTime = a.createdAt?.toDate ? a.createdAt.toDate() : new Date(0);
+                            const bTime = b.createdAt?.toDate ? b.createdAt.toDate() : new Date(0);
+                            return bTime - aTime; // 降序
+                        });
                         
                         const html = [];
                         for (const m of tops) {
-                            const qRep = query(
-                                collection(db, 'comments'),
-                                where('videoId', '==', VIDEO_ID),
-                                where('parentId', '==', m.id),
-                                orderBy('createdAt', 'asc')
-                            );
-                            const repSnap = await getDocs(qRep);
-                            const replies = repSnap.docs.map(d => ({ id: d.id, ...d.data() }));
-                            console.log(`留言 ${m.id} 的回覆:`, replies);
-                            html.push(renderComment(m, replies));
+                            // 找到這條留言的回覆
+                            const commentReplies = replies
+                                .filter(r => r.parentId === m.id)
+                                .sort((a, b) => {
+                                    const aTime = a.createdAt?.toDate ? a.createdAt.toDate() : new Date(0);
+                                    const bTime = b.createdAt?.toDate ? b.createdAt.toDate() : new Date(0);
+                                    return aTime - bTime; // 升序
+                                });
+                            
+                            console.log(`留言 ${m.id} 的回覆:`, commentReplies);
+                            html.push(renderComment(m, commentReplies));
                         }
                         
                         box.innerHTML = html.join('');
@@ -1936,7 +1948,7 @@
                         bindCommentEvents(box);
                     }, (error) => {
                         console.error('監聽留言時發生錯誤:', error);
-                        box.innerHTML = '<div style="text-align:center;color:#dc3545;padding:20px;">載入留言失敗，請重新整理頁面</div>';
+                        box.innerHTML = '<div style="text-align:center;color:#dc3545;padding:20px;">載入留言失敗：' + error.message + '</div>';
                     });
                 }
 
