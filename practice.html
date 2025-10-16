@@ -1830,41 +1830,86 @@
 
                 // 確保登入
                 async function ensureLogin() {
-                    await new Promise(resolve => {
-                        onAuthStateChanged(auth, async u => {
-                            if (u) return resolve();
-                            await signInAnonymously(auth);
-                            resolve();
+                    return new Promise((resolve) => {
+                        onAuthStateChanged(auth, async (user) => {
+                            if (user) {
+                                console.log('用戶已登入，UID:', user.uid);
+                                resolve(user);
+                            } else {
+                                console.log('沒有用戶登入，嘗試匿名登入作為備用...');
+                                try {
+                                    const anonymousUser = await signInAnonymously(auth);
+                                    console.log('匿名登入成功，UID:', anonymousUser.user.uid);
+                                    resolve(anonymousUser.user);
+                                } catch (error) {
+                                    console.error('匿名登入失敗:', error);
+                                    resolve(null);
+                                }
+                            }
                         });
                     });
                 }
 
-                // 取使用者顯示資訊
+                // 取使用者顯示資訊（使用您系統的認證）
                 async function getUserProfile(uid) {
                     try {
                         console.log('開始查詢用戶資料，UID:', uid);
-                        const userDocRef = doc(db, 'user', uid);
-                        console.log('用戶文檔引用:', userDocRef.path);
                         
-                        const snap = await getDoc(userDocRef);
-                        console.log('文檔存在:', snap.exists());
-                        
-                        if (!snap.exists()) {
-                            console.error('用戶文檔不存在，UID:', uid);
-                            return { authorName: '未命名用戶', authorDept: '' };
+                        // 方法1：嘗試通過 UID 映射查找真實用戶資料
+                        const mappingDoc = await getDoc(doc(db, 'uid_mappings', uid));
+                        if (mappingDoc.exists()) {
+                            const mapping = mappingDoc.data();
+                            console.log('找到 UID 映射:', mapping);
+                            
+                            // 使用映射中的 firestoreDocId 查詢用戶資料
+                            const userDocRef = doc(db, 'user', mapping.firestoreDocId);
+                            const userSnap = await getDoc(userDocRef);
+                            
+                            if (userSnap.exists()) {
+                                const userData = userSnap.data();
+                                console.log('通過映射找到用戶資料:', userData);
+                                
+                                const name = userData?.username || userData?.["姓名"] || userData?.name || mapping.name || '未命名用戶';
+                                const dept = userData?.部门 || userData?.dept || userData?.college || userData?.department || '';
+                                
+                                console.log('最終解析結果（通過映射）:', { authorName: name, authorDept: dept });
+                                return { authorName: name, authorDept: dept };
+                            }
                         }
                         
-                        const u = snap.data();
-                        console.log('完整用戶資料:', u);
-                        console.log('username 欄位值:', u?.username);
-                        console.log('所有可用欄位:', Object.keys(u));
+                        // 方法2：直接查詢 user 集合
+                        console.log('嘗試直接查詢 user 集合...');
+                        const userDocRef = doc(db, 'user', uid);
+                        const snap = await getDoc(userDocRef);
                         
-                        // 只使用 username 欄位，確保實名制
-                        const name = u?.username || '未命名用戶';
-                        const dept = u?.部门 || u?.dept || u?.college || '';
+                        if (snap.exists()) {
+                            const u = snap.data();
+                            console.log('直接查詢找到用戶資料:', u);
+                            
+                            const name = u?.username || u?.["姓名"] || u?.name || '未命名用戶';
+                            const dept = u?.部门 || u?.dept || u?.college || u?.department || '';
+                            
+                            console.log('最終解析結果（直接查詢）:', { authorName: name, authorDept: dept });
+                            return { authorName: name, authorDept: dept };
+                        }
                         
-                        console.log('最終解析結果:', { authorName: name, authorDept: dept });
-                        return { authorName: name, authorDept: dept };
+                        // 方法3：從 localStorage 獲取
+                        console.log('嘗試從 localStorage 獲取...');
+                        const localData = localStorage.getItem('pbls_user');
+                        if (localData) {
+                            const userData = JSON.parse(localData);
+                            console.log('從 localStorage 獲取用戶資料:', userData);
+                            
+                            const name = userData?.name || userData?.displayName || '未命名用戶';
+                            const dept = userData?.department || userData?.where || '';
+                            
+                            console.log('最終解析結果（從 localStorage）:', { authorName: name, authorDept: dept });
+                            return { authorName: name, authorDept: dept };
+                        }
+                        
+                        console.error('所有方法都無法找到用戶資料，UID:', uid);
+                        return { authorName: '未命名用戶', authorDept: '' };
+                        
                     } catch (error) {
                         console.error('獲取用戶資料失敗:', error);
                         console.error('錯誤詳情:', error.message, error.code);
