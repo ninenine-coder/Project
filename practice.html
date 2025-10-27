@@ -557,7 +557,7 @@
             width: 100%;
         }
 
-        /* 360實境教學影片樣式 */
+        /* 360°實境教學影片樣式 */
         .vr-video-section {
             max-width: 800px;
             margin: 0 auto 40px auto;
@@ -1263,10 +1263,10 @@
             // 根據類型顯示對應內容
             if (practiceType === 'vr-video') {
                 vrVideoContent.style.display = 'block';
-                console.log('✅ 360實境教學影片已載入');
+                console.log('✅ 360°實境教學影片已載入');
             } else if (practiceType === 'virtual-human') {
                 virtualHumanContent.style.display = 'block';
-                console.log('✅ 虛擬人模擬已載入');
+                console.log('✅ 情境模擬對話已載入');
             }
         };
     </script>
@@ -1296,7 +1296,7 @@
             </div>
             <div class="sidebar-icon" onclick="window.location.href='exam.html'">
                 <i class="fas fa-clipboard-list"></i>
-                <span>考試專區</span>
+                <span>測驗專區</span>
             </div>
             <div class="sidebar-icon" onclick="window.location.href='history.html'">
                 <i class="fas fa-chart-line"></i>
@@ -1344,10 +1344,10 @@
                 <i class="fas fa-vr-cardboard"></i> 360°實境教學影片，身臨其境的學習體驗
             </div>
             <div class="marquee-item">
-                <i class="fas fa-comments"></i> 虛擬人互動，提升急救溝通技巧
+                <i class="fas fa-comments"></i> 情境模擬對話，提升急救溝通技巧
             </div>
             <div class="marquee-item">
-                <i class="fas fa-gamepad"></i> VR實際操作，模擬真實急救情境
+                <i class="fas fa-gamepad"></i> VR操作測驗，模擬真實急救情境
             </div>
             <div class="marquee-item">
                 <i class="fas fa-chart-line"></i> 即時成績追蹤，掌握學習進度
@@ -1365,7 +1365,7 @@
                 <!-- 練習專區首頁內容 -->
                 <div class="practice-homepage content-container" id="practiceHomepage">
                     <h1>練習專區</h1>
-                    <p>這裡提供360°實境教學影片與虛擬人互動學習。</p>
+                    <p>這裡提供360°實境教學影片與情境模擬對話學習。</p>
                     
                     <!-- 練習選項按鈕 -->
                     <div class="practice-options">
@@ -1374,8 +1374,8 @@
                                 <div class="practice-icon" style="margin: 0 auto 20px auto;">
                                     <i class="fas fa-play-circle"></i>
                                 </div>
-                                <h3 style="font-size: 24px; font-weight: 800; color: #1e293b; margin: 14px 0 8px;">360實境教學影片</h3>
-                                <p style="color: #64748b; line-height: 1.6; margin-bottom: 20px;">沉浸式VR學習體驗，讓您身臨其境地學習急救技能</p>
+                                <h3 style="font-size: 24px; font-weight: 800; color: #1e293b; margin: 14px 0 8px;">360°實境教學影片</h3>
+                                <p style="color: #64748b; line-height: 1.6; margin-bottom: 20px;">以實境影片呈現實境場景，感受現場壓力，搭配互動提示強化記憶</p>
                                 <button class="practice-btn" onclick="enterPractice('vr-video')">
                                     進入360實境教學
                                 </button>
@@ -1387,21 +1387,21 @@
                                 <div class="practice-icon" style="margin: 0 auto 20px auto;">
                                     <i class="fas fa-comment-dots"></i>
                                 </div>
-                                <h3 style="font-size: 24px; font-weight: 800; color: #1e293b; margin: 14px 0 8px;">虛擬人模擬</h3>
-                                <p style="color: #64748b; line-height: 1.6; margin-bottom: 20px;">與AI驅動的虛擬患者進行對話練習，提升溝通技巧</p>
+                                <h3 style="font-size: 24px; font-weight: 800; color: #1e293b; margin: 14px 0 8px;">情境模擬對話</h3>
+                                <p style="color: #64748b; line-height: 1.6; margin-bottom: 20px;">虛擬醫護助手會描述情境模擬，請依照模擬狀況做出正確的應對措施</p>
                                 <button class="practice-btn" onclick="enterPractice('virtual-human')">
-                                    進入虛擬人模擬
+                                    進入情境模擬對話
                                 </button>
                             </div>
                         </div>
                     </div>
                                         </div>
 
-                <!-- 360實境教學影片內容 -->
+                <!-- 360°實境教學影片內容 -->
                 <div class="vr-video-content content-container" id="vrVideoContent" style="display: none;">
                     <div class="content-header">
-                        <h2><i class="fas fa-play-circle"></i> 360實境教學影片</h2>
-                        <p>沉浸式VR學習體驗，讓您身臨其境地學習急救技能</p>
+                        <h2><i class="fas fa-play-circle"></i> 360°實境教學影片</h2>
+                        <p>以實境影片呈現實境場景，感受現場壓力，搭配互動提示強化記憶</p>
                     </div>
                     
                     <div class="vr-video-section">
@@ -1450,11 +1450,11 @@
                     </div>
                 </div>
 
-                <!-- 虛擬人模擬內容 -->
+                <!-- 情境模擬對話內容 -->
                 <div class="virtual-human-content content-container" id="virtualHumanContent" style="display: none;">
                     <div class="content-header">
-                        <h2><i class="fas fa-comment-dots"></i> 虛擬人模擬</h2>
-                            <p>與AI驅動的虛擬患者進行對話練習，提升溝通技巧</p>
+                        <h2><i class="fas fa-comment-dots"></i> 情境模擬對話</h2>
+                            <p>虛擬醫護助手會描述情境模擬，請依照模擬狀況做出正確的應對措施</p>
                         </div>
                     
                     <!-- 情境選擇下拉選單 -->

@@ -51,7 +51,7 @@
         <div class="video-container">
           <div class="video-placeholder">
             <i class="fas fa-vr-cardboard"></i>
-            <h3>360實境教學影片</h3>
+            <h3>360°實境教學影片</h3>
             <p>請連接VR頭盔...</p>
             <div class="vr-controls">
               <button class="btn btn-primary">

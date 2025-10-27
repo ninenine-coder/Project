@@ -1352,7 +1352,7 @@
             </div>
             <div class="sidebar-icon active" onclick="window.location.href='exam.html'">
                 <i class="fas fa-clipboard-list"></i>
-                <span>考試專區</span>
+                <span>測驗專區</span>
             </div>
             <div class="sidebar-icon" onclick="window.location.href='history.html'">
                 <i class="fas fa-chart-line"></i>
@@ -1394,8 +1394,8 @@
         <div class="marquee-track">
             <div class="marquee-item"><i class="fas fa-bullhorn"></i> 歡迎使用PBLS VR教學平台！</div>
             <div class="marquee-item"><i class="fas fa-vr-cardboard"></i> 360°實境教學影片，身臨其境的學習體驗</div>
-            <div class="marquee-item"><i class="fas fa-comments"></i> 虛擬人互動，提升急救溝通技巧</div>
-            <div class="marquee-item"><i class="fas fa-gamepad"></i> VR實際操作，模擬真實急救情境</div>
+            <div class="marquee-item"><i class="fas fa-comments"></i> 情境模擬對話，提升急救溝通技巧</div>
+            <div class="marquee-item"><i class="fas fa-gamepad"></i> VR操作測驗，模擬真實急救情境</div>
             <div class="marquee-item"><i class="fas fa-chart-line"></i> 即時成績追蹤，掌握學習進度</div>
             <div class="marquee-item"><i class="fas fa-lightbulb"></i> 問題導向學習法，提升急救技能</div>
         </div>
@@ -2059,7 +2059,7 @@
             const exitMessage = window.quizExitMessage || '尚未完成筆試測驗，若現在離開測驗將不會記錄，確定是否離開？';
             const userChoice = confirm(exitMessage);
             if (userChoice) {
-                // 用戶確認離開，回到考試專區頁面
+                // 用戶確認離開，回到測驗專區頁面
                 isQuizActive = false;
                 window.location.href = 'exam.html';
             }
@@ -3022,7 +3022,7 @@
                             box-shadow: 0 4px 8px rgba(52, 152, 219, 0.3);
                             transition: all 0.3s ease;
                         " onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 12px rgba(52, 152, 219, 0.4)'" 
-                           onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 8px rgba(52, 152, 219, 0.3)'">返回考試專區</button>
+                           onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 8px rgba(52, 152, 219, 0.3)'">返回測驗專區</button>
                         <button onclick="location.reload()" style="
                             background: #27ae60;
                             color: white;

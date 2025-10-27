@@ -8,7 +8,7 @@ class LanguageSwitcher {
         menu: {
           info: '資訊',
           practice: '練習專區',
-          exam: '考試專區',
+          exam: '測驗專區',
           history: '歷史成績',
           team: '團隊'
         },
@@ -23,8 +23,8 @@ class LanguageSwitcher {
           marquee: {
             item1: '🎯 歡迎使用PBLS VR教學平台！',
             item2: '📚 360°實境教學影片，身臨其境的學習體驗',
-            item3: '🤖 虛擬人互動，提升急救溝通技巧',
-            item4: '🎮 VR實際操作，模擬真實急救情境',
+            item3: '🤖 情境模擬對話，提升急救溝通技巧',
+            item4: '🎮 VR操作測驗，模擬真實急救情境',
             item5: '📊 即時成績追蹤，掌握學習進度',
             item6: '💡 問題導向學習法，提升急救技能'
           },
@@ -109,7 +109,7 @@ class LanguageSwitcher {
           // 其他頁面的標題
           pageTitle: {
             practice: '練習專區',
-            exam: '考試專區',
+            exam: '測驗專區',
             history: '歷史成績',
             team: '團隊'
           },
@@ -118,14 +118,14 @@ class LanguageSwitcher {
             pageTitle: '練習專區 - PBLS VR教學平台',
             title: '練習專區',
             subtitle: '歡迎使用PBLS教學平台',
-            description: '這裡提供 360° 實境教學影片與虛擬人互動學習。',
+            description: '這裡提供 360° 實境教學影片與情境模擬對話學習。',
             vrVideo: {
-              title: '360實境教學影片',
+              title: '360°實境教學影片',
               description: '沉浸式VR學習體驗,讓您身臨其境地學習急救技能',
               playButton: '播放VR影片'
             },
             virtualHuman: {
-              title: '虛擬人互動',
+              title: '情境模擬對話',
               description: '與AI驅動的虛擬患者進行對話練習，提升溝通技巧'
             },
             quiz: {
@@ -134,12 +134,12 @@ class LanguageSwitcher {
               startButton: '開始練習'
             }
           },
-          // 考試專區內容
+          // 測驗專區內容
           exam: {
-            title: '考試專區',
+            title: '測驗專區',
             subtitle: '歡迎使用PBLS教學平台',
             vrExam: {
-              title: 'VR實際操作',
+              title: 'VR操作測驗',
               description: '虛擬實境環境中的急救操作測驗',
               startButton: '開始VR測驗'
             },
@@ -198,8 +198,8 @@ class LanguageSwitcher {
             marquee: {
               item1: '🎯 歡迎使用PBLS VR教學平台！',
               item2: '📚 360°實境教學影片，身臨其境的學習體驗',
-              item3: '🤖 虛擬人互動，提升急救溝通技巧',
-              item4: '🎮 VR實際操作，模擬真實急救情境',
+              item3: '🤖 情境模擬對話，提升急救溝通技巧',
+              item4: '🎮 VR操作測驗，模擬真實急救情境',
               item5: '📊 即時成績追蹤，掌握學習進度',
               item6: '💡 問題導向學習法，提升急救技能'
             },
@@ -358,7 +358,7 @@ class LanguageSwitcher {
               startButton: 'Start Practice'
             }
           },
-          // 考試專區內容
+          // 測驗專區內容
           exam: {
             title: 'Exam Area',
             subtitle: 'Welcome to PBLS Learning Platform',
@@ -674,11 +674,11 @@ class LanguageSwitcher {
   }
 
   updateExamPage(content) {
-    // 考試專區頁面的翻譯
+    // 測驗專區頁面的翻譯
     const pageTitle = document.querySelector('.header-title');
     if (pageTitle) pageTitle.textContent = content.exam.subtitle;
 
-    // 考試專區標題
+    // 測驗專區標題
     const examTitle = document.querySelector('.exam-homepage h1');
     if (examTitle) examTitle.textContent = content.exam.title;
 
@@ -719,7 +719,7 @@ class LanguageSwitcher {
         marqueeItems[0].textContent = '🎯 歡迎使用PBLS VR教學平台！';
         marqueeItems[1].textContent = '📚 360°實境教學影片，身臨其境的學習體驗';
         marqueeItems[2].textContent = '🤖 虛擬人互動，提升急救溝通技巧';
-        marqueeItems[3].textContent = '🎮 VR實際操作，模擬真實急救情境';
+        marqueeItems[3].textContent = '🎮 VR操作測驗，模擬真實急救情境';
         marqueeItems[4].textContent = '📊 即時成績追蹤，掌握學習進度';
         marqueeItems[5].textContent = '💡 問題導向學習法，提升急救技能';
       }

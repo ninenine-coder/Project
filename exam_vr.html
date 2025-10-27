@@ -1,0 +1,2432 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VR操作測驗 - PBLS VR教學平台</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <!-- Glass System CSS -->
+    <link rel="stylesheet" href="assets/css/glass-system.css">
+    <!-- i18next -->
+    <script src="https://unpkg.com/i18next@23.7.6/i18next.min.js"></script>
+    <script src="https://unpkg.com/i18next-browser-languagedetector@7.2.0/i18nextBrowserLanguageDetector.min.js"></script>
+    
+    <!-- Firebase -->
+    <script type="module" src="./js/firebase.js"></script>
+    
+    <!-- Glass System Feature Detection -->
+    <script src="src/js/feature-detect.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* 讓 backdrop-filter 看到的背景永遠在最底層這一層 */
+        .global-bg {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            background: url("./assets/背景.png") center calc(50% + 58px) / cover no-repeat;
+            pointer-events: none;
+        }
+
+        /* 讓內容都在背景之上 */
+        body {
+            font-family: 'Microsoft JhengHei', sans-serif;
+            background: transparent;
+            min-height: 100vh;
+            color: #333;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* 主要内容区域 */
+        .main-content {
+            position: relative;
+            z-index: 1;
+            min-height: calc(100vh - 80px);
+            padding-left: 0;
+            margin-left: 0;
+        }
+
+        /* 最上層內容 z-index 拉高一點，確保在 .global-bg 之上 */
+        #root, .main-content, .header, .marquee, .sidebar {
+            position: relative;
+            z-index: 1;
+        }
+
+        /* VR測驗首頁容器不要再有背景色，以免被當成 backdrop 的"背景" */
+        .vr-exam-homepage,
+        .vr-exam-options {
+            background: transparent;
+        }
+
+        /* 内容容器，确保内容在背景之上 */
+        .content-container {
+            position: relative;
+            z-index: 1;
+        }
+
+        /* 顶部间距变量 */
+        :root {
+            --masthead-h: 80px;
+            --section-gap: 60px;
+        }
+
+        /* 毛玻璃卡片样式 */
+        :root {
+            --glass-alpha: .65;
+            --glass-border: rgba(255,255,255,.35);
+            --glass-shadow: 0 10px 30px rgba(16,24,40,.12);
+            --glass-radius: 20px;
+            --glass-blur: 14px;
+            --glass-bg: rgba(255,255,255,var(--glass-alpha));
+        }
+
+        /* 统一顶部间距 */
+        .section-offset {
+            padding-top: calc(var(--masthead-h) + var(--section-gap));
+        }
+
+        .glass-card {
+            background: var(--glass-bg);
+            -webkit-backdrop-filter: saturate(160%) blur(var(--glass-blur));
+            backdrop-filter: saturate(160%) blur(var(--glass-blur));
+            border: 1px solid var(--glass-border);
+            border-radius: var(--glass-radius);
+            box-shadow: var(--glass-shadow);
+        }
+
+        /* 内容排版建议 */
+        .glass-padding { padding: 28px; }
+        .glass-title { font-size: 24px; font-weight: 800; color:#1f2937; }
+        .glass-sub { font-size: 14px; color:#4b5563; }
+
+        /* 兼容性/效能：若不支援 backdrop-filter 改高透明白 */
+        @supports not ((-webkit-backdrop-filter: blur(1px)) or (backdrop-filter: blur(1px))) {
+            .glass-card { background: rgba(255,255,255,.85); }
+        }
+
+        /* 减少动效需求者降低透明特效 */
+        @media (prefers-reduced-motion: reduce) {
+            .glass-card { backdrop-filter: none; -webkit-backdrop-filter: none; }
+        }
+
+        /* === 水流波紋效果 === */
+        .liquid-glass {
+            position: relative;
+            border-radius: 28px;
+            overflow: hidden;
+            background: transparent;
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            box-shadow:
+                inset 0 0 18px rgba(255,255,255,0.25),
+                0 8px 25px rgba(0,0,0,0.25);
+            transition: transform .35s ease, box-shadow .35s ease;
+            perspective: 1000px;
+            width: 100%;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        /* 折射光層 + 水紋 */
+        .liquid-glass::before {
+            content: "";
+            position: absolute;
+            inset: -20%;
+            background:
+                radial-gradient(circle at var(--x, 50%) var(--y, 50%), rgba(255,255,255,0.6) 0%, rgba(255,255,255,0.15) 50%, transparent 80%),
+                url("./assets/背景.png");
+            background-size: 200% 200%;
+            background-blend-mode: overlay;
+            opacity: var(--opacity, 0.8);
+            filter: blur(15px) saturate(130%);
+            transition: opacity 0.3s ease;
+            pointer-events: none;
+            animation: waterIdle 10s ease-in-out infinite alternate;
+        }
+
+        @keyframes waterIdle {
+            0%   { background-position: 0% 0%; }
+            50%  { background-position: 50% 100%; }
+            100% { background-position: 0% 0%; }
+        }
+
+        /* 滑鼠移入時加速波紋流動 */
+        .liquid-glass:hover::before {
+            animation: waterFlow 3s ease-in-out infinite;
+            filter: blur(10px) brightness(1.1);
+        }
+
+        @keyframes waterFlow {
+            0%   { background-position: 0% 0%; }
+            25%  { background-position: 100% 50%; }
+            50%  { background-position: 50% 100%; }
+            75%  { background-position: 0% 50%; }
+            100% { background-position: 0% 0%; }
+        }
+
+        .liquid-content {
+            position: relative;
+            z-index: 2;
+            padding: 3rem;
+            text-align: center;
+            background: rgba(255,255,255,0.03);
+            border-radius: inherit;
+        }
+
+        /* 頂部標題欄 */
+        .header {
+            position: fixed;
+            top: 0;
+            left: 80px;
+            right: 0;
+            height: 80px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 30px;
+            z-index: 999;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            transition: left 0.3s ease;
+        }
+
+        .sidebar:hover ~ .header {
+            left: 180px;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .header-title {
+            color: white;
+            font-size: 24px;
+            font-weight: bold;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .user-info {
+            background: transparent;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 14px;
+            color: #333;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #3498db;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .user-avatar:hover {
+            transform: scale(1.1);
+        }
+
+        .logout-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #e74c3c;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .logout-btn:hover {
+            transform: scale(1.1);
+        }
+
+        /* 跑馬燈 */
+        .marquee.glass-pill {
+            position: fixed;
+            top: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 999;
+            height: 56px;
+            min-width: min(92vw, 1200px);
+            max-width: min(92vw, 1200px);
+            display: flex;
+            align-items: center;
+            padding: 0 26px;
+            border-radius: 9999px;
+            
+            background: rgba(255, 255, 255, 0.16);
+            -webkit-backdrop-filter: blur(18px) saturate(160%);
+            backdrop-filter: blur(18px) saturate(160%);
+            border: 1px solid rgba(255, 255, 255, 0.28);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.18);
+            
+            isolation: isolate;
+        }
+
+        .marquee .marquee-track {
+            display: flex;
+            align-items: center;
+            gap: 28px;
+            white-space: nowrap;
+            will-change: transform;
+            animation: marqueeScroll 26s linear infinite;
+        }
+
+        .marquee:hover .marquee-track {
+            animation-play-state: paused;
+        }
+
+        .marquee .marquee-item {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            color: #1f2937;
+            font-size: 15px;
+            font-weight: 600;
+            letter-spacing: 0.2px;
+            opacity: 0.9;
+        }
+
+        .marquee .marquee-item i {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+
+        .pill-highlight {
+            position: absolute;
+            left: 6px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 96px;
+            height: 44px;
+            border-radius: 9999px;
+            background:
+                radial-gradient(100px 60px at 20% 50%, rgba(0, 170, 255, 0.55), transparent 60%),
+                radial-gradient(120px 80px at 45% 40%, rgba(64, 224, 255, 0.35), transparent 65%);
+            filter: blur(6px) saturate(140%);
+            mix-blend-mode: screen;
+            pointer-events: none;
+        }
+
+        @keyframes marqueeScroll {
+            0%   { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+
+        /* 側邊欄樣式 */
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 80px;
+            height: 100vh;
+            background: rgba(147, 112, 219, 0.85);
+            backdrop-filter: blur(20px);
+            transition: width 0.3s ease;
+            box-shadow: 4px 0 20px rgba(0, 0, 0, 0.3), 
+                         0 0 40px rgba(0, 0, 0, 0.1);
+            border-right: 1px solid rgba(255, 255, 255, 0.1);
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar:hover {
+            width: 180px;
+        }
+
+        .sidebar-top {
+            padding: 20px 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .logo-container {
+            width: 60px;
+            height: 60px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+
+        .logo-image {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+            filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+            transition: all 0.3s ease;
+        }
+
+        .sidebar:hover .logo-container {
+            transform: scale(1.82);
+        }
+
+        .logo-container:hover .logo-image {
+            filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
+        }
+
+        .sidebar-menu {
+            padding: 20px 0;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar-icon {
+            display: flex;
+            align-items: center;
+            padding: 15px 20px;
+            margin: 5px 10px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2),
+                        inset 0 1px 0 rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .sidebar-icon:hover,
+        .sidebar-icon.active {
+            background: rgba(52, 152, 219, 0.8);
+            box-shadow: 0 6px 20px rgba(52, 152, 219, 0.4),
+                        inset 0 1px 0 rgba(255, 255, 255, 0.3);
+        }
+
+        .sidebar-icon i {
+            font-size: 20px;
+            color: white;
+            min-width: 20px;
+            margin-right: 15px;
+        }
+
+        .sidebar-icon span {
+            color: white;
+            font-weight: 500;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            white-space: nowrap;
+        }
+
+        .sidebar:hover .sidebar-icon span {
+            opacity: 1;
+        }
+
+        /* 語言切換按鈕容器 - 固定在底部 */
+        .language-switcher-container {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 10px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* 語言切換按鈕特殊樣式 */
+        .language-switcher {
+            background: rgba(46, 204, 113, 0.8) !important;
+            border: 2px solid rgba(46, 204, 113, 0.6) !important;
+            margin: 0;
+        }
+
+        .language-switcher:hover {
+            background: rgba(39, 174, 96, 0.9) !important;
+            border-color: rgba(39, 174, 96, 0.8) !important;
+            transform: translateX(5px);
+        }
+
+        .language-switcher i {
+            color: white !important;
+        }
+
+        .language-switcher span {
+            color: white !important;
+        }
+
+        /* 主要內容區域 */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            margin-left: 0;
+            margin-top: 140px;
+            padding: 20px 30px 40px 100px;
+            min-height: calc(100vh - 100px);
+        }
+
+        .sidebar:hover ~ .main-content {
+            padding-left: 200px;
+        }
+
+        /* VR測驗首頁樣式 */
+        .vr-exam-homepage {
+            padding: 20px 30px 40px 30px;
+            min-height: calc(100vh - 180px);
+        }
+
+        .vr-exam-homepage h1 {
+            font-size: 2.5rem;
+            color: #333;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-align: center !important;
+            width: 100%;
+        }
+
+        .vr-exam-homepage p {
+            color: #666;
+            font-size: 1.1rem;
+            text-align: center !important;
+            margin-bottom: 40px;
+            width: 100%;
+        }
+
+        /* VR測驗說明卡片樣式 */
+        .vr-instruction-card {
+            background: var(--glass-bg);
+            -webkit-backdrop-filter: saturate(160%) blur(var(--glass-blur));
+            backdrop-filter: saturate(160%) blur(var(--glass-blur));
+            border: 1px solid var(--glass-border);
+            border-radius: var(--glass-radius);
+            box-shadow: var(--glass-shadow);
+            padding: 3rem;
+            max-width: 900px;
+            width: 100%;
+            margin: 0 auto;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .vr-instruction-card::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 50%, #667eea 100%);
+            background-size: 200% 100%;
+            animation: gradientShift 3s ease-in-out infinite;
+        }
+
+        @keyframes gradientShift {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+
+        .instruction-title {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: #1f2937;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .instruction-content {
+            font-size: 1.2rem;
+            line-height: 1.8;
+            color: #4b5563;
+            margin-bottom: 2rem;
+            text-align: left;
+        }
+
+        .instruction-content p {
+            margin-bottom: 1.5rem;
+        }
+
+        .doctor-text-group {
+            display: flex;
+            align-items: flex-start;
+            gap: 20px;
+            margin-bottom: 2rem;
+        }
+
+        .warning-doctor-image {
+            width: 240px;
+            height: 240px;
+            flex-shrink: 0;
+            transform: rotate(0deg);
+            background: transparent;
+        }
+
+        .instruction-text-right {
+            flex: 1;
+            padding-top: 58px;
+        }
+
+        .warning-section {
+            background: linear-gradient(135deg, rgba(255, 193, 7, 0.1) 0%, rgba(255, 152, 0, 0.1) 100%);
+            border: 2px solid rgba(255, 193, 7, 0.3);
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin: 2rem 0;
+            position: relative;
+            overflow: visible;
+            margin-top: -5.8rem;
+            padding-left: 3rem;
+        }
+
+        .warning-text {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #d97706;
+            line-height: 1.6;
+            margin-top: 0.5rem;
+        }
+
+        .warning-doctor-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.2));
+            background: transparent;
+            mix-blend-mode: normal;
+        }
+
+        .warning-text {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #d97706;
+            line-height: 1.6;
+            margin-top: 0.5rem;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-top: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 25px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            min-width: 180px;
+            justify-content: center;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 35px rgba(102, 126, 234, 0.6);
+        }
+
+        .btn-secondary {
+            background: rgba(108, 117, 125, 0.1);
+            color: #6c757d;
+            border: 2px solid rgba(108, 117, 125, 0.3);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(108, 117, 125, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .button-group {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-top: 2rem;
+        }
+
+        /* 學習紀錄彈出視窗樣式 */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-overlay.show {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            animation: modalSlideIn 0.3s ease-out;
+        }
+
+        /* 學習紀錄彈出視窗特殊樣式 */
+        .learning-record-modal {
+            width: 600px;
+            max-height: 80vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .learning-record-body {
+            flex: 1;
+            overflow-y: auto;
+            padding: 2rem;
+            max-height: calc(80vh - 120px); /* 減去header和footer的高度 */
+        }
+
+        .learning-record-footer {
+            position: sticky;
+            bottom: 0;
+            background: white;
+            border-top: 1px solid #e9ecef;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+            z-index: 10;
+            flex-shrink: 0;
+        }
+
+        @keyframes modalSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-50px) scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.5rem;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .modal-header h3 {
+            margin: 0;
+            color: #333;
+            font-size: 1.3rem;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: #6c757d;
+            cursor: pointer;
+            padding: 0;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: background-color 0.2s;
+        }
+
+        .modal-close:hover {
+            background-color: #f8f9fa;
+        }
+
+        .modal-body {
+            padding: 1.5rem;
+        }
+
+        .modal-footer {
+            display: flex;
+            gap: 1rem;
+            justify-content: space-between;
+            padding: 1.5rem;
+            border-top: 1px solid #e9ecef;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #333;
+            font-weight: 600;
+        }
+
+        .datetime-inputs {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .datetime-inputs input {
+            flex: 1;
+            padding: 0.75rem;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.2s;
+        }
+
+        .datetime-inputs input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .form-group input[type="number"] {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.2s;
+        }
+
+        .form-group input[type="number"]:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .progress-slider-container {
+            position: relative;
+            min-height: 100px;
+            padding: 20px 0;
+        }
+
+        .progress-track {
+            position: relative;
+            height: 8px;
+            background: #6c757d;
+            border-radius: 4px;
+            margin: 20px 0;
+        }
+
+        .progress-fill {
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 100%;
+            background: linear-gradient(to right, 
+                #e1bee7 0%, 
+                #ce93d8 25%, 
+                #ba68c8 50%, 
+                #ab47bc 75%, 
+                #8e24aa 100%);
+            border-radius: 4px;
+            transition: width 0.3s ease;
+            width: 0%;
+        }
+
+        .progress-nodes {
+            position: absolute;
+            top: -6px; /* 調整為-6px，讓20px的節點圓圈與8px的進度條對齊 */
+            left: 0;
+            right: 0;
+            display: flex;
+            justify-content: space-between;
+            pointer-events: none;
+        }
+
+        .progress-node {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+            pointer-events: auto;
+        }
+
+        /* 精確定位每個節點 */
+        .progress-node[data-value="0"] {
+            position: absolute;
+            left: 0;
+            transform: translateX(-50%);
+        }
+
+        .progress-node[data-value="1"] {
+            position: absolute;
+            left: 25%;
+            transform: translateX(-50%);
+        }
+
+        .progress-node[data-value="2"] {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .progress-node[data-value="3"] {
+            position: absolute;
+            left: 75%;
+            transform: translateX(-50%);
+        }
+
+        .progress-node[data-value="4"] {
+            position: absolute;
+            left: 100%;
+            transform: translateX(-50%);
+        }
+
+        .node-circle {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #6c757d;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .node-circle i {
+            color: white;
+            font-size: 10px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .progress-node.active .node-circle {
+            background: #e1bee7;
+            transform: scale(1.1);
+        }
+
+        .progress-node.active .node-circle i {
+            opacity: 1;
+        }
+
+        .progress-node[data-value="1"].active .node-circle {
+            background: #ce93d8;
+        }
+
+        .progress-node[data-value="2"].active .node-circle {
+            background: #ba68c8;
+        }
+
+        .progress-node[data-value="3"].active .node-circle {
+            background: #ab47bc;
+        }
+
+        .progress-node[data-value="4"].active .node-circle {
+            background: #8e24aa;
+        }
+
+        .node-label {
+            margin-top: 8px;
+            font-size: 0.9rem;
+            color: #6c757d;
+            font-weight: 600;
+        }
+
+        .progress-node.active .node-label {
+            color: #333;
+        }
+
+        .progress-display {
+            text-align: center;
+            font-weight: 600;
+            color: #667eea;
+            font-size: 1.1rem;
+            margin-top: 50px;
+        }
+
+        /* 選填學習紀錄樣式 */
+        .optional-section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 1rem;
+        }
+
+        .optional-section-header:hover {
+            background: #e9ecef;
+            border-color: #667eea;
+        }
+
+        .optional-section-header label {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #333;
+            margin: 0;
+            cursor: pointer;
+        }
+
+        .optional-section-header i {
+            font-size: 1.2rem;
+            color: #667eea;
+            transition: transform 0.3s ease;
+        }
+
+        .optional-section-header.expanded i {
+            transform: rotate(180deg);
+        }
+
+        .optional-section {
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            background: white;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            padding: 1.5rem;
+        }
+
+        .question-item {
+            margin-bottom: 1.5rem;
+            padding: 1rem;
+            background: #f8f9fa;
+            border-radius: 6px;
+            border: 1px solid #e9ecef;
+        }
+
+        .question-item label {
+            display: block;
+            margin-bottom: 0.8rem;
+            font-weight: 500;
+            color: #333;
+            line-height: 1.4;
+        }
+
+        .yes-no-options, .stage-options {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .radio-option {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
+            padding: 0.5rem 1rem;
+            border: 2px solid #e9ecef;
+            border-radius: 6px;
+            transition: all 0.2s ease;
+            background: white;
+        }
+
+        .radio-option:hover {
+            border-color: #667eea;
+            background: #f8f9ff;
+        }
+
+        .radio-option input[type="radio"] {
+            margin: 0;
+            width: 18px;
+            height: 18px;
+            accent-color: #667eea;
+        }
+
+        .radio-option input[type="radio"]:checked + span {
+            color: #667eea;
+            font-weight: 600;
+        }
+
+        .radio-option:has(input[type="radio"]:checked) {
+            border-color: #667eea;
+            background: #f0f4ff;
+        }
+
+        .question-item textarea {
+            width: 100%;
+            min-height: 80px;
+            padding: 0.8rem;
+            border: 2px solid #e9ecef;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            font-family: inherit;
+            resize: vertical;
+            transition: border-color 0.2s ease;
+        }
+
+        .question-item textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .char-count {
+            text-align: right;
+            font-size: 0.8rem;
+            color: #666;
+            margin-top: 0.5rem;
+        }
+
+        /* 必填標記樣式 */
+        .required {
+            color: #e74c3c;
+            font-weight: bold;
+            margin-left: 0.2rem;
+        }
+
+        /* 選填標記樣式 */
+        .optional-badge {
+            background: #28a745;
+            color: white;
+            font-size: 0.7rem;
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            margin-left: 0.5rem;
+            font-weight: normal;
+        }
+
+        /* 情境選擇下拉選單樣式 */
+        .scenario-selector {
+            max-width: 600px;
+            margin: 40px auto;
+            text-align: center;
+        }
+
+        .selector-container {
+            background: var(--glass-bg);
+            -webkit-backdrop-filter: saturate(160%) blur(var(--glass-blur));
+            backdrop-filter: saturate(160%) blur(var(--glass-blur));
+            border: 1px solid var(--glass-border);
+            border-radius: var(--glass-radius);
+            box-shadow: var(--glass-shadow);
+            padding: 30px;
+        }
+
+        .selector-label {
+            display: block;
+            font-size: 18px;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 15px;
+        }
+
+        .scenario-select {
+            width: 100%;
+            max-width: 400px;
+            padding: 12px 20px;
+            border: 2px solid #e0e0e0;
+            border-radius: 25px;
+            font-size: 16px;
+            background: transparent;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .scenario-select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .scenario-select:hover {
+            border-color: #667eea;
+        }
+
+        /* 內容頁面樣式 */
+        .content-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .back-btn {
+            background: #6c757d;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 20px;
+        }
+
+        .back-btn:hover {
+            background: #5a6268;
+            transform: translateY(-2px);
+        }
+
+        .content-header h2 {
+            font-size: 28px;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+
+        .content-header p {
+            font-size: 16px;
+            color: #7f8c8d;
+        }
+
+        .content-footer {
+            text-align: center;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #e0e0e0;
+        }
+
+        /* 單一情境詳細內容樣式 */
+        .scenario-detail {
+            max-width: 800px;
+            margin: 40px auto;
+        }
+
+        .scenario-detail-content {
+            background: var(--glass-bg);
+            -webkit-backdrop-filter: saturate(160%) blur(var(--glass-blur));
+            backdrop-filter: saturate(160%) blur(var(--glass-blur));
+            border: 1px solid var(--glass-border);
+            border-radius: var(--glass-radius);
+            box-shadow: var(--glass-shadow);
+            padding: 40px;
+            display: flex;
+            gap: 30px;
+            align-items: center;
+        }
+
+        .scenario-detail-image {
+            flex: 1;
+            max-width: 400px;
+        }
+
+        .scenario-detail-image img {
+            width: 100%;
+            height: 300px;
+            object-fit: cover;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .scenario-detail-image div {
+            width: 100%;
+            height: 300px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .scenario-detail-image div img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .scenario-detail-info {
+            flex: 1;
+        }
+
+        .scenario-detail-info h3 {
+            font-size: 28px;
+            color: #2c3e50;
+            margin-bottom: 20px;
+        }
+
+        .scenario-detail-info p {
+            font-size: 16px;
+            color: #7f8c8d;
+            line-height: 1.6;
+            margin-bottom: 30px;
+        }
+
+        .scenario-detail-actions {
+            text-align: center;
+        }
+
+        /* 響應式設計 */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 60px;
+            }
+
+            .sidebar:hover {
+                width: 160px;
+            }
+
+            .main-content {
+                margin-left: 0;
+                margin-top: 120px;
+                padding-left: 80px;
+            }
+
+            .sidebar:hover ~ .main-content {
+                padding-left: 160px;
+            }
+
+            .vr-instruction-card {
+                padding: 2rem;
+                margin: 1rem;
+            }
+
+            .instruction-title {
+                font-size: 2rem;
+            }
+
+            .instruction-content {
+                font-size: 1rem;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .btn {
+                width: 100%;
+                max-width: 300px;
+            }
+        }
+    </style>
+    
+    <!-- 語言切換功能 -->
+    <script src="src/js/language-switcher.js"></script>
+    <!-- 用戶資料服務 -->
+    <script type="module" src="src/services/userDataService.js"></script>
+    <!-- 學習時間服務 -->
+    <script type="module" src="src/services/learningTimeService.js"></script>
+    
+    <!-- 錯誤處理腳本 -->
+    <script>
+        // 捕獲並忽略 Babel 相關錯誤
+        window.addEventListener('error', function(e) {
+            if (e.message && (e.message.includes('@babel/runtime') || e.message.includes('babel'))) {
+                console.warn('Babel 相關錯誤已忽略:', e.message);
+                e.preventDefault();
+                return false;
+            }
+        });
+        
+        // 捕獲未處理的 Promise 拒絕
+        window.addEventListener('unhandledrejection', function(e) {
+            if (e.reason && e.reason.message && e.reason.message.includes('@babel/runtime')) {
+                console.warn('Babel Promise 錯誤已忽略:', e.reason.message);
+                e.preventDefault();
+            }
+            else if (e.reason && e.reason.message && 
+                    (e.reason.message.includes('message channel closed') || 
+                     e.reason.message.includes('asynchronous response'))) {
+                console.warn('瀏覽器擴展相關錯誤已忽略:', e.reason.message);
+                e.preventDefault();
+            }
+        });
+        
+        // 捕獲圖片載入錯誤
+        window.addEventListener('error', function(e) {
+            if (e.target && e.target.tagName === 'IMG') {
+                console.warn('圖片載入失敗:', e.target.src);
+                e.preventDefault();
+                return false;
+            }
+        }, true);
+        
+        // VR測驗頁面特定錯誤處理
+        window.addEventListener('error', function(e) {
+            if (e.target && e.target.tagName === 'IFRAME') {
+                console.warn('VR測驗內容載入失敗:', e.target.src);
+                e.preventDefault();
+                return false;
+            }
+        }, true);
+        
+        // 確保VR測驗功能正常運作
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('✅ VR測驗頁面已載入，錯誤處理已啟用');
+            
+            // 檢查關鍵元素是否存在
+            const vrContainer = document.getElementById('vr-instruction-card');
+            
+            if (vrContainer) {
+                console.log('✅ VR測驗容器已找到');
+            } else {
+                console.warn('⚠️ VR測驗容器未找到');
+            }
+        });
+    </script>
+</head>
+<body>
+    <!-- 固定底圖，讓 backdrop-filter 一定有東西可以"透視＋模糊" -->
+    <div class="global-bg" aria-hidden="true"></div>
+    
+    <!-- 側邊欄 -->
+    <div class="sidebar">
+        <!-- 頂部：Logo -->
+        <div class="sidebar-top">
+            <div class="logo-container">
+                <img src="assets/logo.png" alt="PBLS Logo" class="logo-image">
+            </div>
+        </div>
+        
+        <!-- 選單 -->
+        <div class="sidebar-menu">
+            <div class="sidebar-icon" onclick="window.location.href='info.html'">
+                <i class="fas fa-info-circle"></i>
+                <span>資訊</span>
+            </div>
+            <div class="sidebar-icon" onclick="window.location.href='practice.html'">
+                <i class="fas fa-play-circle"></i>
+                <span>練習專區</span>
+            </div>
+            <div class="sidebar-icon active" onclick="window.location.href='exam.html'">
+                <i class="fas fa-clipboard-list"></i>
+                <span>測驗專區</span>
+            </div>
+            <div class="sidebar-icon" onclick="window.location.href='history.html'">
+                <i class="fas fa-chart-line"></i>
+                <span>歷史成績</span>
+            </div>
+            <div class="sidebar-icon" onclick="window.location.href='team.html'">
+                <i class="fas fa-users"></i>
+                <span>團隊</span>
+            </div>
+        </div>
+
+        <!-- 語言切換按鈕 - 固定在底部 -->
+        <div class="language-switcher-container">
+            <div class="sidebar-icon language-switcher" onclick="toggleLanguage()">
+                <i class="fas fa-globe"></i>
+                <span id="language-text">中文</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- 頂部標題欄 -->
+    <div class="header">
+        <div class="header-left">
+            <h1 class="header-title">歡迎使用PBLS教學平台</h1>
+        </div>
+        <div class="header-right">
+            <div class="user-info" id="user-info-display">載入中...</div>
+            <div class="user-avatar" onclick="showUserProfile()">
+                <i class="fas fa-user"></i>
+            </div>
+            <div class="logout-btn" onclick="logout()">
+                <i class="fas fa-sign-out-alt"></i>
+            </div>
+        </div>
+    </div>
+
+    <!-- 跑馬燈 -->
+    <div class="marquee glass-pill" role="marquee" aria-label="最新公告">
+        <div class="marquee-track">
+            <div class="marquee-item">
+                <i class="fas fa-bullhorn"></i> 歡迎使用PBLS VR教學平台！
+            </div>
+            <div class="marquee-item">
+                <i class="fas fa-vr-cardboard"></i> 360°實境教學影片，身臨其境的學習體驗
+            </div>
+            <div class="marquee-item">
+                <i class="fas fa-comments"></i> 情境模擬對話，提升急救溝通技巧
+            </div>
+            <div class="marquee-item">
+                <i class="fas fa-gamepad"></i> VR操作測驗，模擬真實急救情境
+            </div>
+            <div class="marquee-item">
+                <i class="fas fa-chart-line"></i> 即時成績追蹤，掌握學習進度
+            </div>
+            <div class="marquee-item">
+                <i class="fas fa-lightbulb"></i> 問題導向學習法，提升急救技能
+            </div>
+        </div>
+        <!-- 左側藍色高光 -->
+        <span class="pill-highlight" aria-hidden="true"></span>
+    </div>
+
+    <!-- 主要內容區域 -->
+    <div class="main-content">
+        <!-- VR測驗首頁內容 -->
+        <div class="vr-exam-homepage content-container" id="vrExamHomepage">
+            <h1>VR操作測驗</h1>
+            <p>虛擬實境環境中的急救操作測驗</p>
+            
+            <!-- VR測驗選項按鈕 -->
+            <div class="vr-exam-options">
+                <div class="liquid-glass">
+                    <div class="liquid-content">
+                        <div class="doctor-text-group">
+                            <div class="warning-doctor-image">
+                                <img src="assets/醫師.png" alt="醫師">
+                            </div>
+                            <div class="instruction-text-right">
+                                <p style="color: #64748b; line-height: 1.6; margin-bottom: 20px; text-align: left;">
+                                    您將扮演一位臨床醫師，依照畫面提示完成一連串兒童急救步驟。請在每個步驟中正確執行操作，完成後輸入您的成績與花費時間。
+                                </p>
+                            </div>
+                        </div>
+                        
+                        <div class="warning-section">
+                            <div class="warning-text">
+                                ⚠️ 急救黃金時間為三分鐘——若能在三分鐘內完成所有流程，代表您具備出色的臨場反應與判斷能力！
+                            </div>
+                        </div>
+                        
+                        <div class="button-group">
+                            <button class="btn btn-primary" onclick="fillLearningRecord()">
+                                <i class="fas fa-edit"></i>
+                                填寫學習紀錄
+                            </button>
+                            <button class="btn btn-secondary" onclick="returnToExamArea()">
+                                <i class="fas fa-arrow-left"></i>
+                                返回測驗專區
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- VR測驗內容 -->
+        <div class="vr-exam-content content-container" id="vrExamContent" style="display: none;">
+            <div class="content-header">
+                <h2><i class="fas fa-headset"></i> VR操作測驗</h2>
+                <p>虛擬實境環境中的急救操作測驗</p>
+            </div>
+            
+            <!-- 情境選擇下拉選單 -->
+            <div class="scenario-selector">
+                <div class="selector-container">
+                    <label for="scenarioSelect" class="selector-label">選擇測驗情境：</label>
+                    <select id="scenarioSelect" class="scenario-select" onchange="selectScenario()">
+                        <option value="">請選擇情境...</option>
+                        <option value="cardiac">心臟驟停</option>
+                        <option value="poisoning">食物中毒</option>
+                        <option value="drowning">溺水</option>
+                        <option value="fire">火災嗆傷</option>
+                        <option value="trauma">外傷</option>
+                    </select>
+                </div>
+            </div>
+            
+            <!-- 單一情境詳細內容 -->
+            <div class="scenario-detail" id="scenarioDetail" style="display: none;">
+                <div class="scenario-detail-content">
+                    <div class="scenario-detail-image">
+                        <img id="scenarioDetailImg" src="" alt="" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                        <div id="scenarioDetailIcon" style="display: none; align-items: center; justify-content: center; width: 100%; height: 100%;">
+                            <i class="fas fa-heartbeat"></i>
+                        </div>
+                    </div>
+                    <div class="scenario-detail-info">
+                        <h3 id="scenarioDetailTitle">情境標題</h3>
+                        <p id="scenarioDetailDescription">情境描述</p>
+                        <div class="scenario-detail-actions">
+                            <button class="btn btn-primary" onclick="startScenario()">
+                                <i class="fas fa-play"></i> 開始VR測驗
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="content-footer">
+                <button class="back-btn" onclick="goBackToHomepage()">
+                    <i class="fas fa-arrow-left"></i> 返回測驗專區
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 學習紀錄填寫彈出視窗 -->
+    <div id="learningRecordModal" class="modal-overlay">
+        <div class="modal-content learning-record-modal">
+            <div class="modal-header">
+                <h3>填寫學習紀錄</h3>
+                <button class="modal-close" onclick="closeLearningRecordModal()">&times;</button>
+            </div>
+            <div class="modal-body learning-record-body">
+                <form id="learningRecordForm">
+                    <div class="form-group">
+                        <label for="testDate">測驗時間 <span class="required">*</span></label>
+                        <div class="datetime-inputs">
+                            <input type="date" id="testDate" required>
+                            <input type="time" id="testTime" step="60" required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="testDuration">測驗時長（秒）<span class="required">*</span></label>
+                        <input type="number" id="testDuration" min="1" max="180" required placeholder="請輸入測驗時長（秒）">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="completionProgress">完成進度 (拖曳搖桿紀錄) <span class="required">*</span></label>
+                        <div class="progress-slider-container">
+                            <div class="progress-track">
+                                <div class="progress-fill" id="progressFill"></div>
+                                <div class="progress-nodes">
+                                    <div class="progress-node" data-value="0">
+                                        <div class="node-circle">
+                                            <i class="fas fa-check"></i>
+                                        </div>
+                                        <span class="node-label">0%</span>
+                                    </div>
+                                    <div class="progress-node" data-value="1">
+                                        <div class="node-circle">
+                                            <i class="fas fa-check"></i>
+                                        </div>
+                                        <span class="node-label">25%</span>
+                                    </div>
+                                    <div class="progress-node" data-value="2">
+                                        <div class="node-circle">
+                                            <i class="fas fa-check"></i>
+                                        </div>
+                                        <span class="node-label">50%</span>
+                                    </div>
+                                    <div class="progress-node" data-value="3">
+                                        <div class="node-circle">
+                                            <i class="fas fa-check"></i>
+                                        </div>
+                                        <span class="node-label">75%</span>
+                                    </div>
+                                    <div class="progress-node" data-value="4">
+                                        <div class="node-circle">
+                                            <i class="fas fa-check"></i>
+                                        </div>
+                                        <span class="node-label">100%</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="progress-display">
+                                選擇進度：<span id="progressValue">0%</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 選填的詳細學習紀錄 -->
+                    <div class="form-group">
+                        <div class="optional-section-header" onclick="toggleOptionalSection()">
+                            <label>學習紀錄 <span class="optional-badge">選填</span></label>
+                            <i class="fas fa-chevron-down" id="optionalToggleIcon"></i>
+                        </div>
+                        <div class="optional-section" id="optionalSection" style="display: none;">
+                            <div class="question-item">
+                                <label>1. 我在第一關有確實放置ambu於正確位置。</label>
+                                <div class="yes-no-options">
+                                    <label class="radio-option">
+                                        <input type="radio" name="q1" value="yes">
+                                        <span>是</span>
+                                    </label>
+                                    <label class="radio-option">
+                                        <input type="radio" name="q1" value="no">
+                                        <span>否</span>
+                                    </label>
+                                </div>
+                            </div>
+                            
+                            <div class="question-item">
+                                <label>2. 我在第一關有確實在15下CPR後，按壓兩下ambu。</label>
+                                <div class="yes-no-options">
+                                    <label class="radio-option">
+                                        <input type="radio" name="q2" value="yes">
+                                        <span>是</span>
+                                    </label>
+                                    <label class="radio-option">
+                                        <input type="radio" name="q2" value="no">
+                                        <span>否</span>
+                                    </label>
+                                </div>
+                            </div>
+                            
+                            <div class="question-item">
+                                <label>3. 我在第二關有確實判斷出VF心電圖且知道此狀況可以電擊。</label>
+                                <div class="yes-no-options">
+                                    <label class="radio-option">
+                                        <input type="radio" name="q3" value="yes">
+                                        <span>是</span>
+                                    </label>
+                                    <label class="radio-option">
+                                        <input type="radio" name="q3" value="no">
+                                        <span>否</span>
+                                    </label>
+                                </div>
+                            </div>
+                            
+                            <div class="question-item">
+                                <label>4. 我在第二關有確實判斷出VT心電圖且知道此狀況可以電擊。</label>
+                                <div class="yes-no-options">
+                                    <label class="radio-option">
+                                        <input type="radio" name="q4" value="yes">
+                                        <span>是</span>
+                                    </label>
+                                    <label class="radio-option">
+                                        <input type="radio" name="q4" value="no">
+                                        <span>否</span>
+                                    </label>
+                                </div>
+                            </div>
+                            
+                            <div class="question-item">
+                                <label>5. 我在第二關有確實判斷出Asystole心電圖且知道此狀況不可以電擊。</label>
+                                <div class="yes-no-options">
+                                    <label class="radio-option">
+                                        <input type="radio" name="q5" value="yes">
+                                        <span>是</span>
+                                    </label>
+                                    <label class="radio-option">
+                                        <input type="radio" name="q5" value="no">
+                                        <span>否</span>
+                                    </label>
+                                </div>
+                            </div>
+                            
+                            <div class="question-item">
+                                <label>6. 我在第二關有確實判斷出PEA心電圖且知道此狀況不可以電擊。</label>
+                                <div class="yes-no-options">
+                                    <label class="radio-option">
+                                        <input type="radio" name="q6" value="yes">
+                                        <span>是</span>
+                                    </label>
+                                    <label class="radio-option">
+                                        <input type="radio" name="q6" value="no">
+                                        <span>否</span>
+                                    </label>
+                                </div>
+                            </div>
+                            
+                            <div class="question-item">
+                                <label>7. 我在第三關有確實判斷正確充電的焦耳數。</label>
+                                <div class="yes-no-options">
+                                    <label class="radio-option">
+                                        <input type="radio" name="q7" value="yes">
+                                        <span>是</span>
+                                    </label>
+                                    <label class="radio-option">
+                                        <input type="radio" name="q7" value="no">
+                                        <span>否</span>
+                                    </label>
+                                </div>
+                            </div>
+                            
+                            <div class="question-item">
+                                <label>8. 我在第三關有確實判斷正確執行電擊。</label>
+                                <div class="yes-no-options">
+                                    <label class="radio-option">
+                                        <input type="radio" name="q8" value="yes">
+                                        <span>是</span>
+                                    </label>
+                                    <label class="radio-option">
+                                        <input type="radio" name="q8" value="no">
+                                        <span>否</span>
+                                    </label>
+                                </div>
+                            </div>
+                            
+                            <div class="question-item">
+                                <label>9. 我在第四關有正確選擇藥劑並配置。</label>
+                                <div class="yes-no-options">
+                                    <label class="radio-option">
+                                        <input type="radio" name="q9" value="yes">
+                                        <span>是</span>
+                                    </label>
+                                    <label class="radio-option">
+                                        <input type="radio" name="q9" value="no">
+                                        <span>否</span>
+                                    </label>
+                                </div>
+                            </div>
+                            
+                            <div class="question-item">
+                                <label>10. 我覺得哪個關卡最不熟?</label>
+                                <div class="stage-options">
+                                    <label class="radio-option">
+                                        <input type="radio" name="q10" value="stage1">
+                                        <span>第一關</span>
+                                    </label>
+                                    <label class="radio-option">
+                                        <input type="radio" name="q10" value="stage2">
+                                        <span>第二關</span>
+                                    </label>
+                                    <label class="radio-option">
+                                        <input type="radio" name="q10" value="stage3">
+                                        <span>第三關</span>
+                                    </label>
+                                    <label class="radio-option">
+                                        <input type="radio" name="q10" value="stage4">
+                                        <span>第四關</span>
+                                    </label>
+                                </div>
+                            </div>
+                            
+                            <div class="question-item">
+                                <label>11. 你有沒有在哪個關卡遇到困難?什麼困難?</label>
+                                <textarea name="q11" maxlength="200" placeholder="請簡述遇到的困難..."></textarea>
+                                <div class="char-count">0/200 字</div>
+                            </div>
+                            
+                            <div class="question-item">
+                                <label>12. 老師評語</label>
+                                <textarea name="q12" maxlength="200" placeholder="請輸入老師評語..."></textarea>
+                                <div class="char-count">0/200 字</div>
+                            </div>
+                            
+                            <div class="question-item">
+                                <label>13. 筆記欄(或對自己想說的話)</label>
+                                <textarea name="q13" maxlength="200" placeholder="請輸入筆記或想說的話..."></textarea>
+                                <div class="char-count">0/200 字</div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer learning-record-footer">
+                <button type="button" class="btn btn-primary" onclick="confirmLearningRecord()">確認</button>
+                <button type="button" class="btn btn-secondary" onclick="cancelLearningRecord()">取消</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 頁面載入時檢查登入狀態
+        document.addEventListener('DOMContentLoaded', function() {
+            checkLoginStatus();
+            
+            // 更新用戶資訊顯示
+            setTimeout(() => {
+                updateUserInfoDisplay();
+            }, 1000);
+            
+            // 確保跑馬燈正常顯示
+            const marquee = document.querySelector('.marquee');
+            if (marquee) {
+                console.log('✅ 跑馬燈元素已找到');
+                marquee.style.display = 'flex';
+            } else {
+                console.error('❌ 找不到跑馬燈元素');
+            }
+            
+            // 初始化液態玻璃效果
+            initLiquidGlassEffect();
+        });
+
+        // 檢查登入狀態
+        function checkLoginStatus() {
+            console.log('檢查登入狀態');
+            
+            // 從localStorage獲取用戶信息
+            const savedUser = localStorage.getItem('pbls_user');
+            
+            if (savedUser) {
+                try {
+                    const userData = JSON.parse(savedUser);
+                    console.log('用戶已登入:', userData);
+                    
+                    // 顯示用戶信息
+                    displayUserInfo(userData);
+                    
+                } catch (error) {
+                    console.error('解析用戶數據失敗:', error);
+                    redirectToLogin();
+                }
+            } else {
+                console.log('用戶未登入，跳轉到登入頁面');
+                redirectToLogin();
+            }
+        }
+
+        // 顯示用戶信息
+        function displayUserInfo(userData) {
+            const userName = document.getElementById('user-name');
+            const userPhoto = document.getElementById('user-photo');
+            
+            if (userName && userPhoto) {
+                userName.textContent = userData.name || userData.displayName || '用戶';
+                userPhoto.src = userData.photoURL || userData.photo || 'https://via.placeholder.com/40/667eea/ffffff?text=U';
+                userPhoto.alt = userData.name || '用戶頭像';
+                
+                console.log('用戶信息已顯示');
+            }
+        }
+
+        // 跳轉到登入頁面
+        function redirectToLogin() {
+            console.log('跳轉到登入頁面');
+            window.location.href = 'login.html';
+        }
+
+        // 填寫學習紀錄
+        function fillLearningRecord() {
+            console.log('填寫學習紀錄');
+            showLearningRecordModal();
+        }
+
+        // 切換選填欄位顯示
+        function toggleOptionalSection() {
+            const section = document.getElementById('optionalSection');
+            const header = document.querySelector('.optional-section-header');
+            const icon = document.getElementById('optionalToggleIcon');
+            
+            if (section.style.display === 'none') {
+                section.style.display = 'block';
+                header.classList.add('expanded');
+                icon.classList.remove('fa-chevron-down');
+                icon.classList.add('fa-chevron-up');
+            } else {
+                section.style.display = 'none';
+                header.classList.remove('expanded');
+                icon.classList.remove('fa-chevron-up');
+                icon.classList.add('fa-chevron-down');
+            }
+        }
+
+        // 字數統計
+        function updateCharCount(textarea) {
+            const charCount = textarea.nextElementSibling;
+            const currentLength = textarea.value.length;
+            const maxLength = parseInt(textarea.getAttribute('maxlength'));
+            
+            charCount.textContent = `${currentLength}/${maxLength} 字`;
+            
+            if (currentLength > maxLength * 0.9) {
+                charCount.style.color = '#e74c3c';
+            } else if (currentLength > maxLength * 0.7) {
+                charCount.style.color = '#f39c12';
+            } else {
+                charCount.style.color = '#666';
+            }
+        }
+
+        // 顯示學習紀錄彈出視窗
+        function showLearningRecordModal() {
+            const modal = document.getElementById('learningRecordModal');
+            if (modal) {
+                // 設定預設值
+                const now = new Date();
+                const today = now.toISOString().split('T')[0];
+                
+                // 計算一個月前的日期和明天的日期
+                const oneMonthAgo = new Date();
+                oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
+                const oneMonthAgoStr = oneMonthAgo.toISOString().split('T')[0];
+                
+                const tomorrow = new Date();
+                tomorrow.setDate(tomorrow.getDate() + 1);
+                const tomorrowStr = tomorrow.toISOString().split('T')[0];
+                
+                // 使用12小時制格式
+                const currentTime = now.toLocaleTimeString('zh-TW', { 
+                    hour12: true, 
+                    hour: '2-digit', 
+                    minute: '2-digit' 
+                });
+                
+                // 設定日期輸入框的限制和預設值
+                const dateInput = document.getElementById('testDate');
+                dateInput.value = today;
+                dateInput.min = oneMonthAgoStr;
+                dateInput.max = tomorrowStr;
+                
+                document.getElementById('testTime').value = currentTime;
+                document.getElementById('testDuration').value = '';
+                updateProgressDisplay(0);
+                
+                // 添加字數統計事件監聽器
+                const textareas = modal.querySelectorAll('textarea[maxlength]');
+                textareas.forEach(textarea => {
+                    textarea.addEventListener('input', function() {
+                        updateCharCount(this);
+                    });
+                    // 初始化字數統計
+                    updateCharCount(textarea);
+                });
+                
+                modal.classList.add('show');
+            }
+        }
+
+        // 關閉學習紀錄彈出視窗
+        function closeLearningRecordModal() {
+            const modal = document.getElementById('learningRecordModal');
+            if (modal) {
+                modal.classList.remove('show');
+            }
+        }
+
+        // 更新進度顯示
+        function updateProgressDisplay(selectedValue) {
+            const display = document.getElementById('progressValue');
+            const progressFill = document.getElementById('progressFill');
+            const nodes = document.querySelectorAll('.progress-node');
+            
+            const progressValues = ['0%', '25%', '50%', '75%', '100%'];
+            const progressPercentages = [0, 25, 50, 75, 100];
+            
+            if (display) {
+                display.textContent = progressValues[selectedValue];
+            }
+            
+            if (progressFill) {
+                progressFill.style.width = progressPercentages[selectedValue] + '%';
+            }
+            
+            // 更新節點狀態
+            nodes.forEach((node, index) => {
+                if (index <= selectedValue) {
+                    node.classList.add('active');
+                } else {
+                    node.classList.remove('active');
+                }
+            });
+        }
+
+        // 進度滑桿事件監聽
+        document.addEventListener('DOMContentLoaded', function() {
+            // 為節點添加點擊事件
+            const nodes = document.querySelectorAll('.progress-node');
+            nodes.forEach((node, index) => {
+                node.addEventListener('click', function() {
+                    updateProgressDisplay(index);
+                });
+            });
+            
+            // 點擊背景關閉彈出視窗
+            const modal = document.getElementById('learningRecordModal');
+            if (modal) {
+                modal.addEventListener('click', function(e) {
+                    if (e.target === modal) {
+                        closeLearningRecordModal();
+                    }
+                });
+            }
+        });
+
+        // 取消學習紀錄
+        function cancelLearningRecord() {
+            closeLearningRecordModal();
+        }
+
+        // 獲取當前用戶
+        async function getCurrentUser() {
+            const savedUser = localStorage.getItem('pbls_user');
+            if (savedUser) {
+                try {
+                    const userData = JSON.parse(savedUser);
+                    console.log('從localStorage獲取用戶:', userData);
+                    
+                    // 等待Firebase初始化
+                    await window.__FB__.authReady;
+                    
+                    // 從uid_mappings查找對應的uid
+                    const { doc, getDoc } = await import("https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore.js");
+                    
+                    try {
+                        const mappingDoc = await getDoc(doc(window.__FB__.db, 'uid_mappings', userData.uid));
+                        if (mappingDoc.exists()) {
+                            const mapping = mappingDoc.data();
+                            console.log('找到UID映射:', mapping);
+                            
+                            // 使用映射中的firebaseUID作為uid
+                            return {
+                                ...userData,
+                                uid: mapping.firebaseUID,
+                                displayName: mapping.name || userData.displayName,
+                                email: mapping.email || userData.email
+                            };
+                        }
+                    } catch (error) {
+                        console.error('查找UID映射失敗:', error);
+                    }
+                    
+                    // 如果找不到映射，使用原始uid
+                    return userData;
+                } catch (error) {
+                    console.error('解析用戶數據失敗:', error);
+                    return null;
+                }
+            }
+            return null;
+        }
+
+        // 確認學習紀錄
+        async function confirmLearningRecord() {
+            const testDate = document.getElementById('testDate').value;
+            const testTime = document.getElementById('testTime').value;
+            const testDuration = document.getElementById('testDuration').value;
+            
+            // 獲取當前選擇的進度
+            let completionProgress = 0;
+            const activeNodes = document.querySelectorAll('.progress-node.active');
+            if (activeNodes.length > 0) {
+                completionProgress = activeNodes.length - 1;
+            }
+
+            // 驗證表單 - 只驗證必填欄位
+            if (!testDate || !testTime || !testDuration) {
+                alert('請填寫所有必填欄位（測驗時間、測驗時長、完成進度）');
+                return;
+            }
+
+            // 驗證日期範圍（最近一個月內到明天）
+            const selectedDate = new Date(testDate);
+            const today = new Date();
+            const oneMonthAgo = new Date();
+            oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
+            const tomorrow = new Date();
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            
+            if (selectedDate < oneMonthAgo || selectedDate > tomorrow) {
+                alert('測驗日期必須在最近一個月內到明天之間');
+                return;
+            }
+
+            if (testDuration < 1 || testDuration > 180) {
+                alert('測驗時長必須在1-180秒之間');
+                return;
+            }
+
+            // 驗證完成進度（必填）
+            if (completionProgress < 0 || completionProgress > 4) {
+                alert('請選擇完成進度');
+                return;
+            }
+
+            try {
+                // 獲取當前用戶
+                const currentUser = await getCurrentUser();
+                if (!currentUser) {
+                    alert('請先登入');
+                    return;
+                }
+
+                // 收集選填欄位數據（可選填寫）
+                const optionalData = {};
+                
+                // 收集是/否問題的答案（可選）
+                for (let i = 1; i <= 9; i++) {
+                    const selectedOption = document.querySelector(`input[name="q${i}"]:checked`);
+                    optionalData[`q${i}`] = selectedOption ? selectedOption.value : null;
+                }
+                
+                // 收集第10題（最不熟的關卡）（可選）
+                const selectedStage = document.querySelector('input[name="q10"]:checked');
+                optionalData.q10 = selectedStage ? selectedStage.value : null;
+                
+                // 收集簡答題（可選）
+                const textareaQuestions = ['q11', 'q12', 'q13'];
+                textareaQuestions.forEach(qName => {
+                    const textarea = document.querySelector(`textarea[name="${qName}"]`);
+                    optionalData[qName] = textarea ? textarea.value.trim() : '';
+                });
+
+                console.log('選填數據收集完成:', optionalData);
+
+                // 準備資料
+                const progressValues = ['0%', '25%', '50%', '75%', '100%'];
+                const progressPercentages = [0, 25, 50, 75, 100];
+                const learningRecordData = {
+                    uid: currentUser.uid,
+                    userName: currentUser.displayName || currentUser.email,
+                    examType: 'VR操作測驗',
+                    score: progressPercentages[completionProgress], // 使用進度百分比作為分數
+                    correctCount: progressPercentages[completionProgress], // VR測驗的"正確數"就是進度
+                    questionCount: 100, // VR測驗總共100%完成度
+                    testDate: testDate,
+                    testTime: testTime,
+                    testDurationSeconds: parseInt(testDuration),
+                    timeSpentMs: parseInt(testDuration) * 1000, // 轉換為毫秒
+                    completionProgress: progressValues[completionProgress],
+                    progressPercentage: progressPercentages[completionProgress],
+                    submittedAt: new Date().toISOString(),
+                    createdAt: new Date().toISOString(),
+                    timestamp: Date.now(),
+                    // 選填欄位數據
+                    optionalAnswers: optionalData
+                };
+
+                // 儲存到Firebase
+                console.log('準備儲存的數據:', learningRecordData);
+                await saveLearningRecordToFirebase(learningRecordData);
+                
+                // 檢查是否有選填內容
+                const hasOptionalContent = Object.values(optionalData).some(value => 
+                    value !== null && value !== ''
+                );
+                
+                if (hasOptionalContent) {
+                    alert('學習紀錄已成功儲存！包含選填的詳細學習紀錄。');
+                } else {
+                    alert('學習紀錄已成功儲存！');
+                }
+                
+                closeLearningRecordModal();
+                
+            } catch (error) {
+                console.error('儲存學習紀錄時發生錯誤:', error);
+                alert('儲存失敗，請稍後再試');
+            }
+        }
+
+        // 儲存學習紀錄到Firebase
+        async function saveLearningRecordToFirebase(data) {
+            try {
+                // 等待Firebase初始化
+                await window.__FB__.authReady;
+                
+                // 使用正確的Firebase導入
+                const { collection, addDoc } = await import("https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore.js");
+                
+                const docRef = await addDoc(collection(window.__FB__.db, 'scores'), data);
+                console.log('學習紀錄已儲存到scores集合，ID:', docRef.id);
+                return docRef.id;
+            } catch (error) {
+                console.error('Firebase儲存錯誤:', error);
+                throw error;
+            }
+        }
+
+        // 返回測驗專區
+        function returnToExamArea() {
+            console.log('返回測驗專區');
+            window.location.href = 'exam.html';
+        }
+
+        // 開始VR測驗
+        function startVRExam() {
+            console.log('開始VR測驗');
+            
+            const homepage = document.getElementById('vrExamHomepage');
+            const vrExamContent = document.getElementById('vrExamContent');
+            
+            if (!homepage || !vrExamContent) {
+                console.error('找不到VR測驗內容元素');
+                return;
+            }
+            
+            // 隱藏首頁
+            homepage.style.display = 'none';
+            
+            // 顯示VR測驗內容
+            vrExamContent.style.display = 'block';
+            console.log('✅ VR測驗內容已載入');
+        }
+
+        // 返回首頁
+        function goBackToHomepage() {
+            const homepage = document.getElementById('vrExamHomepage');
+            const vrExamContent = document.getElementById('vrExamContent');
+            
+            // 隱藏VR測驗內容
+            vrExamContent.style.display = 'none';
+            
+            // 顯示首頁
+            homepage.style.display = 'block';
+        }
+
+        // 情境資料
+        const scenarioData = {
+            'cardiac': {
+                name: '心臟驟停',
+                image: 'assets/心臟驟停情境.png',
+                iconImage: 'assets/心臟驟停情境.png',
+                description: '傍晚18點30分，客廳忽然安靜下來，一位5歲、110公分、18公斤的男童倒地，毫無反應。現場做了急救措施，患者OHCA，家屬在外等待。您需要在VR環境中進行CPR操作，包括正確的按壓位置、深度和頻率。'
+            },
+            'poisoning': {
+                name: '食物中毒',
+                image: 'assets/食物中毒情境.png',
+                iconImage: 'assets/食物中毒情境.png',
+                description: '下午16點12分，5歲小孩（103公分／25公斤）在餐桌旁突然倒下，四周留有嘔吐物與食物殘渣。家人驚慌失措，患者OHCA，家屬在外等待。您需要在VR環境中進行氣道清理和CPR操作。'
+            },
+            'drowning': {
+                name: '溺水',
+                image: 'assets/溺水情境.png',
+                iconImage: 'assets/溺水情境.png',
+                description: '下午3點20分的游泳池旁傳來呼喊——5歲小孩（105公分／20公斤）被拉上岸時已無反應。患者OHCA，家屬在外等待。您需要在VR環境中進行溺水急救，包括氣道清理和CPR。'
+            },
+            'fire': {
+                name: '火災嗆傷',
+                image: 'assets/火災嗆傷情境.png',
+                iconImage: 'assets/火災嗆傷情境.png',
+                description: '文化三路住宅區發生一起火災，現場一位8歲兒童（125公分／27公斤）被推進急診，患者OHCA。您需要在VR環境中進行嗆傷急救，包括氣道管理和CPR。'
+            },
+            'trauma': {
+                name: '外傷',
+                image: 'assets/外傷情境.png',
+                iconImage: 'assets/外傷情境.png',
+                description: '下午16點12分，一位6歲男童（100公分／22公斤）因打碎玻璃造成明顯撕裂傷，血迅速滲透衣物；他意識模糊、哭喊聲微弱、四肢冰冷，經家人發現後急救並送往醫院。患者OHCA。您需要在VR環境中進行外傷急救，包括止血和CPR。'
+            }
+        };
+
+        // 選擇情境
+        function selectScenario() {
+            const select = document.getElementById('scenarioSelect');
+            const scenarioType = select.value;
+            const scenarioDetail = document.getElementById('scenarioDetail');
+            
+            if (scenarioType) {
+                const scenario = scenarioData[scenarioType];
+                
+                // 更新情境詳細內容
+                document.getElementById('scenarioDetailTitle').textContent = scenario.name;
+                document.getElementById('scenarioDetailDescription').textContent = scenario.description;
+                document.getElementById('scenarioDetailImg').src = scenario.image;
+                document.getElementById('scenarioDetailImg').alt = scenario.name;
+                
+                // 更新圖標為圖片
+                const iconElement = document.getElementById('scenarioDetailIcon');
+                iconElement.innerHTML = `<img src="${scenario.iconImage}" alt="${scenario.name}圖示" onerror="this.style.display='none'; this.parentElement.innerHTML='<i class=\'fas fa-heartbeat\'></i>';">`;
+                
+                // 顯示情境詳細內容
+                scenarioDetail.style.display = 'block';
+            } else {
+                // 隱藏情境詳細內容
+                scenarioDetail.style.display = 'none';
+            }
+        }
+
+        // 開始情境測驗
+        function startScenario() {
+            const select = document.getElementById('scenarioSelect');
+            const scenarioType = select.value;
+            const scenario = scenarioData[scenarioType];
+            
+            if (scenario) {
+                // 顯示載入動畫
+                const button = event.target;
+                const originalText = button.innerHTML;
+                button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 載入中...';
+                button.disabled = true;
+                
+                // 模擬載入過程
+                setTimeout(() => {
+                    alert(`${scenario.name}VR測驗功能開發中，敬請期待！\n\n這將是一個沉浸式的VR急救操作測驗，讓您能夠：\n• 在虛擬實境中進行真實的急救操作\n• 體驗逼真的急救情境\n• 獲得即時的操作反饋\n• 提升實際操作技能`);
+                    
+                    // 恢復按鈕狀態
+                    button.innerHTML = originalText;
+                    button.disabled = false;
+                }, 1000);
+            }
+        }
+
+        // 液態玻璃交互效果
+        function initLiquidGlassEffect() {
+            const cards = document.querySelectorAll('.liquid-glass');
+            
+            cards.forEach(card => {
+                const handleMove = (e) => {
+                    const rect = card.getBoundingClientRect();
+                    const x = ((e.clientX - rect.left) / rect.width) * 100;
+                    const y = ((e.clientY - rect.top) / rect.height) * 100;
+                    card.style.setProperty('--x', `${x}%`);
+                    card.style.setProperty('--y', `${y}%`);
+                    card.style.setProperty('--opacity', '1');
+                };
+
+                const handleLeave = () => {
+                    card.style.setProperty('--opacity', '0.8');
+                };
+
+                card.addEventListener('mousemove', handleMove);
+                card.addEventListener('mouseleave', handleLeave);
+            });
+        }
+
+        // 用戶頭像功能
+        function showUserProfile() {
+            // 使用動態導入來避免模組問題
+            import('./js/userInfoDisplay.js').then(module => {
+                module.userInfoDisplay.showUserProfile();
+            }).catch(error => {
+                console.error('顯示用戶資料失敗:', error);
+                alert('無法載入用戶資料');
+            });
+        }
+
+        // 更新用戶資訊顯示
+        function updateUserInfoDisplay() {
+            // 使用動態導入來避免模組問題
+            import('./js/userInfoDisplay.js').then(module => {
+                module.userInfoDisplay.updateDisplay();
+            }).catch(error => {
+                console.error('更新用戶資訊顯示失敗:', error);
+                const userInfoDisplay = document.getElementById('user-info-display');
+                if (userInfoDisplay) {
+                    userInfoDisplay.textContent = '載入中...';
+                }
+            });
+        }
+
+        // 登出功能
+        async function logout() {
+            if (confirm('確定要登出嗎？')) {
+                try {
+                    // 保存學習時間到Firebase
+                    if (window.learningTimeService && window.learningTimeService.isInitialized) {
+                        console.log('正在保存學習時間...');
+                        await window.learningTimeService.handleLogout();
+                    }
+                    
+                    // 清除本地儲存
+                    localStorage.removeItem('pbls_user');
+                    localStorage.removeItem('pbls_user_profile');
+                    
+                    console.log('用戶已登出');
+                
+                    // 跳轉到登入頁面
+                    window.location.href = 'login.html';
+                } catch (error) {
+                    console.error('登出過程中發生錯誤:', error);
+                    alert('登出時發生錯誤，請重試');
+                }
+            }
+        }
+    </script>
+    
+    <!-- 載入增強的語言管理器 -->
+    <script type="module">
+        import './src/js/enhanced-language-manager.js';
+    </script>
+</body>
+</html>

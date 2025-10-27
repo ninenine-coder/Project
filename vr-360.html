@@ -26,6 +26,29 @@
       z-index:100;
     }
     #desktopHint.show{opacity:1}
+    
+    /* 全螢幕模式字幕樣式 */
+    :fullscreen #subtitleContainer,
+    :-webkit-full-screen #subtitleContainer,
+    :-moz-full-screen #subtitleContainer,
+    :-ms-fullscreen #subtitleContainer {
+      position: fixed !important;
+      z-index: 999999999 !important;
+      bottom: 30px !important;
+      display: block !important;
+    }
+    
+    /* 確保全螢幕時字幕文字可見 */
+    :fullscreen #subtitleText,
+    :-webkit-full-screen #subtitleText,
+    :-moz-full-screen #subtitleText,
+    :-ms-fullscreen #subtitleText {
+      background: rgba(0, 0, 0, 0.8) !important;
+      font-size: 18px !important;
+      padding: 12px 24px !important;
+      border: 2px solid rgba(255, 255, 255, 0.3) !important;
+    }
+    
   </style>
 </head>
 <body>
@@ -109,6 +132,34 @@
     </a-entity>
   </a-scene>
 
+  <!-- 自定義字幕容器 -->
+  <div id="subtitleContainer" style="
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 999999999;
+    pointer-events: none;
+    max-width: 90%;
+    text-align: center;
+    width: 100%;
+  ">
+    <div id="subtitleText" style="
+      background: rgba(0, 0, 0, 0.7);
+      color: white;
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-size: 16px;
+      font-family: 'Microsoft JhengHei', 'Noto Sans TC', sans-serif serif;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      white-space: normal;
+      word-wrap: break-word;
+      max-width: 600px;
+      margin: 0 auto;
+    "></div>
+  </div>
 
   <script>
     const video = document.getElementById('vid');
@@ -120,13 +171,48 @@
   const desktopCursor = document.getElementById('desktopCursor');
   const clickToStart = document.getElementById('clickToStart');
   const clickToReplay = document.getElementById('clickToReplay');
+  const subtitleText = document.getElementById('subtitleText');
   const SRC = './assets/360/hls-master/index.m3u8';
+
+  // 字幕資料 - 時間格式：00:03:10.000 = 0分3秒10毫秒
+  const subtitles = [
+    { start: 3.10, end: 4.20, text: "林口長庚急診您好!" },
+    { start: 4.20, end: 7.00, text: "學姊好，這裡是救護車。" },
+    { start: 7.00, end: 10.20, text: "一名OHCA五歲男童上午十點於游泳池溺水" },
+    { start: 10.20, end: 12.00, text: "報案時已無意識" },
+    { start: 12.00, end: 15.20, text: "十點零三分到達現場立刻執行CPR" },
+    { start: 15.20, end: 17.18, text: "目前尚未有ROSC" },
+    { start: 17.18, end: 18.28, text: "有做什麼處置嗎?" },
+    { start: 19.05, end: 22.10, text: "已建立airway持續給氧，SpO2無法偵測。" },
+    { start: 22.11, end: 26.19, text: "並建立IV給藥途徑，給予Epinephrine一隻0.5毫克。" },
+    { start: 26.20, end: 28.00, text: "好，什麼時候到?" },
+    { start: 28.00, end: 30.22, text: "預估兩分鐘後送至林口長庚急診室" },
+    { start: 30.29, end: 31.28, text: "好，收到。" }
+  ];
 
   let isVRMode = false;
   let videoReady = false;
   let mouseDownPos = null;
   let isDragging = false;
   let isPracticeMode = false; // 檢查是否為練習模式
+  let currentSubtitle = null;
+
+  // 字幕更新函數
+  function updateSubtitle() {
+    if (!video || !subtitleText) return;
+    
+    const currentTime = video.currentTime; // 保持秒為單位
+    const subtitle = subtitles.find(sub => currentTime >= sub.start && currentTime <= sub.end);
+    
+    if (subtitle && subtitle !== currentSubtitle) {
+      currentSubtitle = subtitle;
+      subtitleText.textContent = subtitle.text;
+      subtitleText.style.opacity = '1';
+    } else if (!subtitle && currentSubtitle) {
+      currentSubtitle = null;
+      subtitleText.style.opacity = '0';
+    }
+  }
 
   // 0) 檢查URL參數，如果從練習模擬進入則禁用重播功能
   const urlParams = new URLSearchParams(window.location.search);
@@ -204,6 +290,70 @@
   }
   video.addEventListener('canplay', showPlay);
   video.addEventListener('canplaythrough', showPlay);
+  
+  // 添加字幕時間監聽器
+  video.addEventListener('timeupdate', updateSubtitle);
+  
+  // 強制確保字幕容器可見
+  function ensureSubtitleVisible() {
+    const subtitleContainer = document.getElementById('subtitleContainer');
+    if (subtitleContainer) {
+      subtitleContainer.style.display = 'block';
+      subtitleContainer.style.zIndex = '999999999';
+      subtitleContainer.style.position = 'fixed';
+    }
+  }
+  
+  // 頁面載入時確保字幕可見
+  window.addEventListener('load', ensureSubtitleVisible);
+  
+  // 全螢幕事件監聽器
+  document.addEventListener('fullscreenchange', handleFullscreenChange);
+  document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
+  document.addEventListener('mozfullscreenchange', handleFullscreenChange);
+  document.addEventListener('MSFullscreenChange', handleFullscreenChange);
+  
+  let wasPlayingBeforeFullscreen = false;
+  let currentTimeBeforeFullscreen = 0;
+  
+  function handleFullscreenChange() {
+    const isFullscreen = !!(document.fullscreenElement || 
+                           document.webkitFullscreenElement || 
+                           document.mozFullScreenElement || 
+                           document.msFullscreenElement);
+    
+    if (isFullscreen) {
+      // 進入全螢幕：記錄當前播放狀態
+      wasPlayingBeforeFullscreen = !video.paused;
+      currentTimeBeforeFullscreen = video.currentTime;
+      
+      // 全螢幕模式：調整字幕位置和樣式
+      subtitleText.style.fontSize = '18px';
+      subtitleText.style.padding = '12px 24px';
+      subtitleText.style.background = 'rgba(0, 0, 0, 0.8)';
+      subtitleText.style.border = '2px solid rgba(255, 255, 255, 0.3)';
+      
+      // 確保全螢幕時字幕容器可見
+      const subtitleContainer = document.getElementById('subtitleContainer');
+      if (subtitleContainer) {
+        subtitleContainer.style.display = 'block';
+        subtitleContainer.style.zIndex = '999999999';
+      }
+      
+    } else {
+      // 退出全螢幕：保持播放狀態連續
+      if (wasPlayingBeforeFullscreen && video.paused) {
+        // 如果進入全螢幕前在播放，退出後繼續播放
+        video.play().catch(e => console.log('播放失敗:', e));
+      }
+      
+      // 恢復原始樣式
+      subtitleText.style.fontSize = '16px';
+      subtitleText.style.padding = '8px 16px';
+      subtitleText.style.background = 'rgba(0, 0, 0, 0.7)';
+      subtitleText.style.border = 'none';
+    }
+  }
 
   // 4) 播放邏輯（支援桌面點擊和 VR 手把）
   function tryPlay(){

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>考試專區 - PBLS VR教學平台</title>
+    <title>測驗專區 - PBLS VR教學平台</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <!-- Glass System CSS -->
     <link rel="stylesheet" href="assets/css/glass-system.css">
@@ -67,7 +67,7 @@
             z-index: 1;
         }
 
-        /* 考試首頁容器不要再有背景色，以免被當成 backdrop 的"背景" */
+        /* 測驗首頁容器不要再有背景色，以免被當成 backdrop 的"背景" */
         .exam-homepage,
         .exam-options {
             background: transparent;
@@ -504,7 +504,7 @@
             padding-left: 200px; /* 侧边栏展开时，内容向右移动 */
         }
 
-        /* 考試專區首頁樣式 */
+        /* 測驗專區首頁樣式 */
         .exam-homepage {
             padding: 30px;
             min-height: calc(100vh - 180px);
@@ -673,27 +673,27 @@
             }
         }, true);
         
-        // 考試頁面特定錯誤處理
+        // 測驗頁面特定錯誤處理
         window.addEventListener('error', function(e) {
             if (e.target && e.target.tagName === 'IFRAME') {
-                console.warn('考試內容載入失敗:', e.target.src);
+                console.warn('測驗內容載入失敗:', e.target.src);
                 e.preventDefault();
                 return false;
             }
         }, true);
         
-        // 確保考試功能正常運作
+        // 確保測驗功能正常運作
         document.addEventListener('DOMContentLoaded', function() {
-            console.log('✅ 考試頁面已載入，錯誤處理已啟用');
+            console.log('✅ 測驗頁面已載入，錯誤處理已啟用');
             
             // 檢查關鍵元素是否存在
             const examContainer = document.getElementById('exam-container');
             const questionContainer = document.getElementById('question-container');
             
             if (examContainer) {
-                console.log('✅ 考試容器已找到');
+                console.log('✅ 測驗容器已找到');
             } else {
-                console.warn('⚠️ 考試容器未找到');
+                console.warn('⚠️ 測驗容器未找到');
             }
             
             if (questionContainer) {
@@ -729,7 +729,7 @@
             </div>
             <div class="sidebar-icon active" onclick="window.location.href='exam.html'">
                 <i class="fas fa-clipboard-list"></i>
-                <span>考試專區</span>
+                <span>測驗專區</span>
             </div>
             <div class="sidebar-icon" onclick="window.location.href='history.html'">
                 <i class="fas fa-chart-line"></i>
@@ -777,10 +777,10 @@
                 <i class="fas fa-vr-cardboard"></i> 360°實境教學影片，身臨其境的學習體驗
             </div>
             <div class="marquee-item">
-                <i class="fas fa-comments"></i> 虛擬人互動，提升急救溝通技巧
+                <i class="fas fa-comments"></i> 情境模擬對話，提升急救溝通技巧
             </div>
             <div class="marquee-item">
-                <i class="fas fa-gamepad"></i> VR實際操作，模擬真實急救情境
+                <i class="fas fa-gamepad"></i> VR操作測驗，模擬真實急救情境
             </div>
             <div class="marquee-item">
                 <i class="fas fa-chart-line"></i> 即時成績追蹤，掌握學習進度
@@ -794,12 +794,12 @@
 
     <!-- 主要內容區域 -->
     <div class="main-content">
-        <!-- 考試專區首頁內容 -->
+        <!-- 測驗專區首頁內容 -->
         <div class="exam-homepage" id="examHomepage">
-            <h1>考試專區</h1>
-            <p>選擇您要進行的考試類型</p>
+            <h1>測驗專區</h1>
+            <p>選擇您要進行的測驗類型</p>
             
-            <!-- 考試選項按鈕 -->
+            <!-- 測驗選項按鈕 -->
             <div class="exam-options">
                 <div class="liquid-glass">
                     <div class="liquid-content">
@@ -819,7 +819,7 @@
                         <div class="exam-icon">
                             <i class="fas fa-headset"></i>
                         </div>
-                        <h3>VR實際操作</h3>
+                        <h3>VR操作測驗</h3>
                         <p>虛擬實境環境中的急救操作測驗</p>
                         <button class="exam-btn" onclick="window.location.href='exam_vr.html'">
                             開始VR測驗

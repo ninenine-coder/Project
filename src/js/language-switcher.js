@@ -7,7 +7,7 @@ class LanguageSwitcher {
         menu: {
           info: '資訊',
           practice: '練習專區',
-          exam: '考試專區',
+          exam: '測驗專區',
           history: '歷史成績',
           team: '團隊'
         },
@@ -21,8 +21,8 @@ class LanguageSwitcher {
           marquee: {
             item1: '🎯 歡迎使用PBLS VR教學平台！',
             item2: '📚 360°實境教學影片，身臨其境的學習體驗',
-            item3: '🤖 虛擬人互動，提升急救溝通技巧',
-            item4: '🎮 VR實際操作，模擬真實急救情境',
+            item3: '🤖 情境模擬對話，提升急救溝通技巧',
+            item4: '🎮 VR操作測驗，模擬真實急救情境',
             item5: '📊 即時成績追蹤，掌握學習進度',
             item6: '💡 問題導向學習法，提升急救技能'
           },
@@ -119,13 +119,13 @@ class LanguageSwitcher {
           practice: {
             pageTitle: '練習專區 - PBLS VR教學平台',
             title: '練習專區',
-            description: '這裡提供 360° 實境教學影片與虛擬人互動學習。',
+            description: '這裡提供 360° 實境教學影片與情境模擬對話學習。',
             videoSection: {
               title: '360° 實境教學影片',
               description: '觀看高品質的360度影片，體驗身臨其境的急救情境'
             },
             virtualHumanSection: {
-              title: '虛擬人互動',
+              title: '情境模擬對話',
               description: '與AI驅動的虛擬患者進行對話練習，提升溝通技巧'
             }
           },
@@ -139,8 +139,8 @@ class LanguageSwitcher {
             marquee: {
               item1: '🎯 歡迎使用PBLS VR教學平台！',
               item2: '📚 360°實境教學影片，身臨其境的學習體驗',
-              item3: '🤖 虛擬人互動，提升急救溝通技巧',
-              item4: '🎮 VR實際操作，模擬真實急救情境',
+              item3: '🤖 情境模擬對話，提升急救溝通技巧',
+              item4: '🎮 VR操作測驗，模擬真實急救情境',
               item5: '📊 即時成績追蹤，掌握學習進度',
               item6: '💡 問題導向學習法，提升急救技能'
             },
