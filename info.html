@@ -743,6 +743,126 @@
             flex: 1;
         }
 
+        /* 知識內容樣式 */
+        .knowledge-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .knowledge-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            position: relative;
+        }
+
+        .knowledge-grid::before {
+            content: '';
+            position: absolute;
+            left: 50%;
+            top: 20px;
+            bottom: 20px;
+            width: 2px;
+            background: linear-gradient(to bottom, #8b5cf6, #667eea);
+            transform: translateX(-50%);
+            border-radius: 1px;
+        }
+
+        .knowledge-column {
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+
+        .knowledge-item {
+            background: rgba(248, 250, 252, 0.8);
+            border-radius: 10px;
+            padding: 20px;
+        }
+
+        .knowledge-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 15px;
+            text-align: justify;
+        }
+
+        .knowledge-subitem {
+            margin-bottom: 20px;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.6);
+            border-radius: 8px;
+        }
+
+        .subitem-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 10px;
+            text-align: justify;
+        }
+
+        .subitem-content {
+            color: #4b5563;
+            line-height: 1.7;
+            text-align: justify;
+        }
+
+        .subitem-content h5 {
+            font-size: 15px;
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 10px;
+            text-align: justify;
+        }
+
+        .knowledge-list {
+            margin: 15px 0;
+            padding-left: 20px;
+            text-align: justify;
+        }
+
+        .knowledge-list li {
+            margin-bottom: 8px;
+            line-height: 1.6;
+            color: #4b5563;
+            text-align: justify;
+        }
+
+        .subitem-content ol {
+            margin: 10px 0;
+            padding-left: 20px;
+            text-align: justify;
+        }
+
+        .subitem-content ol li {
+            margin-bottom: 8px;
+            line-height: 1.6;
+            text-align: justify;
+        }
+
+        .subitem-content p {
+            margin: 10px 0;
+            line-height: 1.6;
+            color: #6b7280;
+            font-style: italic;
+            text-align: justify;
+        }
+
+        /* 響應式設計 - 小螢幕時改為單欄 */
+        @media (max-width: 1024px) {
+            .knowledge-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+        }
+
         /* 響應式設計 */
         @media (max-width: 768px) {
             .sidebar {
@@ -936,6 +1056,136 @@
                         <i class="fas fa-info-circle" style="font-size: 48px; margin-bottom: 20px; color: #9c27b0;"></i>
                         <p style="font-size: 18px; font-weight: 600; color: #4a148c; margin-bottom: 15px;">PBLS 流程圖</p>
                         <p style="font-size: 14px; line-height: 1.6;">流程圖內容將在後續版本中提供</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 兒童基礎救命術知識內容 -->
+            <section class="section section-white">
+                <h2 class="section-title">PBLS觀念釐清</h2>
+                
+                <div class="knowledge-content">
+                    <div class="knowledge-grid">
+                        <!-- 左欄 -->
+                        <div class="knowledge-column">
+                            <div class="knowledge-item">
+                                <h3 class="knowledge-title">學習目標</h3>
+                                <ul class="knowledge-list">
+                                    <li>熟悉 PBLS 的執行方式</li>
+                                    <li>熟悉高品質兒童心肺復甦術的進行</li>
+                                    <li>熟悉兒童自動體外電擊器的使用</li>
+                                </ul>
+                            </div>
+
+                            <div class="knowledge-item">
+                                <h3 class="knowledge-title">一、執行重點</h3>
+                                
+                                <div class="knowledge-subitem">
+                                    <h4 class="subitem-title">A. 定義</h4>
+                                    <div class="subitem-content">
+                                        <h5>嬰兒(infant)、兒童(child)及成人(adult)之分類：</h5>
+                                        <ol>
+                                            <li>嬰兒指南適用於1歲以下之年齡。</li>
+                                            <li>兒童指南適用於一歲以上至青春期以下之年齡層(青春期定義: 男性:可見腋毛,女性:胸部發育)。</li>
+                                            <li>成人基礎生命支持指南適用於青春期以上之年齡。</li>
+                                        </ol>
+                                    </div>
+                                </div>
+
+                                <div class="knowledge-subitem">
+                                    <h4 class="subitem-title">B. CPR 順序</h4>
+                                    <div class="subitem-content">
+                                        <ol>
+                                            <li>胸部按壓(C)→氣道(A)→呼吸(B)。</li>
+                                            <li>兒童的施救必須合併通氣及心臟按壓。</li>
+                                        </ol>
+                                    </div>
+                                </div>
+
+                                <div class="knowledge-subitem">
+                                    <h4 class="subitem-title">C. 胸部按壓</h4>
+                                    <div class="subitem-content">
+                                        <ol>
+                                            <li>面對嬰幼兒,單獨的施救者(不論是非專業施救者或是醫護人員)應該以兩指頭按壓胸骨(兩乳頭連線下)。</li>
+                                            <li>對於孩童,因個案與施救者各有不同大小的身型,故施救者可以自行選擇單手雙手掌根進行胸部按壓。</li>
+                                        </ol>
+                                    </div>
+                                </div>
+
+                                <div class="knowledge-subitem">
+                                    <h4 class="subitem-title">D. 打開呼吸道</h4>
+                                    <div class="subitem-content">
+                                        <ol>
+                                            <li>無論創傷或非創傷的患者均可使用壓額提下巴法打開呼吸道。</li>
+                                            <li>在有2位訓練有素的施救者在場狀況下,若懷疑病人有脊髓外傷,建議使用推下顎法(jaw thrust)取代壓額提下巴法打開呼吸道。</li>
+                                        </ol>
+                                    </div>
+                                </div>
+
+                                <div class="knowledge-subitem">
+                                    <h4 class="subitem-title">E. 人工呼吸</h4>
+                                    <div class="subitem-content">
+                                        <ol>
+                                            <li>若無法有效同時密封嬰幼兒的口鼻,就考慮口對口或口對鼻人工呼吸。</li>
+                                            <li>當給予人工呼吸時,需確認胸部起伏。</li>
+                                        </ol>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 右欄 -->
+                        <div class="knowledge-column">
+                            <div class="knowledge-item">
+                                <h3 class="knowledge-title">F. 單人施救</h3>
+                                <div class="subitem-content">
+                                    <ol>
+                                        <li>確認現場安全。</li>
+                                        <li>個案無反應時,大聲呼救或以行動裝置啟動緊急救援系統(119)。</li>
+                                        <li>10秒鐘以內同時檢查脈搏與呼吸。</li>
+                                        <li>無正常呼吸但有脈搏>50下/分鐘:給予每分鐘12-20次呼吸,每兩分鐘檢查一次脈搏。</li>
+                                        <li>無呼吸或僅有無效呼吸(gasping)且無脈搏:若有人目睹突然倒下,則須立即啟動緊急救援系統119且取得自動去顫器 AED。否則立即開始胸部按壓30下→人工呼吸2次循環,2分鐘後仍無脈搏,則須立即啟動緊急救援系統 119且取得自動去顫器 AED。</li>
+                                    </ol>
+                                </div>
+                            </div>
+
+                            <div class="knowledge-item">
+                                <h3 class="knowledge-title">G. 雙人施救</h3>
+                                <div class="subitem-content">
+                                    <ol>
+                                        <li>確認現場安全。</li>
+                                        <li>個案無反應時,一位施救者留在個案旁邊,另一位立即啟動緊急救援系統 119且取得自動去顫器 AED。</li>
+                                        <li>10秒鐘以內同時檢查脈搏與呼吸。</li>
+                                        <li>無正常呼吸但有脈搏>60下/分鐘:給予每分鐘12-20次呼吸,每兩分鐘檢查一次脈搏。</li>
+                                        <li>無呼吸或僅有無效呼吸(gasping)且無脈搏:立即開始胸部按壓30下→人工呼吸2次循環(30:2胸部按壓吹氣比),第二施救者到達時則改為(15:2胸部按壓吹氣比),並使用自動去顫器AED。</li>
+                                    </ol>
+                                </div>
+                            </div>
+
+                            <div class="knowledge-item">
+                                <h3 class="knowledge-title">二、高品質的心肺復甦術</h3>
+                                <div class="subitem-content">
+                                    <ol>
+                                        <li>C-A-B</li>
+                                        <li>胸部按壓速率每分鐘100-120下。</li>
+                                        <li>對孩童(一個月大到青春期)的按壓深度,應至少達胸壁前後徑的1/3。嬰幼兒約為4公分;孩童約為5公分;青春期以後則與成人相同為5-6公分。</li>
+                                        <li>每次胸部按壓後,需要讓胸部有完全地回彈。因為足夠的胸部擴張才能讓血流回流至心臟,再壓送到身體其它各處。</li>
+                                        <li>提供通氣時,儘量減少中斷胸部按壓。</li>
+                                        <li>避免過度換氣。選擇適當的通氣強度及潮氣容積,恰好能使胸部有起伏即可。</li>
+                                    </ol>
+                                </div>
+                            </div>
+
+                            <div class="knowledge-item">
+                                <h3 class="knowledge-title">三、兒童自動體外電擊器的使用</h3>
+                                <div class="knowledge-subitem">
+                                    <h4 class="subitem-title">A. 辨別心臟驟停原因</h4>
+                                    <div class="subitem-content">
+                                        <p>詳細內容將在後續版本中提供</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </section>
