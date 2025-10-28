@@ -55,10 +55,9 @@
             .global-bg { display: none; }
         }
 
-        /* 顶部间距变量 */
         :root {
-            --masthead-h: 80px;                /* 顶部导航栏高度 */
-            --section-gap: 60px;               /* 额外上方留白 */
+            --masthead-h: 80px;                
+            --section-gap: 60px;               
         }
 
         /* 最上層內容 z-index 拉高一點，確保在 .global-bg 之上 */
@@ -860,6 +859,53 @@
             }
         }
 
+        .history-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .header-content {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .header-content h2 {
+            margin: 0;
+            color: #667eea;
+            font-size: 1.8rem;
+            font-weight: 600;
+        }
+
+        .filter-container {
+            display: flex;
+            align-items: center;
+        }
+
+        .test-type-filter {
+            padding: 0.5rem 1rem;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background: white;
+            font-size: 0.9rem;
+            color: #333;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            min-width: 120px;
+        }
+
+        .test-type-filter:hover {
+            border-color: #667eea;
+        }
+
+        .test-type-filter:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.2);
+        }
+
         .export-btn-small {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
@@ -1304,9 +1350,9 @@
                             <i class="fas fa-clock"></i>
                         </div>
                         <h3 id="totalTime">總學習時間</h3>
-                        <p id="totalTimeValue">0 分鐘</p>
+                        <p id="totalTimeValue">0秒</p>
                         <div class="stats-info">
-                            <span id="averageTime">平均時間: 0 分鐘</span>
+                            <span id="averageTime">平均時間: 0秒</span>
                         </div>
                     </div>
                 </div>
@@ -1314,12 +1360,22 @@
 
             <!-- 成績列表 -->
             <div class="history-section">
-                <div class="history-header">
+            <div class="history-header">
+                <div class="header-content">
                     <h2>成績記錄</h2>
                     <button class="export-btn-small" onclick="exportScores()">
                         <i class="fas fa-download"></i> 匯出成績
                     </button>
                 </div>
+                <div class="filter-container">
+                    <select id="testTypeFilter" class="test-type-filter" onchange="filterScores()">
+                        <option value="all">全部</option>
+                        <option value="模擬對話情境">模擬對話情境</option>
+                        <option value="VR操作測驗">VR操作測驗</option>
+                        <option value="筆試測驗">筆試測驗</option>
+                    </select>
+                </div>
+            </div>
                 <div id="historyList" class="history-list">
                     <div class="loading-message">
                         <i class="fas fa-spinner fa-spin"></i> 載入成績中...
@@ -1661,6 +1717,22 @@
         // 歷史成績功能
         let historyScores = [];
         
+        // 篩選成績功能
+        function filterScores() {
+            const filterValue = document.getElementById('testTypeFilter').value;
+            let filteredScores = historyScores;
+            
+            if (filterValue !== 'all') {
+                filteredScores = historyScores.filter(score => {
+                    const examType = score.examType || '筆試測驗';
+                    return examType === filterValue;
+                });
+            }
+            
+            displayHistoryScores(filteredScores);
+            updateStatistics(filteredScores);
+        }
+        
         // 載入歷史成績
         async function loadHistoryScores() {
             try {
@@ -1728,6 +1800,9 @@
                 displayHistoryScores(historyScores);
                 updateStatistics(historyScores);
                 
+                // 進行篩選
+                filterScores();
+                
             } catch (error) {
                 console.error('❌ 載入歷史成績失敗:', error);
                 
@@ -1751,6 +1826,10 @@
                 displayHistoryScores(formattedScores);
                 updateStatistics(formattedScores);
                 
+                // 儲存到全域變數並進行篩選
+                historyScores = formattedScores;
+                filterScores();
+                
             } catch (error) {
                 console.error('❌ 載入本地成績失敗:', error);
                 displayNoScores();
@@ -1767,20 +1846,57 @@
           }
           
             const historyHTML = scores.map(score => {
-                // 正確處理 Firestore Timestamp 對象
+                // 正確處理時間顯示
                 let date;
                 try {
-                    if (score.submittedAt && typeof score.submittedAt.toDate === 'function') {
-                        // Firestore Timestamp 對象
-                        date = score.submittedAt.toDate().toLocaleString('zh-TW');
-                    } else if (score.submittedAt && score.submittedAt.seconds) {
-                        // Firestore Timestamp 的 seconds 屬性
-                        date = new Date(score.submittedAt.seconds * 1000).toLocaleString('zh-TW');
-                    } else if (score.submittedAt) {
-                        // 普通日期字符串或 Date 對象
-                        date = new Date(score.submittedAt).toLocaleString('zh-TW');
+                    if (score.examType === 'VR操作測驗') {
+                        // VR操作測驗優先使用testDate和testTime
+                        if (score.testDate && score.testTime) {
+                            const userFilledDateTimeString = `${score.testDate} ${score.testTime}`;
+                            const userFilledDate = new Date(userFilledDateTimeString);
+                            
+                            if (!isNaN(userFilledDate.getTime())) {
+                                date = userFilledDate.toLocaleString('zh-TW');
+                            } else {
+                                console.warn('VR操作測驗：用戶填寫的日期時間無效，將使用提交時間。', userFilledDateTimeString);
+                                // 回退到submittedAt
+                                if (score.submittedAt && typeof score.submittedAt.toDate === 'function') {
+                                    date = score.submittedAt.toDate().toLocaleString('zh-TW');
+                                } else if (score.submittedAt && score.submittedAt.seconds) {
+                                    date = new Date(score.submittedAt.seconds * 1000).toLocaleString('zh-TW');
+                                } else if (score.submittedAt) {
+                                    date = new Date(score.submittedAt).toLocaleString('zh-TW');
+                                } else {
+                                    date = '未知日期';
+                                }
+                            }
+                        } else {
+                            // 如果testDate或testTime缺失，則使用submittedAt
+                            console.warn('VR操作測驗：testDate或testTime缺失，將使用提交時間。', score.testDate, score.testTime);
+                            if (score.submittedAt && typeof score.submittedAt.toDate === 'function') {
+                                date = score.submittedAt.toDate().toLocaleString('zh-TW');
+                            } else if (score.submittedAt && score.submittedAt.seconds) {
+                                date = new Date(score.submittedAt.seconds * 1000).toLocaleString('zh-TW');
+                            } else if (score.submittedAt) {
+                                date = new Date(score.submittedAt).toLocaleString('zh-TW');
+                            } else {
+                                date = '未知日期';
+                            }
+                        }
                     } else {
-                        date = '未知日期';
+                        // 筆試測驗使用submittedAt
+                        if (score.submittedAt && typeof score.submittedAt.toDate === 'function') {
+                            // Firestore Timestamp 對象
+                            date = score.submittedAt.toDate().toLocaleString('zh-TW');
+                        } else if (score.submittedAt && score.submittedAt.seconds) {
+                            // Firestore Timestamp 的 seconds 屬性
+                            date = new Date(score.submittedAt.seconds * 1000).toLocaleString('zh-TW');
+                        } else if (score.submittedAt) {
+                            // 普通日期字符串或 Date 對象
+                            date = new Date(score.submittedAt).toLocaleString('zh-TW');
+                        } else {
+                            date = '未知日期';
+                        }
                     }
                 } catch (error) {
                     console.error('日期格式化錯誤:', error, score.submittedAt);
@@ -1799,7 +1915,7 @@
                             <h4>${score.examType || '筆試測驗'} ${localBadge}</h4>
                             <div class="history-details">
                                 <span><i class="fas fa-calendar"></i> ${date}</span>
-                                <span><i class="fas fa-clock"></i> ${timeSpent} 分鐘</span>
+                                <span><i class="fas fa-clock"></i> ${timeSpent}</span>
                                 <span><i class="fas fa-check-circle"></i> ${score.examType === 'VR操作測驗' ? 
                                     (score.progressPercentage !== undefined ? `${score.progressPercentage}%` : '未知%') : 
                                     `${score.correctCount || 0}/${score.questionCount || 0} 題`}</span>
@@ -1885,17 +2001,52 @@
             const csvContent = [
                 '日期時間,用戶,分數,正確題數,總題數,耗時(分鐘),測驗類型',
                 ...historyScores.map(score => {
-                    // 正確處理 Firestore Timestamp 對象
+                    // 正確處理時間顯示
                     let date;
                     try {
-                        if (score.submittedAt && typeof score.submittedAt.toDate === 'function') {
-                            date = score.submittedAt.toDate().toLocaleString('zh-TW');
-                        } else if (score.submittedAt && score.submittedAt.seconds) {
-                            date = new Date(score.submittedAt.seconds * 1000).toLocaleString('zh-TW');
-                        } else if (score.submittedAt) {
-                            date = new Date(score.submittedAt).toLocaleString('zh-TW');
+                        if (score.examType === 'VR操作測驗') {
+                            // VR操作測驗優先使用testDate和testTime
+                            if (score.testDate && score.testTime) {
+                                const userFilledDateTimeString = `${score.testDate} ${score.testTime}`;
+                                const userFilledDate = new Date(userFilledDateTimeString);
+                                
+                                if (!isNaN(userFilledDate.getTime())) {
+                                    date = userFilledDate.toLocaleString('zh-TW');
+                                } else {
+                                    // 回退到submittedAt
+                                    if (score.submittedAt && typeof score.submittedAt.toDate === 'function') {
+                                        date = score.submittedAt.toDate().toLocaleString('zh-TW');
+                                    } else if (score.submittedAt && score.submittedAt.seconds) {
+                                        date = new Date(score.submittedAt.seconds * 1000).toLocaleString('zh-TW');
+                                    } else if (score.submittedAt) {
+                                        date = new Date(score.submittedAt).toLocaleString('zh-TW');
+                                    } else {
+                                        date = '未知日期';
+                                    }
+                                }
+                            } else {
+                                // 如果testDate或testTime缺失，則使用submittedAt
+                                if (score.submittedAt && typeof score.submittedAt.toDate === 'function') {
+                                    date = score.submittedAt.toDate().toLocaleString('zh-TW');
+                                } else if (score.submittedAt && score.submittedAt.seconds) {
+                                    date = new Date(score.submittedAt.seconds * 1000).toLocaleString('zh-TW');
+                                } else if (score.submittedAt) {
+                                    date = new Date(score.submittedAt).toLocaleString('zh-TW');
+                                } else {
+                                    date = '未知日期';
+                                }
+                            }
                         } else {
-                            date = '未知日期';
+                            // 筆試測驗使用submittedAt
+                            if (score.submittedAt && typeof score.submittedAt.toDate === 'function') {
+                                date = score.submittedAt.toDate().toLocaleString('zh-TW');
+                            } else if (score.submittedAt && score.submittedAt.seconds) {
+                                date = new Date(score.submittedAt.seconds * 1000).toLocaleString('zh-TW');
+                            } else if (score.submittedAt) {
+                                date = new Date(score.submittedAt).toLocaleString('zh-TW');
+                            } else {
+                                date = '未知日期';
+                            }
                         }
                     } catch (error) {
                         date = '日期錯誤';
