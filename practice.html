@@ -527,6 +527,10 @@
             min-height: calc(100vh - 100px);
         }
 
+        .main-content.no-marquee {
+            margin-top: 48px;
+        }
+
         .sidebar:hover ~ .main-content {
             padding-left: 200px; /* 侧边栏展开时，内容向右移动 */
         }
@@ -826,20 +830,23 @@
         }
 
         .back-btn {
-            background: #6c757d;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 20px;
-            font-size: 14px;
+            background: rgba(99, 102, 241, 0.12);
+            color: #4f46e5;
+            border: 2px solid rgba(99, 102, 241, 0.3);
+            padding: 12px 26px;
+            border-radius: 28px;
+            font-size: 15px;
+            font-weight: 600;
             cursor: pointer;
             transition: all 0.3s ease;
-            margin-bottom: 20px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
         }
 
         .back-btn:hover {
-            background: #5a6268;
-            transform: translateY(-2px);
+            background: rgba(99, 102, 241, 0.2);
+            transform: translateY(-1px);
         }
 
         .content-header h2 {
@@ -854,57 +861,169 @@
         }
 
         .content-footer {
-            text-align: center;
             margin-top: 40px;
             padding-top: 20px;
             border-top: 1px solid #e0e0e0;
         }
 
-        /* 情境選擇下拉選單樣式 */
-        .scenario-selector {
-            max-width: 600px;
-            margin: 40px auto;
+        .footer-actions {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .footer-primary .start-scenario-btn {
+            background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+            color: white;
+            border: none;
+            padding: 14px 36px;
+            border-radius: 999px;
+            font-size: 18px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            box-shadow: 0 18px 35px rgba(34, 197, 94, 0.25);
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .footer-primary .start-scenario-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 22px 42px rgba(21, 128, 61, 0.3);
+        }
+
+        .footer-primary .start-scenario-btn i {
+            font-size: 18px;
+        }
+
+        .footer-actions.single {
+            gap: 0;
+        }
+
+        /* 情境模擬看板樣式 */
+        .scenario-board {
+            max-width: 980px;
+            margin: 0 auto 32px;
+        }
+
+        .scenario-board-banner {
+            padding: 0 24px 28px;
             text-align: center;
         }
 
-        .selector-container {
-            background: var(--glass-bg);
-            -webkit-backdrop-filter: saturate(160%) blur(var(--glass-blur));
-            backdrop-filter: saturate(160%) blur(var(--glass-blur));
-            border: 1px solid var(--glass-border);
-            border-radius: var(--glass-radius);
-            box-shadow: var(--glass-shadow);
-            padding: 30px;
+        .scenario-board-banner h2 {
+            margin: 0;
+            font-size: 30px;
+            letter-spacing: 4px;
+            color: #1f2937;
+            font-weight: 800;
         }
 
-        .selector-label {
-            display: block;
-            font-size: 18px;
-            font-weight: 600;
-            color: #2c3e50;
-            margin-bottom: 15px;
+        .scenario-board-banner p {
+            margin: 12px auto 0;
+            max-width: 620px;
+            color: #475569;
+            font-size: 15px;
+            line-height: 1.6;
         }
 
-        .scenario-select {
-            width: 100%;
-            max-width: 400px;
-            padding: 12px 20px;
-            border: 2px solid #e0e0e0;
-            border-radius: 25px;
-            font-size: 16px;
-            background: transparent;
+        .scenario-grid {
+            display: grid;
+            grid-template-columns: repeat(6, minmax(0, 1fr));
+            gap: 18px;
+            padding: 24px 20px 30px;
+            max-width: 1120px;
+            margin: 0 auto;
+            align-items: stretch;
+        }
+
+        .scenario-card {
+            grid-column: span 2;
+            display: flex;
+            flex-direction: column;
+            border-radius: 18px;
+            background: linear-gradient(145deg, rgba(255, 255, 255, 0.9), rgba(241, 245, 249, 0.95));
+            box-shadow: 0 14px 30px rgba(15, 23, 42, 0.12);
+            border: 2px solid transparent;
             cursor: pointer;
-            transition: all 0.3s ease;
+            overflow: hidden;
+            transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
         }
 
-        .scenario-select:focus {
+        .scenario-card:nth-child(4) {
+            grid-column: 2 / span 2;
+        }
+
+        .scenario-card:nth-child(5) {
+            grid-column: 4 / span 2;
+        }
+
+        .scenario-card.active,
+        .scenario-card:hover {
+            transform: translateY(-4px);
+            border-color: rgba(59, 130, 246, 0.4);
+            box-shadow: 0 26px 48px rgba(37, 99, 235, 0.16);
+        }
+
+        .scenario-card:focus {
             outline: none;
-            border-color: #667eea;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.22);
         }
 
-        .scenario-select:hover {
-            border-color: #667eea;
+        .scenario-card-image {
+            position: relative;
+            width: 100%;
+            height: 180px;
+            overflow: hidden;
+        }
+
+        .scenario-card-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.3s ease;
+        }
+
+        .scenario-card:hover .scenario-card-image img {
+            transform: scale(1.05);
+        }
+
+        .scenario-card-body {
+            padding: 16px 18px 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            flex: 1;
+        }
+
+        .scenario-card-body h3 {
+            margin: 0;
+            font-size: 17px;
+            color: #0f172a;
+            font-weight: 700;
+            letter-spacing: 0.6px;
+        }
+
+        .scenario-card-body p {
+            margin: 0;
+            font-size: 13px;
+            color: #334155;
+            line-height: 1.55;
+        }
+
+        .scenario-card-body span {
+            display: none;
+        }
+
+        .scenario-detail-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            justify-content: center;
+            align-items: center;
         }
 
         /* 單一情境詳細內容樣式 */
@@ -1119,6 +1238,10 @@
                 padding-left: 80px; /* 内容从侧边栏右边开始 */
             }
 
+            .main-content.no-marquee {
+                margin-top: 36px;
+            }
+
             .sidebar:hover ~ .main-content {
                 padding-left: 160px; /* 侧边栏展开时，内容向右移动 */
             }
@@ -1169,12 +1292,39 @@
                 height: 250px;
             }
 
-            .selector-container {
-                padding: 20px;
+            .scenario-board {
+                margin: 0 auto 24px;
             }
 
-            .scenario-select {
-                max-width: 100%;
+            .scenario-board-banner {
+                padding: 0 18px 24px;
+            }
+
+            .scenario-grid {
+                padding: 24px 12px 32px;
+                gap: 18px;
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+
+            .scenario-card {
+                grid-column: span 2 !important;
+                grid-template-columns: 1fr;
+                padding: 18px;
+            }
+
+            .scenario-card-image {
+                height: 200px;
+            }
+
+            .footer-actions {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .footer-actions .back-btn,
+            .footer-primary .start-scenario-btn {
+                width: 100%;
+                justify-content: center;
             }
 
             .vr-player-container {
@@ -1452,23 +1602,57 @@
 
                 <!-- 情境模擬對話內容 -->
                 <div class="virtual-human-content content-container" id="virtualHumanContent" style="display: none;">
-                    <div class="content-header">
-                        <h2><i class="fas fa-comment-dots"></i> 情境模擬對話</h2>
-                            <p>虛擬醫護助手會描述情境模擬，請依照模擬狀況做出正確的應對措施</p>
+                    <div class="scenario-board" id="scenarioBoard">
+                        <div class="scenario-board-banner">
+                            <h2>情境模擬對話</h2>
+                            <p>從五大常見急救情境中選擇一個進入練習，透過對話式互動熟悉判斷流程與指令溝通。</p>
                         </div>
-                    
-                    <!-- 情境選擇下拉選單 -->
-                    <div class="scenario-selector">
-                        <div class="selector-container">
-                            <label for="scenarioSelect" class="selector-label">選擇情境模擬：</label>
-                            <select id="scenarioSelect" class="scenario-select" onchange="selectScenario()">
-                                <option value="">請選擇情境...</option>
-                                <option value="cardiac">心臟驟停</option>
-                                <option value="poisoning">食物中毒</option>
-                                <option value="drowning">溺水</option>
-                                <option value="fire">火災嗆傷</option>
-                                <option value="trauma">外傷</option>
-                            </select>
+                        <div class="scenario-grid">
+                            <button class="scenario-card" type="button" data-scenario="cardiac" onclick="enterScenarioDetail('cardiac')">
+                                <div class="scenario-card-image">
+                                    <img src="assets/心臟驟停情境.png" alt="心臟驟停情境圖片">
+                                </div>
+                                <div class="scenario-card-body">
+                                    <h3>心臟驟停</h3>
+                                    <p>孩童在家突然倒地無反應，你需要在黃金時間內下達指令讓團隊展開救援。</p>
+                                </div>
+                            </button>
+                            <button class="scenario-card" type="button" data-scenario="poisoning" onclick="enterScenarioDetail('poisoning')">
+                                <div class="scenario-card-image">
+                                    <img src="assets/食物中毒情境.png" alt="食物中毒情境圖片">
+                                </div>
+                                <div class="scenario-card-body">
+                                    <h3>食物中毒</h3>
+                                    <p>餐桌旁的孩子突然失去意識，觀察環境線索，判斷下一步的處置流程。</p>
+                                </div>
+                            </button>
+                            <button class="scenario-card" type="button" data-scenario="drowning" onclick="enterScenarioDetail('drowning')">
+                                <div class="scenario-card-image">
+                                    <img src="assets/溺水情境.png" alt="溺水情境圖片">
+                                </div>
+                                <div class="scenario-card-body">
+                                    <h3>溺水</h3>
+                                    <p>泳池救援後的緊急處置，考驗你對呼吸循環監測與團隊分工的指揮能力。</p>
+                                </div>
+                            </button>
+                            <button class="scenario-card" type="button" data-scenario="fire" onclick="enterScenarioDetail('fire')">
+                                <div class="scenario-card-image">
+                                    <img src="assets/火災嗆傷情境.png" alt="火災嗆傷情境圖片">
+                                </div>
+                                <div class="scenario-card-body">
+                                    <h3>火災嗆傷</h3>
+                                    <p>濃煙救出的兒童氧合不佳，掌握嗆傷病人處置重點，安定團隊與家屬。</p>
+                                </div>
+                            </button>
+                            <button class="scenario-card" type="button" data-scenario="trauma" onclick="enterScenarioDetail('trauma')">
+                                <div class="scenario-card-image">
+                                    <img src="assets/外傷情境.png" alt="外傷情境圖片">
+                                </div>
+                                <div class="scenario-card-body">
+                                    <h3>外傷</h3>
+                                    <p>事故造成的大量出血，檢查生命徵象並指示止血、評估與後續處置步驟。</p>
+                                </div>
+                            </button>
                             </div>
                             </div>
                     
@@ -1484,19 +1668,16 @@
                             <div class="scenario-detail-info">
                                 <h3 id="scenarioDetailTitle">情境標題</h3>
                                 <p id="scenarioDetailDescription">情境描述</p>
-                                <div class="scenario-detail-actions">
-                                    <button class="start-scenario-btn" onclick="startScenario()">
-                                        <i class="fas fa-play"></i> 開始情境模擬
-                                    </button>
-                                </div>
                             </div>
                         </div>
                     </div>
                     
                     <div class="content-footer">
+                        <div class="footer-actions single">
                         <button class="back-btn" onclick="goBackToHomepage()">
                             <i class="fas fa-arrow-left"></i> 返回練習專區
                         </button>
+                        </div>
             </div>
         </div>
     </div>
@@ -1627,6 +1808,21 @@
         });
 
         // 進入練習內容
+        function setMarqueeVisibility(isVisible) {
+            const marquee = document.querySelector('.marquee.glass-pill');
+            const mainContent = document.querySelector('.main-content');
+            if (marquee) {
+                marquee.style.display = isVisible ? 'flex' : 'none';
+            }
+            if (mainContent) {
+                if (isVisible) {
+                    mainContent.classList.remove('no-marquee');
+                } else {
+                    mainContent.classList.add('no-marquee');
+                }
+            }
+        }
+
         function enterPractice(practiceType) {
             const homepage = document.getElementById('practiceHomepage');
             const vrVideoContent = document.getElementById('vrVideoContent');
@@ -1637,9 +1833,12 @@
             
             // 根據類型顯示對應內容
             if (practiceType === 'vr-video') {
+                setMarqueeVisibility(false);
                 vrVideoContent.style.display = 'block';
             } else if (practiceType === 'virtual-human') {
+                setMarqueeVisibility(false);
                 virtualHumanContent.style.display = 'block';
+                resetScenarioSelection();
             }
         }
 
@@ -1655,6 +1854,8 @@
             
             // 顯示首頁
             homepage.style.display = 'block';
+            setMarqueeVisibility(true);
+            resetScenarioSelection();
         }
 
         // 情境資料
@@ -1663,81 +1864,129 @@
                 name: '心臟驟停',
                 image: 'assets/心臟驟停情境.png',
                 iconImage: 'assets/心臟驟停情境.png',
+                summary: '孩童在家突然倒地無反應，你需要在黃金時間內下達指令讓團隊展開救援。',
                 description: '傍晚18點30分，客廳忽然安靜下來，一位5歲、110公分、18公斤的男童倒地，毫無反應。現場做了急救措施，患者OHCA，家屬在外等待。你只需要說出「下一步要做什麼」處理方式，系統就會即時呈現團隊/旁人依你指令採取的處置與生理變化；你的目標，是把時間贏回來!'
             },
             'poisoning': {
                 name: '食物中毒',
                 image: 'assets/食物中毒情境.png',
                 iconImage: 'assets/食物中毒情境.png',
+                summary: '餐桌旁的孩子突然失去意識，觀察環境線索，判斷下一步的處置流程。',
                 description: '下午16點12分，5歲小孩（103公分／25公斤）在餐桌旁突然倒下，四周留有嘔吐物與食物殘渣。家人驚慌失措，患者OHCA，家屬在外等待。你只需要說出「下一步要做什麼」處理措施，系統就會即時呈現團隊/旁人依你指令採取的處置與生理變化；你的目標，是把時間贏回來!'
             },
             'drowning': {
                 name: '溺水',
                 image: 'assets/溺水情境.png',
                 iconImage: 'assets/溺水情境.png',
+                summary: '泳池救援後的緊急處置，考驗你對呼吸循環監測與團隊分工的指揮能力。',
                 description: '下午3點20分的游泳池旁傳來呼喊——5歲小孩（105公分／20公斤）被拉上岸時已無反應。患者OHCA，家屬在外等待。你只需要說出「下一步要做什麼」的處理措施，系統就會即時呈現團隊/旁人依你指令採取的處置與生理變化；你的目標，是把時間贏回來!'
             },
             'fire': {
                 name: '火災嗆傷',
                 image: 'assets/火災嗆傷情境.png',
                 iconImage: 'assets/火災嗆傷情境.png',
+                summary: '濃煙救出的兒童氧合不佳，掌握嗆傷病人處置重點，安定團隊與家屬。',
                 description: '文化三路住宅區發生一起火災，現場一位8歲兒童（125公分／27公斤）被推進急診，患者OHCA。你只需要說出「下一步要做什麼」的處理措施，系統就會即時呈現團隊/旁人依你指令採取的處置與生理變化；你的目標，是把時間贏回來!'
             },
             'trauma': {
                 name: '外傷',
                 image: 'assets/外傷情境.png',
                 iconImage: 'assets/外傷情境.png',
-                description: '下午16點12分，一位6歲男童（100公分／22公斤）因打碎玻璃造成明顯撕裂傷，血迅速滲透衣物；他意識模糊、哭喊聲微弱、四肢冰冷，經家人發現後急救並送往醫院。患者OHCA。你只需要說出「下一步要做什麼」處理措施，系統就會即時呈現團隊/旁人依你指令採取的處置與生理變化；你的目標，是把時間贏回來！!'
+                summary: '事故造成的大量出血，檢查生命徵象並指示止血、評估與後續處置步驟。',
+                description: '下午16點12分，一位6歲男童（100公分／22公斤）因打碎玻璃造成明顯撕裂傷，血迅速滲透衣物；他意識模糊、哭喊聲微弱、四肢冰冷，經家人發現後急救並送往醫院。患者OHCA。你只需要說出「下一步要做什麼」處理措施，系統就會即時呈現團隊/旁人依你指令採取的處置與生理變化；你的目標，是把時間贏回來!'
             }
         };
 
-        // 選擇情境
-        function selectScenario() {
-            const select = document.getElementById('scenarioSelect');
-            const scenarioType = select.value;
+        let currentScenarioType = '';
+
+        function resetScenarioSelection() {
             const scenarioDetail = document.getElementById('scenarioDetail');
-            
-            if (scenarioType) {
+            const scenarioBoard = document.getElementById('scenarioBoard');
+            currentScenarioType = '';
+            if (scenarioDetail) {
+                scenarioDetail.style.display = 'none';
+            }
+            if (scenarioBoard) {
+                scenarioBoard.style.display = 'block';
+            }
+            document.querySelectorAll('.scenario-card').forEach(card => card.classList.remove('active'));
+        }
+
+        function enterScenarioDetail(scenarioType) {
                 const scenario = scenarioData[scenarioType];
+            const scenarioDetail = document.getElementById('scenarioDetail');
+            const scenarioBoard = document.getElementById('scenarioBoard');
+
+            if (!scenario || !scenarioDetail || !scenarioBoard) {
+                resetScenarioSelection();
+                return;
+            }
+
+            currentScenarioType = scenarioType;
+            scenarioBoard.style.display = 'none';
+
+            const scenarioDetailTitle = document.getElementById('scenarioDetailTitle');
+            const scenarioDetailDescription = document.getElementById('scenarioDetailDescription');
+            const scenarioDetailImg = document.getElementById('scenarioDetailImg');
+            const iconElement = document.getElementById('scenarioDetailIcon');
                 
                 // 更新情境詳細內容
-                document.getElementById('scenarioDetailTitle').textContent = scenario.name;
-                document.getElementById('scenarioDetailDescription').textContent = scenario.description;
-                document.getElementById('scenarioDetailImg').src = scenario.image;
-                document.getElementById('scenarioDetailImg').alt = scenario.name;
+            scenarioDetailTitle.textContent = scenario.name;
+            scenarioDetailDescription.textContent = scenario.description;
+            scenarioDetailImg.style.display = 'block';
+            scenarioDetailImg.src = scenario.image;
+            scenarioDetailImg.alt = scenario.name;
                 
                 // 更新圖標為圖片
-                const iconElement = document.getElementById('scenarioDetailIcon');
-                iconElement.innerHTML = `<img src="${scenario.iconImage}" alt="${scenario.name}圖示" onerror="this.style.display='none'; this.parentElement.innerHTML='<i class=\'fas fa-heartbeat\'></i>';">`;
+            iconElement.style.display = 'none';
+            iconElement.innerHTML = `<img src="${scenario.iconImage}" alt="${scenario.name}圖示" onerror="this.style.display='none'; this.parentElement.innerHTML='<i class=&quot;fas fa-heartbeat&quot;></i>';">`;
                 
                 // 顯示情境詳細內容
                 scenarioDetail.style.display = 'block';
-            } else {
-                // 隱藏情境詳細內容
-                scenarioDetail.style.display = 'none';
+
+            // 更新卡片狀態
+            document.querySelectorAll('.scenario-card').forEach(card => {
+                card.classList.toggle('active', card.dataset.scenario === scenarioType);
+            });
+
+            scenarioDetail.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        function showScenarioBoard() {
+            resetScenarioSelection();
+            const scenarioBoard = document.getElementById('scenarioBoard');
+            if (scenarioBoard) {
+                scenarioBoard.scrollIntoView({ behavior: 'smooth', block: 'start' });
             }
         }
 
         // 開始情境模擬
-        function startScenario() {
-            const select = document.getElementById('scenarioSelect');
-            const scenarioType = select.value;
-            const scenario = scenarioData[scenarioType];
+        function startScenario(event) {
+            if (!currentScenarioType) {
+                alert('請先選擇情境模擬。');
+                return;
+            }
+
+            const scenario = scenarioData[currentScenarioType];
             
             if (scenario) {
                 // 顯示載入動畫
-                const button = event.target;
-                const originalText = button.innerHTML;
+                const button = event?.currentTarget || event?.target;
+                const originalText = button ? button.innerHTML : null;
+                if (button) {
                 button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 載入中...';
                 button.disabled = true;
+                }
                 
                 // 模擬載入過程
                 setTimeout(() => {
                     alert(`${scenario.name}情境模擬功能開發中，敬請期待！\n\n這將是一個AI驅動的虛擬情境模擬，讓您能夠：\n• 與虛擬患者進行真實對話\n• 練習醫療溝通技巧\n• 獲得即時反饋和建議\n• 提升專業溝通能力`);
                     
                     // 恢復按鈕狀態
+                    if (button && originalText !== null) {
                     button.innerHTML = originalText;
                     button.disabled = false;
+                    }
                 }, 1000);
             }
         }

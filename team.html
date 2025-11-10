@@ -277,11 +277,6 @@
             display: none !important;
         }
 
-        /* 跑馬燈暫停效果 */
-        .marquee:hover .marquee-content {
-            animation-play-state: paused;
-        }
-
         /* ===== 團隊頁面專用樣式 ===== */
 
         /* 側邊欄樣式 */
@@ -1038,13 +1033,16 @@
     </div>
 
     <!-- Glass System 跑馬燈 -->
-    <div class="marquee glass glass-pill glass--lighter" role="marquee" aria-label="最新公告">
-        <div class="marquee-content">
-            <div class="marquee-item">🎯 歡迎使用PBLS VR教學平台！</div>
-            <div class="marquee-item">📚 360°實境教學影片，身臨其境</div>
-            <div class="marquee-item">🤖 情境模擬對話，提升溝通技巧</div>
-            <div class="marquee-item">🎮 VR操作測驗，模擬真實急救情境</div>
+    <div class="marquee glass-pill" role="marquee" aria-label="最新公告">
+        <div class="marquee-track">
+            <div class="marquee-item"><i class="fas fa-bullhorn"></i> 歡迎使用PBLS VR教學平台！</div>
+            <div class="marquee-item"><i class="fas fa-vr-cardboard"></i> 360°實境教學影片，身臨其境的學習體驗</div>
+            <div class="marquee-item"><i class="fas fa-comments"></i> 情境模擬對話，提升急救溝通技巧</div>
+            <div class="marquee-item"><i class="fas fa-gamepad"></i> VR操作測驗，模擬真實急救情境</div>
+            <div class="marquee-item"><i class="fas fa-chart-line"></i> 即時成績追蹤，掌握學習進度</div>
+            <div class="marquee-item"><i class="fas fa-lightbulb"></i> 問題導向學習法，提升急救技能</div>
         </div>
+        <span class="pill-highlight" aria-hidden="true"></span>
     </div>
 
     <!-- 主要內容區域 -->
@@ -1298,7 +1296,7 @@
             <div class="team-member-card liquid-glass">
                 <div class="liquid-content">
                     <div class="cap-card">
-                        <div class="cap-3d" tabindex="0" role="button" aria-expanded="false" aria-label="查看致謝人員1資訊">
+                        <div class="cap-3d" tabindex="0" role="button" aria-expanded="false" aria-label="查看張玉喆資訊">
                             <div class="cap-face cap-front">
                                 <div class="bottle-cap" style="--cap-size: 180px; --cap-color:#f0e6ff; --cap-edge:#d9b3ff;">
                                     <div class="bottle-cap__face"></div>
@@ -1311,7 +1309,7 @@
                             </div>
                             <div class="cap-face cap-back">
                                 <div class="cap-back-inner">
-                                    <h4>致謝人員1</h4>
+                                    <h4>張玉喆</h4>
                                     <p class="title">特別致謝</p>
                                     <div class="contact">
                                         <a><i class="fas fa-envelope"></i> </a>
@@ -1320,7 +1318,7 @@
                                 </div>
                             </div>
                         </div>
-                        <h3 class="member-name">致謝人員1</h3>
+                        <h3 class="member-name">張玉喆</h3>
                         <p class="member-role">特別致謝</p>
                     </div>
                 </div>
@@ -1330,7 +1328,7 @@
             <div class="team-member-card liquid-glass">
                 <div class="liquid-content">
                     <div class="cap-card">
-                        <div class="cap-3d" tabindex="0" role="button" aria-expanded="false" aria-label="查看致謝人員2資訊">
+                        <div class="cap-3d" tabindex="0" role="button" aria-expanded="false" aria-label="查看楊鈺淇資訊">
                             <div class="cap-face cap-front">
                                 <div class="bottle-cap" style="--cap-size: 180px; --cap-color:#e6fff0; --cap-edge:#b3ffd9;">
                                     <div class="bottle-cap__face"></div>
@@ -1343,7 +1341,7 @@
                             </div>
                             <div class="cap-face cap-back">
                                 <div class="cap-back-inner">
-                                    <h4>致謝人員2</h4>
+                                    <h4>楊鈺淇</h4>
                                     <p class="title">特別致謝</p>
                                     <div class="contact">
                                         <a><i class="fas fa-envelope"></i> </a>
@@ -1352,7 +1350,7 @@
                                 </div>
                             </div>
                         </div>
-                        <h3 class="member-name">致謝人員2</h3>
+                        <h3 class="member-name">楊鈺淇</h3>
                         <p class="member-role">特別致謝</p>
                     </div>
                 </div>
@@ -1362,7 +1360,7 @@
             <div class="team-member-card liquid-glass">
                 <div class="liquid-content">
                     <div class="cap-card">
-                        <div class="cap-3d" tabindex="0" role="button" aria-expanded="false" aria-label="查看致謝人員3資訊">
+                        <div class="cap-3d" tabindex="0" role="button" aria-expanded="false" aria-label="查看許芳瑜資訊">
                             <div class="cap-face cap-front">
                                 <div class="bottle-cap" style="--cap-size: 180px; --cap-color:#fff6e6; --cap-edge:#ffe6b3;">
                                     <div class="bottle-cap__face"></div>
@@ -1375,7 +1373,7 @@
                             </div>
                             <div class="cap-face cap-back">
                                 <div class="cap-back-inner">
-                                    <h4>致謝人員3</h4>
+                                    <h4>許芳瑜</h4>
                                     <p class="title">特別致謝</p>
                                     <div class="contact">
                                         <a><i class="fas fa-envelope"></i> </a>
@@ -1384,7 +1382,7 @@
                                 </div>
                             </div>
                         </div>
-                        <h3 class="member-name">致謝人員3</h3>
+                        <h3 class="member-name">許芳瑜</h3>
                         <p class="member-role">特別致謝</p>
                     </div>
                 </div>
@@ -1394,7 +1392,7 @@
             <div class="team-member-card liquid-glass">
                 <div class="liquid-content">
                     <div class="cap-card">
-                        <div class="cap-3d" tabindex="0" role="button" aria-expanded="false" aria-label="查看致謝人員4資訊">
+                        <div class="cap-3d" tabindex="0" role="button" aria-expanded="false" aria-label="查看李芸萱資訊">
                             <div class="cap-face cap-front">
                                 <div class="bottle-cap" style="--cap-size: 180px; --cap-color:#e6f6ff; --cap-edge:#b3e6ff;">
                                     <div class="bottle-cap__face"></div>
@@ -1407,7 +1405,7 @@
                             </div>
                             <div class="cap-face cap-back">
                                 <div class="cap-back-inner">
-                                    <h4>致謝人員4</h4>
+                                    <h4>李芸萱</h4>
                                     <p class="title">特別致謝</p>
                                     <div class="contact">
                                         <a><i class="fas fa-envelope"></i> </a>
@@ -1416,7 +1414,7 @@
                                 </div>
                             </div>
                         </div>
-                        <h3 class="member-name">致謝人員4</h3>
+                        <h3 class="member-name">李芸萱</h3>
                         <p class="member-role">特別致謝</p>
                     </div>
                 </div>

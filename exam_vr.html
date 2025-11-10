@@ -58,7 +58,7 @@
         }
 
         /* 最上層內容 z-index 拉高一點，確保在 .global-bg 之上 */
-        #root, .main-content, .header, .marquee, .sidebar {
+        #root, .main-content, .header, .sidebar {
             position: relative;
             z-index: 1;
         }
@@ -264,80 +264,6 @@
 
         .logout-btn:hover {
             transform: scale(1.1);
-        }
-
-        /* 跑馬燈 */
-        .marquee.glass-pill {
-            position: fixed;
-            top: 80px;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 999;
-            height: 56px;
-            min-width: min(92vw, 1200px);
-            max-width: min(92vw, 1200px);
-            display: flex;
-            align-items: center;
-            padding: 0 26px;
-            border-radius: 9999px;
-            
-            background: rgba(255, 255, 255, 0.16);
-            -webkit-backdrop-filter: blur(18px) saturate(160%);
-            backdrop-filter: blur(18px) saturate(160%);
-            border: 1px solid rgba(255, 255, 255, 0.28);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.18);
-            
-            isolation: isolate;
-        }
-
-        .marquee .marquee-track {
-            display: flex;
-            align-items: center;
-            gap: 28px;
-            white-space: nowrap;
-            will-change: transform;
-            animation: marqueeScroll 26s linear infinite;
-        }
-
-        .marquee:hover .marquee-track {
-            animation-play-state: paused;
-        }
-
-        .marquee .marquee-item {
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-            color: #1f2937;
-            font-size: 15px;
-            font-weight: 600;
-            letter-spacing: 0.2px;
-            opacity: 0.9;
-        }
-
-        .marquee .marquee-item i {
-            font-size: 16px;
-            opacity: 0.9;
-        }
-
-        .pill-highlight {
-            position: absolute;
-            left: 6px;
-            top: 50%;
-            transform: translateY(-50%);
-            width: 96px;
-            height: 44px;
-            border-radius: 9999px;
-            background:
-                radial-gradient(100px 60px at 20% 50%, rgba(0, 170, 255, 0.55), transparent 60%),
-                radial-gradient(120px 80px at 45% 40%, rgba(64, 224, 255, 0.35), transparent 65%);
-            filter: blur(6px) saturate(140%);
-            mix-blend-mode: screen;
-            pointer-events: none;
-        }
-
-        @keyframes marqueeScroll {
-            0%   { transform: translateX(0); }
-            100% { transform: translateX(-50%); }
         }
 
         /* 側邊欄樣式 */
@@ -826,6 +752,42 @@
         .datetime-inputs input:focus {
             outline: none;
             border-color: #667eea;
+        }
+
+        .duration-inputs {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .duration-inputs input {
+            flex: 1;
+            width: auto;
+            min-width: 80px;
+            max-width: 140px;
+            padding: 0.75rem;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.2s;
+        }
+
+        .duration-inputs input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .duration-inputs span {
+            font-weight: 600;
+            color: #495057;
+        }
+
+        .input-hint {
+            display: block;
+            margin-top: 0.5rem;
+            color: #6c757d;
+            font-size: 0.9rem;
         }
 
         .form-group input[type="number"] {
@@ -1460,32 +1422,6 @@
         </div>
     </div>
 
-    <!-- 跑馬燈 -->
-    <div class="marquee glass-pill" role="marquee" aria-label="最新公告">
-        <div class="marquee-track">
-            <div class="marquee-item">
-                <i class="fas fa-bullhorn"></i> 歡迎使用PBLS VR教學平台！
-            </div>
-            <div class="marquee-item">
-                <i class="fas fa-vr-cardboard"></i> 360°實境教學影片，身臨其境的學習體驗
-            </div>
-            <div class="marquee-item">
-                <i class="fas fa-comments"></i> 情境模擬對話，提升急救溝通技巧
-            </div>
-            <div class="marquee-item">
-                <i class="fas fa-gamepad"></i> VR操作測驗，模擬真實急救情境
-            </div>
-            <div class="marquee-item">
-                <i class="fas fa-chart-line"></i> 即時成績追蹤，掌握學習進度
-            </div>
-            <div class="marquee-item">
-                <i class="fas fa-lightbulb"></i> 問題導向學習法，提升急救技能
-            </div>
-        </div>
-        <!-- 左側藍色高光 -->
-        <span class="pill-highlight" aria-hidden="true"></span>
-    </div>
-
     <!-- 主要內容區域 -->
     <div class="main-content">
         <!-- VR測驗首頁內容 -->
@@ -1598,8 +1534,14 @@
                     </div>
                     
                     <div class="form-group">
-                        <label for="testDuration">測驗時長（秒）<span class="required">*</span></label>
-                        <input type="number" id="testDuration" min="1" max="180" required placeholder="請輸入測驗時長（秒）">
+                        <label for="durationMinutes">測驗時長 <span class="required">*</span></label>
+                        <div class="duration-inputs">
+                            <input type="number" id="durationMinutes" min="0" max="3" placeholder="0">
+                            <span>分</span>
+                            <input type="number" id="durationSeconds" min="0" max="59" placeholder="0">
+                            <span>秒</span>
+                        </div>
+                        <small class="input-hint">最多3分鐘，秒數請填0-59</small>
                     </div>
                     
                     <div class="form-group">
@@ -1839,15 +1781,6 @@
                 updateUserInfoDisplay();
             }, 1000);
             
-            // 確保跑馬燈正常顯示
-            const marquee = document.querySelector('.marquee');
-            if (marquee) {
-                console.log('✅ 跑馬燈元素已找到');
-                marquee.style.display = 'flex';
-            } else {
-                console.error('❌ 找不到跑馬燈元素');
-            }
-            
             // 初始化液態玻璃效果
             initLiquidGlassEffect();
         });
@@ -1970,7 +1903,8 @@
                 dateInput.max = tomorrowStr;
                 
                 document.getElementById('testTime').value = currentTime;
-                document.getElementById('testDuration').value = '';
+                document.getElementById('durationMinutes').value = '';
+                document.getElementById('durationSeconds').value = '';
                 updateProgressDisplay(0);
                 
                 // 添加字數統計事件監聽器
@@ -2094,7 +2028,12 @@
         async function confirmLearningRecord() {
             const testDate = document.getElementById('testDate').value;
             const testTime = document.getElementById('testTime').value;
-            const testDuration = document.getElementById('testDuration').value;
+            const durationMinutesRaw = document.getElementById('durationMinutes').value.trim();
+            const durationSecondsRaw = document.getElementById('durationSeconds').value.trim();
+            const hasDurationInput = durationMinutesRaw !== '' || durationSecondsRaw !== '';
+            const durationMinutes = durationMinutesRaw === '' ? 0 : parseInt(durationMinutesRaw, 10);
+            const durationSeconds = durationSecondsRaw === '' ? 0 : parseInt(durationSecondsRaw, 10);
+            const durationInSeconds = durationMinutes * 60 + durationSeconds;
             
             // 獲取當前選擇的進度
             let completionProgress = 0;
@@ -2104,8 +2043,33 @@
             }
 
             // 驗證表單 - 只驗證必填欄位
-            if (!testDate || !testTime || !testDuration) {
+            if (!testDate || !testTime || !hasDurationInput) {
                 alert('請填寫所有必填欄位（測驗時間、測驗時長、完成進度）');
+                return;
+            }
+
+            if (Number.isNaN(durationMinutes) || Number.isNaN(durationSeconds)) {
+                alert('測驗時長格式錯誤，請輸入正確的分鐘與秒數');
+                return;
+            }
+
+            if (durationMinutes < 0 || durationSeconds < 0) {
+                alert('測驗時長不得為負數');
+                return;
+            }
+
+            if (durationMinutes > 3 || durationSeconds > 59 || (durationMinutes === 3 && durationSeconds > 0)) {
+                alert('測驗時長最多為3分鐘，且秒數需介於0-59之間');
+                return;
+            }
+
+            if (durationInSeconds === 0) {
+                alert('測驗時長至少為1秒');
+                return;
+            }
+
+            if (durationInSeconds > 180) {
+                alert('測驗時長必須在1-180秒（最多3分鐘）之間');
                 return;
             }
 
@@ -2119,11 +2083,6 @@
             
             if (selectedDate < oneMonthAgo || selectedDate > tomorrow) {
                 alert('測驗日期必須在最近一個月內到明天之間');
-                return;
-            }
-
-            if (testDuration < 1 || testDuration > 180) {
-                alert('測驗時長必須在1-180秒之間');
                 return;
             }
 
@@ -2175,8 +2134,8 @@
                     questionCount: 100, // VR測驗總共100%完成度
                     testDate: testDate,
                     testTime: testTime,
-                    testDurationSeconds: parseInt(testDuration),
-                    timeSpentMs: parseInt(testDuration) * 1000, // 轉換為毫秒
+                    testDurationSeconds: durationInSeconds,
+                    timeSpentMs: durationInSeconds * 1000, // 轉換為毫秒
                     completionProgress: progressValues[completionProgress],
                     progressPercentage: progressPercentages[completionProgress],
                     submittedAt: new Date().toISOString(),
