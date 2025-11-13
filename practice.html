@@ -1077,6 +1077,9 @@
 
         .scenario-detail-info {
             flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
         }
 
         .scenario-detail-info h3 {
@@ -1093,7 +1096,45 @@
         }
 
         .scenario-detail-actions {
-            text-align: center;
+            margin-top: auto;
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        .scenario-embed {
+            max-width: 980px;
+            margin: 40px auto;
+            background: var(--glass-bg);
+            -webkit-backdrop-filter: saturate(160%) blur(var(--glass-blur));
+            backdrop-filter: saturate(160%) blur(var(--glass-blur));
+            border: 1px solid var(--glass-border);
+            border-radius: var(--glass-radius);
+            box-shadow: var(--glass-shadow);
+            padding: 36px 40px;
+            display: none;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        .scenario-embed-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .scenario-embed-title {
+            font-size: 26px;
+            color: #1f2937;
+            margin: 0;
+        }
+
+        .scenario-embed iframe {
+            width: 100%;
+            min-height: 600px;
+            border: none;
+            border-radius: 20px;
+            box-shadow: 0 22px 45px rgba(15, 118, 110, 0.15);
         }
 
         .start-scenario-btn {
@@ -1118,30 +1159,168 @@
             margin-right: 10px;
         }
 
-        /* VR 360度影片播放器樣式 */
-        .vr-player-container {
+        /* Virti 360° 完整影片嵌入 */
+        .virti-360-wrapper {
             position: relative;
-            padding-top: 56.25%;
-            max-width: 1200px;
-            margin: 12px auto;
-            background: #000;
-        }
-
-        .vr-player-container iframe {
-            position: absolute;
-            inset: 0;
             width: 100%;
-            height: 100%;
-            border: 0;
-            border-radius: 12px;
+            max-width: 1200px;
+            margin: 0 auto;
         }
 
-        .vr-360-note {
-            font-size: 12px;
-            color: #666;
-            margin-top: 8px;
+        .virti-360-frame {
+            width: 100%;
+            min-height: 600px;
+            border: none;
+            border-radius: 12px;
+            box-shadow: 0 18px 38px rgba(79, 70, 229, 0.15);
+        }
+
+        .virti-seek-blocker {
+            position: absolute;
+            left: 0;
+            bottom: 78px;
+            width: 100%;
+            height: 26px;
+            pointer-events: auto;
+            background: transparent;
+            z-index: 2;
+        }
+
+        .pbls-overlay-progress {
+            position: absolute;
+            left: 60px;
+            right: 60px;
+            bottom: 36px;
+            max-width: calc(100% - 120px);
+            padding: 12px 18px;
+            border-radius: 16px;
+            background: rgba(12, 14, 24, 0.88);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 14px 32px rgba(0, 0, 0, 0.45);
+            pointer-events: auto;
+            z-index: 2;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 18px;
+        }
+
+        .pbls-subtitle-header {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .pbls-subtitle-timer {
+            font-family: 'Roboto Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+            font-size: 16px;
+            font-weight: 600;
+            color: #ffffff;
+            padding: 4px 12px;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.18);
+            letter-spacing: 0.12em;
+        }
+
+        .pbls-subtitle-text {
+            font-size: 16px;
+            line-height: 1.6;
+            color: #f8fafc;
             text-align: center;
-            line-height: 1.4;
+            min-height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 4px 12px;
+            min-width: 280px;
+        }
+
+        .pbls-progress-wrapper {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+        }
+
+        .pbls-overlay-progress .pbls-progress-bar {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .pbls-overlay-progress .pbls-step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2px;
+            opacity: 0.55;
+            transition: transform 0.25s ease, opacity 0.25s ease;
+            cursor: pointer;
+        }
+
+        .pbls-overlay-progress .pbls-step-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 999px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            background: rgba(255, 255, 255, 0.16);
+            color: #fff;
+        }
+
+        .pbls-overlay-progress .pbls-step-label {
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.88);
+            white-space: nowrap;
+        }
+
+        .pbls-overlay-progress .pbls-connector {
+            width: 32px;
+            height: 4px;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.22);
+            transition: background 0.25s ease;
+        }
+
+        .pbls-overlay-progress .pbls-connector.is-completed {
+            background: rgba(59, 164, 255, 0.55);
+        }
+
+        .pbls-overlay-progress .pbls-step.is-active {
+            opacity: 1;
+            transform: translateY(-3px);
+        }
+
+        .pbls-overlay-progress .pbls-step.is-completed {
+            opacity: 0.75;
+        }
+
+        .pbls-overlay-progress .pbls-step.is-active[data-step="1"] .pbls-step-icon {
+            background: rgba(59, 164, 255, 0.28);
+            box-shadow: 0 0 0 2px rgba(59, 164, 255, 0.65);
+        }
+
+        .pbls-overlay-progress .pbls-step.is-active[data-step="2"] .pbls-step-icon {
+            background: rgba(54, 179, 126, 0.28);
+            box-shadow: 0 0 0 2px rgba(54, 179, 126, 0.65);
+        }
+
+        .pbls-overlay-progress .pbls-step.is-active[data-step="3"] .pbls-step-icon {
+            background: rgba(255, 86, 48, 0.28);
+            box-shadow: 0 0 0 2px rgba(255, 86, 48, 0.65);
+        }
+
+        .pbls-overlay-progress .pbls-step.is-completed .pbls-step-icon {
+            filter: grayscale(0.15);
+        }
+
+        .pbls-subtitle-controls {
+            display: none;
         }
 
         /* 討論區樣式 */
@@ -1316,6 +1495,54 @@
                 height: 200px;
             }
 
+            .scenario-detail-actions {
+                justify-content: center;
+                margin-top: 24px;
+            }
+
+            .scenario-embed {
+                padding: 24px 20px;
+            }
+
+            .scenario-embed iframe {
+                min-height: 420px;
+                border-radius: 16px;
+            }
+
+            .virti-360-wrapper {
+                max-width: 100%;
+            }
+
+            .virti-360-frame {
+                min-height: 420px;
+            }
+
+            .virti-seek-blocker {
+                bottom: 52px;
+                height: 22px;
+            }
+
+            .pbls-overlay-progress {
+                left: 20px;
+                right: 20px;
+                transform: none;
+                bottom: 48px;
+                width: auto;
+                padding: 12px 14px;
+            }
+
+            .pbls-subtitle-timer {
+                font-size: 15px;
+            }
+
+            .pbls-subtitle-text {
+                font-size: 15px;
+            }
+
+            .pbls-overlay-progress .pbls-step-label {
+                font-size: 10px;
+            }
+
             .footer-actions {
                 flex-direction: column;
                 align-items: stretch;
@@ -1325,19 +1552,6 @@
             .footer-primary .start-scenario-btn {
                 width: 100%;
                 justify-content: center;
-            }
-
-            .vr-player-container {
-                margin: 15px auto;
-            }
-
-            .vr-player-container iframe {
-                border-radius: 8px;
-            }
-
-            .vr-360-note {
-                font-size: 11px;
-                margin-top: 6px;
             }
         }
     </style>
@@ -1554,21 +1768,43 @@
                         <p>以實境影片呈現實境場景，感受現場壓力，搭配互動提示強化記憶</p>
                     </div>
                     
-                    <div class="vr-video-section">
-                        <div class="vr-player-container">
+                    <div class="virti-360-wrapper">
                             <iframe
-                                src="vr-360.html"
-                                title="360° VR 影片播放器"
-                                frameborder="0"
-                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share; vr"
-                                allowfullscreen
+                            title="Virti-360"
+                            id="Virti360Player"
+                            class="virti-360-frame"
+                            width="100%"
+                            height="600"
+                            allow="fullscreen; xr-spatial-tracking;"
+                            src="https://app.virti.com/embed/my-simulations/35981690f54168db201.29010440"
                                 loading="lazy"
                                 referrerpolicy="origin-when-cross-origin">
                             </iframe>
+                        <div class="virti-seek-blocker" aria-hidden="true"></div>
+                        <div class="pbls-overlay-progress">
+                            <div class="pbls-subtitle-header">
+                                <div class="pbls-subtitle-timer" id="subtitleTimerDisplay">00:00</div>
+                            </div>
+                            <div class="pbls-subtitle-text" id="subtitleTextDisplay">點擊「開始」即可同步字幕</div>
+                            <div class="pbls-progress-wrapper">
+                                <div class="pbls-progress-bar">
+                                    <div class="pbls-step is-active" data-step="1" data-start="0">
+                                        <div class="pbls-step-icon" aria-hidden="true">📞</div>
+                                        <div class="pbls-step-label">接聽電話</div>
+                                    </div>
+                                    <div class="pbls-connector" aria-hidden="true"></div>
+                                    <div class="pbls-step" data-step="2" data-start="80">
+                                        <div class="pbls-step-icon" aria-hidden="true">🛏️</div>
+                                        <div class="pbls-step-label">患者轉送</div>
+                                    </div>
+                                    <div class="pbls-connector" aria-hidden="true"></div>
+                                    <div class="pbls-step" data-step="3" data-start="170">
+                                        <div class="pbls-step-icon" aria-hidden="true">🚨</div>
+                                        <div class="pbls-step-label">急救中</div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                        <p class="vr-360-note">
-                            支援 VR 頭盔、滑鼠拖曳與手機陀螺儀。點擊右下角 "Enter VR" 進入 VR 模式。
-                        </p>
                     </div>
 
                     <!-- 討論區 -->
@@ -1668,16 +1904,37 @@
                             <div class="scenario-detail-info">
                                 <h3 id="scenarioDetailTitle">情境標題</h3>
                                 <p id="scenarioDetailDescription">情境描述</p>
+                                <div class="scenario-detail-actions">
+                                    <button class="start-scenario-btn" id="startScenarioBtn" type="button" onclick="startScenario(event)">
+                                        <i class="fas fa-play"></i> 進入情境模擬
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </div>
                     
+                    <div class="scenario-embed" id="scenarioEmbed">
+                        <div class="scenario-embed-header">
+                            <h3 id="scenarioEmbedTitle" class="scenario-embed-title">情境模擬</h3>
+                            <button class="back-btn" onclick="returnToScenarioDetail()">
+                                <i class="fas fa-undo"></i> 返回情境說明
+                            </button>
+                        </div>
+                        <iframe
+                            title="Virti-Player"
+                            id="scenarioEmbedFrame"
+                            allow="microphone; fullscreen; xr-spatial-tracking;"
+                            src=""
+                        ></iframe>
+                    </div>
+                    
                     <div class="content-footer">
-                        <div class="footer-actions single">
+                        <button class="back-btn" onclick="showScenarioBoard()">
+                            <i class="fas fa-list"></i> 返回情境列表
+                        </button>
                         <button class="back-btn" onclick="goBackToHomepage()">
                             <i class="fas fa-arrow-left"></i> 返回練習專區
                         </button>
-                        </div>
             </div>
         </div>
     </div>
@@ -1700,6 +1957,8 @@
             } else {
                 console.error('❌ 找不到跑馬燈元素');
             }
+
+            initOverlayProgress();
         });
 
         // 檢查登入狀態
@@ -1835,6 +2094,7 @@
             if (practiceType === 'vr-video') {
                 setMarqueeVisibility(false);
                 vrVideoContent.style.display = 'block';
+                resetSubtitleTimer();
             } else if (practiceType === 'virtual-human') {
                 setMarqueeVisibility(false);
                 virtualHumanContent.style.display = 'block';
@@ -1847,6 +2107,7 @@
             const homepage = document.getElementById('practiceHomepage');
             const vrVideoContent = document.getElementById('vrVideoContent');
             const virtualHumanContent = document.getElementById('virtualHumanContent');
+            hideScenarioEmbed(true);
             
             // 隱藏所有內容頁面
             vrVideoContent.style.display = 'none';
@@ -1856,6 +2117,294 @@
             homepage.style.display = 'block';
             setMarqueeVisibility(true);
             resetScenarioSelection();
+            resetSubtitleTimer();
+        }
+
+        const virtiPoisoningURL = "https://app.virti.com/embed/my-virtual-humans/1208968ca5abf489df0.28003731";
+
+        let subtitleCues = [];
+        let subtitleTotalDuration = 0;
+        let subtitleElapsedSeconds = 0;
+        let subtitleTimerRunning = false;
+        let subtitleLastTick = 0;
+        let subtitleRafId = null;
+        let subtitleTimerDisplayEl = null;
+        let subtitleTextDisplayEl = null;
+
+        function parseTimestampToSeconds(timestamp) {
+            const parts = timestamp.trim().split(':');
+            if (parts.length < 3) return 0;
+            const [h, m, rest] = parts;
+            const [s, ms = '0'] = rest.split('.');
+            return Number(h) * 3600 + Number(m) * 60 + Number(s) + Number(`0.${ms}`);
+        }
+
+        function parseVTT(text) {
+            const cues = [];
+            const blocks = text.replace(/\r/g, '').split(/\n\n+/);
+            blocks.forEach(block => {
+                const lines = block.split('\n').filter(line => line.trim().length > 0);
+                if (!lines.length) return;
+                if (lines[0].startsWith('WEBVTT')) return;
+                let timeLineIndex = 0;
+                if (!lines[0].includes('-->') && lines.length > 1 && lines[1].includes('-->')) {
+                    timeLineIndex = 1;
+                }
+                const timeLine = lines[timeLineIndex];
+                if (!timeLine || !timeLine.includes('-->')) return;
+                const [startStr, endStr] = timeLine.split('-->');
+                const start = parseTimestampToSeconds(startStr);
+                const end = parseTimestampToSeconds(endStr);
+                const textLines = lines.slice(timeLineIndex + 1);
+                const textContent = textLines.join('\n').trim();
+                if (textContent) {
+                    cues.push({ start, end, text: textContent });
+                }
+            });
+            return cues.sort((a, b) => a.start - b.start);
+        }
+
+        async function loadSubtitles() {
+            try {
+                const response = await fetch('web360-simple/subtitles.vtt', { cache: 'no-cache' });
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+                const text = await response.text();
+                subtitleCues = parseVTT(text);
+                subtitleTotalDuration = subtitleCues.length ? subtitleCues[subtitleCues.length - 1].end : 0;
+                updateSubtitleForTime(0);
+                updateTimerDisplay();
+            } catch (error) {
+                console.error('❌ 無法載入字幕檔案:', error);
+                if (subtitleTextDisplayEl) {
+                    subtitleTextDisplayEl.textContent = '字幕載入失敗，請稍後再試。';
+                }
+            }
+        }
+
+        function formatElapsedTime(seconds) {
+            const total = Math.max(0, Math.floor(seconds));
+            const mins = Math.floor(total / 60);
+            const secs = total % 60;
+            return `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+        }
+
+        function updateTimerDisplay() {
+            if (subtitleTimerDisplayEl) {
+                subtitleTimerDisplayEl.textContent = formatElapsedTime(subtitleElapsedSeconds);
+            }
+        }
+
+        function updateSubtitleForTime(seconds) {
+            if (!subtitleTextDisplayEl) return;
+            if (!subtitleCues.length) {
+                subtitleTextDisplayEl.textContent = '字幕載入中...';
+                return;
+            }
+            const cue = subtitleCues.find(item => seconds >= item.start && seconds <= item.end);
+            subtitleTextDisplayEl.textContent = cue ? cue.text : '';
+        }
+
+        function updateStageByTime(seconds) {
+            const steps = document.querySelectorAll('.pbls-overlay-progress .pbls-step');
+            if (!steps.length) return;
+            let targetStage = Number(steps[0].dataset.step) || 1;
+            let latestStart = Number(steps[0].dataset.start ?? '0') || 0;
+            steps.forEach(step => {
+                const stage = Number(step.dataset.step);
+                const start = Number(step.dataset.start);
+                if (!Number.isFinite(stage)) return;
+                if (Number.isFinite(start) && seconds >= start && start >= latestStart) {
+                    targetStage = stage;
+                    latestStart = start;
+                }
+            });
+            setStage(targetStage);
+        }
+
+        function subtitleTick(timestamp) {
+            if (!subtitleTimerRunning) return;
+            if (!subtitleLastTick) subtitleLastTick = timestamp;
+            const delta = (timestamp - subtitleLastTick) / 1000;
+            subtitleLastTick = timestamp;
+            subtitleElapsedSeconds += delta;
+            if (subtitleElapsedSeconds >= subtitleTotalDuration && subtitleTotalDuration > 0) {
+                subtitleElapsedSeconds = subtitleTotalDuration;
+                updateTimerDisplay();
+                updateSubtitleForTime(subtitleElapsedSeconds);
+                updateStageByTime(subtitleElapsedSeconds);
+                pauseSubtitleTimer({ autoComplete: true });
+                return;
+            }
+            updateTimerDisplay();
+            updateSubtitleForTime(subtitleElapsedSeconds);
+            updateStageByTime(subtitleElapsedSeconds);
+            subtitleRafId = requestAnimationFrame(subtitleTick);
+        }
+
+        function startSubtitleTimer() {
+            if (subtitleTimerRunning) return;
+            if (!subtitleCues.length) return;
+            subtitleTimerRunning = true;
+            subtitleLastTick = 0;
+            subtitleRafId = requestAnimationFrame(subtitleTick);
+        }
+
+        function pauseSubtitleTimer({ autoComplete = false } = {}) {
+            if (subtitleTimerRunning) {
+                subtitleTimerRunning = false;
+                if (subtitleRafId) {
+                    cancelAnimationFrame(subtitleRafId);
+                    subtitleRafId = null;
+                }
+            }
+        }
+
+        function resetSubtitleTimer() {
+            if (subtitleRafId) {
+                cancelAnimationFrame(subtitleRafId);
+                subtitleRafId = null;
+            }
+            subtitleTimerRunning = false;
+            subtitleElapsedSeconds = 0;
+            subtitleLastTick = 0;
+            updateTimerDisplay();
+            updateSubtitleForTime(0);
+            updateStageByTime(0);
+        }
+
+        function toggleTimerForInteraction() {
+            if (!subtitleCues.length) return;
+            if (subtitleTimerRunning) {
+                pauseSubtitleTimer();
+            } else {
+                if (subtitleTotalDuration > 0 && subtitleElapsedSeconds >= subtitleTotalDuration - 0.05) {
+                    subtitleElapsedSeconds = 0;
+                    subtitleLastTick = 0;
+                    updateTimerDisplay();
+                    updateSubtitleForTime(0);
+                    updateStageByTime(0);
+                }
+                startSubtitleTimer();
+            }
+        }
+
+        function handleVirtiMessage(event) {
+            if (!event || typeof event.data === 'undefined') return;
+            const data = event.data;
+            const messageType = typeof data === 'string'
+                ? data
+                : data.type || data.event || data.action || data.state;
+            switch (messageType) {
+                case 'virti:play':
+                case 'player:play':
+                case 'play':
+                case 'resume':
+                    startSubtitleTimer();
+                    break;
+                case 'virti:pause':
+                case 'player:pause':
+                case 'pause':
+                case 'hint:open':
+                case 'hint-open':
+                    pauseSubtitleTimer();
+                    break;
+                case 'virti:seek':
+                case 'player:seek':
+                case 'seek':
+                    if (typeof data.currentTime === 'number') {
+                        subtitleElapsedSeconds = Math.max(0, Math.min(subtitleTotalDuration || data.currentTime, data.currentTime));
+                        updateTimerDisplay();
+                        updateSubtitleForTime(subtitleElapsedSeconds);
+                        updateStageByTime(subtitleElapsedSeconds);
+                    }
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        function setStage(stage) {
+            const overlay = document.querySelector('.pbls-overlay-progress');
+            if (!overlay) return;
+            const steps = overlay.querySelectorAll('.pbls-step');
+            const connectors = overlay.querySelectorAll('.pbls-connector');
+            steps.forEach(step => {
+                const n = Number(step.dataset.step);
+                step.classList.remove('is-active', 'is-completed');
+                if (n < stage) {
+                    step.classList.add('is-completed');
+                } else if (n === stage) {
+                    step.classList.add('is-active');
+                }
+            });
+            connectors.forEach((connector, index) => {
+                connector.classList.toggle('is-completed', (index + 1) < stage);
+            });
+        }
+
+        async function initOverlayProgress() {
+            const overlay = document.querySelector('.pbls-overlay-progress');
+            if (!overlay) return;
+            
+            subtitleTimerDisplayEl = document.getElementById('subtitleTimerDisplay');
+            subtitleTextDisplayEl = document.getElementById('subtitleTextDisplay');
+
+            const steps = overlay.querySelectorAll('.pbls-step');
+            steps.forEach(step => {
+                step.addEventListener('click', () => {
+                    const stage = Number(step.dataset.step);
+                    if (Number.isFinite(stage)) {
+                        const start = Number(step.dataset.start);
+                        if (subtitleTimerRunning) {
+                            pauseSubtitleTimer();
+                        }
+                        if (Number.isFinite(start)) {
+                            subtitleElapsedSeconds = Math.min(start, subtitleTotalDuration || start);
+                            subtitleLastTick = 0;
+                            updateTimerDisplay();
+                            updateSubtitleForTime(subtitleElapsedSeconds);
+                            updateStageByTime(subtitleElapsedSeconds);
+                        }
+                        setStage(stage);
+                    }
+                });
+            });
+            // 預設第一階段
+            setStage(1);
+            if (subtitleTextDisplayEl) {
+                subtitleTextDisplayEl.textContent = '字幕載入中...';
+            }
+            updateTimerDisplay();
+            await loadSubtitles();
+            if (subtitleCues.length) {
+                resetSubtitleTimer();
+            }
+
+            const virtiPlayer = document.getElementById('Virti360Player');
+            if (virtiPlayer) {
+                let pointerDownInfo = null;
+                virtiPlayer.addEventListener('pointerdown', (event) => {
+                    pointerDownInfo = {
+                        x: event.clientX,
+                        y: event.clientY,
+                        time: performance.now()
+                    };
+                });
+                virtiPlayer.addEventListener('pointerup', (event) => {
+                    if (!pointerDownInfo) return;
+                    const dx = Math.abs(event.clientX - pointerDownInfo.x);
+                    const dy = Math.abs(event.clientY - pointerDownInfo.y);
+                    const dt = performance.now() - pointerDownInfo.time;
+                    pointerDownInfo = null;
+                    if (dx <= 6 && dy <= 6 && dt <= 600) {
+                        toggleTimerForInteraction();
+                    }
+                });
+            }
+
+            window.addEventListener('message', handleVirtiMessage, false);
         }
 
         // 情境資料
@@ -1865,35 +2414,45 @@
                 image: 'assets/心臟驟停情境.png',
                 iconImage: 'assets/心臟驟停情境.png',
                 summary: '孩童在家突然倒地無反應，你需要在黃金時間內下達指令讓團隊展開救援。',
-                description: '傍晚18點30分，客廳忽然安靜下來，一位5歲、110公分、18公斤的男童倒地，毫無反應。現場做了急救措施，患者OHCA，家屬在外等待。你只需要說出「下一步要做什麼」處理方式，系統就會即時呈現團隊/旁人依你指令採取的處置與生理變化；你的目標，是把時間贏回來!'
+                description: '傍晚18點30分，客廳忽然安靜下來，一位5歲、110公分、18公斤的男童倒地，毫無反應。現場做了急救措施，患者OHCA，家屬在外等待。你只需要說出「下一步要做什麼」處理方式，系統就會即時呈現團隊/旁人依你指令採取的處置與生理變化；你的目標，是把時間贏回來!',
+                embedUrl: 'https://app.virti.com/embed/my-virtual-humans/1205368c978ec0b4f87.81769899',
+                embedTitle: '心臟驟停情境虛擬人訓練'
             },
             'poisoning': {
                 name: '食物中毒',
                 image: 'assets/食物中毒情境.png',
                 iconImage: 'assets/食物中毒情境.png',
                 summary: '餐桌旁的孩子突然失去意識，觀察環境線索，判斷下一步的處置流程。',
-                description: '下午16點12分，5歲小孩（103公分／25公斤）在餐桌旁突然倒下，四周留有嘔吐物與食物殘渣。家人驚慌失措，患者OHCA，家屬在外等待。你只需要說出「下一步要做什麼」處理措施，系統就會即時呈現團隊/旁人依你指令採取的處置與生理變化；你的目標，是把時間贏回來!'
+                description: '下午16點12分，5歲小孩（103公分／25公斤）在餐桌旁突然倒下，四周留有嘔吐物與食物殘渣。家人驚慌失措，患者OHCA，家屬在外等待。你只需要說出「下一步要做什麼」處理措施，系統就會即時呈現團隊/旁人依你指令採取的處置與生理變化；你的目標，是把時間贏回來!',
+                embedUrl: virtiPoisoningURL,
+                embedTitle: '食物中毒情境虛擬人訓練'
             },
             'drowning': {
                 name: '溺水',
                 image: 'assets/溺水情境.png',
                 iconImage: 'assets/溺水情境.png',
                 summary: '泳池救援後的緊急處置，考驗你對呼吸循環監測與團隊分工的指揮能力。',
-                description: '下午3點20分的游泳池旁傳來呼喊——5歲小孩（105公分／20公斤）被拉上岸時已無反應。患者OHCA，家屬在外等待。你只需要說出「下一步要做什麼」的處理措施，系統就會即時呈現團隊/旁人依你指令採取的處置與生理變化；你的目標，是把時間贏回來!'
+                description: '下午3點20分的游泳池旁傳來呼喊——5歲小孩（105公分／20公斤）被拉上岸時已無反應。患者OHCA，家屬在外等待。你只需要說出「下一步要做什麼」的處理措施，系統就會即時呈現團隊/旁人依你指令採取的處置與生理變化；你的目標，是把時間贏回來!',
+                embedUrl: 'https://app.virti.com/embed/my-virtual-humans/1196868c3ab21200c38.72245762',
+                embedTitle: '溺水情境虛擬人訓練'
             },
             'fire': {
                 name: '火災嗆傷',
                 image: 'assets/火災嗆傷情境.png',
                 iconImage: 'assets/火災嗆傷情境.png',
                 summary: '濃煙救出的兒童氧合不佳，掌握嗆傷病人處置重點，安定團隊與家屬。',
-                description: '文化三路住宅區發生一起火災，現場一位8歲兒童（125公分／27公斤）被推進急診，患者OHCA。你只需要說出「下一步要做什麼」的處理措施，系統就會即時呈現團隊/旁人依你指令採取的處置與生理變化；你的目標，是把時間贏回來!'
+                description: '文化三路住宅區發生一起火災，現場一位8歲兒童（125公分／27公斤）被推進急診，患者OHCA。你只需要說出「下一步要做什麼」的處理措施，系統就會即時呈現團隊/旁人依你指令採取的處置與生理變化；你的目標，是把時間贏回來!',
+                embedUrl: 'https://app.virti.com/embed/my-virtual-humans/1186668bc5a4082d3f0.92972546',
+                embedTitle: '火災嗆傷情境虛擬人訓練'
             },
             'trauma': {
                 name: '外傷',
                 image: 'assets/外傷情境.png',
                 iconImage: 'assets/外傷情境.png',
                 summary: '事故造成的大量出血，檢查生命徵象並指示止血、評估與後續處置步驟。',
-                description: '下午16點12分，一位6歲男童（100公分／22公斤）因打碎玻璃造成明顯撕裂傷，血迅速滲透衣物；他意識模糊、哭喊聲微弱、四肢冰冷，經家人發現後急救並送往醫院。患者OHCA。你只需要說出「下一步要做什麼」處理措施，系統就會即時呈現團隊/旁人依你指令採取的處置與生理變化；你的目標，是把時間贏回來!'
+                description: '下午16點12分，一位6歲男童（100公分／22公斤）因打碎玻璃造成明顯撕裂傷，血迅速滲透衣物；他意識模糊、哭喊聲微弱、四肢冰冷，經家人發現後急救並送往醫院。患者OHCA。你只需要說出「下一步要做什麼」處理措施，系統就會即時呈現團隊/旁人依你指令採取的處置與生理變化；你的目標，是把時間贏回來!',
+                embedUrl: 'https://app.virti.com/embed/my-virtual-humans/1196768c3a4802d6862.95088487',
+                embedTitle: '外傷情境虛擬人訓練'
             }
         };
 
@@ -1902,12 +2461,20 @@
         function resetScenarioSelection() {
             const scenarioDetail = document.getElementById('scenarioDetail');
             const scenarioBoard = document.getElementById('scenarioBoard');
+            const scenarioEmbed = document.getElementById('scenarioEmbed');
             currentScenarioType = '';
             if (scenarioDetail) {
                 scenarioDetail.style.display = 'none';
             }
             if (scenarioBoard) {
                 scenarioBoard.style.display = 'block';
+            }
+            if (scenarioEmbed) {
+                scenarioEmbed.style.display = 'none';
+            }
+            const iframe = document.getElementById('scenarioEmbedFrame');
+            if (iframe) {
+                iframe.src = '';
             }
             document.querySelectorAll('.scenario-card').forEach(card => card.classList.remove('active'));
         }
@@ -1916,6 +2483,7 @@
                 const scenario = scenarioData[scenarioType];
             const scenarioDetail = document.getElementById('scenarioDetail');
             const scenarioBoard = document.getElementById('scenarioBoard');
+            hideScenarioEmbed(true);
 
             if (!scenario || !scenarioDetail || !scenarioBoard) {
                 resetScenarioSelection();
@@ -1956,6 +2524,7 @@
             resetScenarioSelection();
             const scenarioBoard = document.getElementById('scenarioBoard');
             if (scenarioBoard) {
+                hideScenarioEmbed(true);
                 scenarioBoard.scrollIntoView({ behavior: 'smooth', block: 'start' });
             }
         }
@@ -1970,7 +2539,6 @@
             const scenario = scenarioData[currentScenarioType];
             
             if (scenario) {
-                // 顯示載入動畫
                 const button = event?.currentTarget || event?.target;
                 const originalText = button ? button.innerHTML : null;
                 if (button) {
@@ -1978,16 +2546,69 @@
                 button.disabled = true;
                 }
                 
-                // 模擬載入過程
+                if (scenario.embedUrl) {
+                    showScenarioEmbed(scenario.embedTitle || `${scenario.name}情境虛擬人訓練`, scenario.embedUrl);
+                    if (button && originalText !== null) {
+                        button.innerHTML = originalText;
+                        button.disabled = false;
+                    }
+                    return;
+                }
+
                 setTimeout(() => {
                     alert(`${scenario.name}情境模擬功能開發中，敬請期待！\n\n這將是一個AI驅動的虛擬情境模擬，讓您能夠：\n• 與虛擬患者進行真實對話\n• 練習醫療溝通技巧\n• 獲得即時反饋和建議\n• 提升專業溝通能力`);
                     
-                    // 恢復按鈕狀態
                     if (button && originalText !== null) {
                     button.innerHTML = originalText;
                     button.disabled = false;
                     }
                 }, 1000);
+            }
+        }
+
+        function showScenarioEmbed(title, url) {
+            const scenarioDetail = document.getElementById('scenarioDetail');
+            const scenarioEmbed = document.getElementById('scenarioEmbed');
+            const iframe = document.getElementById('scenarioEmbedFrame');
+            const embedTitle = document.getElementById('scenarioEmbedTitle');
+
+            if (!scenarioEmbed || !iframe) {
+                return;
+            }
+
+            if (scenarioDetail) {
+                scenarioDetail.style.display = 'none';
+            }
+
+            if (embedTitle) {
+                embedTitle.textContent = title || '情境模擬';
+            }
+
+            if (iframe.src !== url) {
+                iframe.src = url;
+            }
+
+            scenarioEmbed.style.display = 'flex';
+            scenarioEmbed.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        function hideScenarioEmbed(resetSrc = false) {
+            const scenarioEmbed = document.getElementById('scenarioEmbed');
+            const iframe = document.getElementById('scenarioEmbedFrame');
+            if (scenarioEmbed) {
+                scenarioEmbed.style.display = 'none';
+            }
+            if (resetSrc && iframe) {
+                iframe.src = '';
+            }
+        }
+
+        function returnToScenarioDetail() {
+            const scenarioDetail = document.getElementById('scenarioDetail');
+            hideScenarioEmbed(true);
+            if (scenarioDetail) {
+                scenarioDetail.style.display = 'block';
+                scenarioDetail.scrollIntoView({ behavior: 'smooth', block: 'start' });
             }
         }
 
