@@ -2218,7 +2218,7 @@
                             width="100%"
                             height="600"
                             allow="fullscreen; xr-spatial-tracking;"
-                            src="https://app.virti.com/embed/my-simulations/35981690f54168db201.29010440"
+                            src=""
                                 loading="lazy"
                                 referrerpolicy="origin-when-cross-origin">
                             </iframe>
@@ -2450,6 +2450,22 @@
             }
 
             initOverlayProgress();
+            
+            // 初始化所有Virti iframe的URL，添加external_user_id参数
+            function initializeVirtiIframes() {
+                // 更新 Virti360Player 的 URL
+                const virti360Player = document.getElementById('Virti360Player');
+                if (virti360Player) {
+                    // 如果src为空或未设置，使用基础URL
+                    const baseUrl = virti360Player.src || 'https://app.virti.com/embed/my-simulations/35981690f54168db201.29010440';
+                    const urlWithUserId = addExternalUserIDToVirtiUrl(baseUrl);
+                    virti360Player.src = urlWithUserId;
+                    console.log('✅ Virti360Player URL已更新，添加external_user_id:', urlWithUserId);
+                }
+            }
+            
+            // 延迟初始化，确保函数已定义
+            setTimeout(initializeVirtiIframes, 200);
         });
 
         // 檢查登入狀態
@@ -2934,6 +2950,47 @@
         }
 
         // 情境資料
+        // 获取用户ID用于Virti的external_user_id参数
+        function getExternalUserID() {
+            try {
+                // 优先从localStorage获取用户数据
+                const savedUser = localStorage.getItem('pbls_user');
+                if (savedUser) {
+                    const userData = JSON.parse(savedUser);
+                    // 优先使用 uid（Firestore文档ID）
+                    if (userData.uid) {
+                        return userData.uid;
+                    }
+                    // 如果没有uid，尝试使用account或其他唯一标识
+                    if (userData.account) {
+                        return userData.account;
+                    }
+                }
+                
+                // 尝试从Firebase Auth获取UID
+                if (typeof auth !== 'undefined' && auth.currentUser) {
+                    return auth.currentUser.uid;
+                }
+                
+                // 如果没有找到用户ID，使用demo ID
+                console.warn('未找到用户ID，使用demo ID');
+                return 'pbls-demo-' + Date.now();
+            } catch (error) {
+                console.error('获取用户ID失败:', error);
+                return 'pbls-demo-' + Date.now();
+            }
+        }
+
+        // 为Virti URL添加external_user_id参数
+        function addExternalUserIDToVirtiUrl(baseUrl) {
+            if (!baseUrl) return baseUrl;
+            
+            // 如果URL已经包含参数，使用&连接，否则使用?连接
+            const separator = baseUrl.includes('?') ? '&' : '?';
+            const userId = getExternalUserID();
+            return `${baseUrl}${separator}external_user_id=${encodeURIComponent(userId)}`;
+        }
+
         const scenarioData = {
             'cardiac': {
                 name: '心臟驟停',
@@ -3140,8 +3197,11 @@
                 embedTitle.textContent = title || '情境模擬';
             }
 
-            if (iframe.src !== url) {
-                iframe.src = url;
+            // 为URL添加external_user_id参数
+            const urlWithUserId = addExternalUserIDToVirtiUrl(url);
+            
+            if (iframe.src !== urlWithUserId) {
+                iframe.src = urlWithUserId;
             }
 
             // 启用全屏模式
