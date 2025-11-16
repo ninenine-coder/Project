@@ -864,6 +864,11 @@
             margin-top: 40px;
             padding-top: 20px;
             border-top: 1px solid #e0e0e0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 16px;
+            flex-wrap: wrap;
         }
 
         .footer-actions {
@@ -1116,11 +1121,45 @@
             gap: 24px;
         }
 
+        /* 全屏模式样式 */
+        .scenario-embed.fullscreen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            width: 100vw;
+            height: 100vh;
+            max-width: 100vw;
+            max-height: 100vh;
+            margin: 0;
+            padding: 0;
+            border: none;
+            border-radius: 0;
+            background: #000;
+            z-index: 10000;
+            gap: 0;
+        }
+
         .scenario-embed-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
             gap: 16px;
+        }
+
+        /* 全屏模式下隐藏头部 */
+        .scenario-embed.fullscreen .scenario-embed-header {
+            display: none;
+        }
+
+        /* 全屏模式下 iframe 占满整个屏幕 */
+        .scenario-embed.fullscreen iframe {
+            width: 100vw;
+            height: 100vh;
+            min-height: 100vh;
+            border-radius: 0;
+            box-shadow: none;
         }
 
         .scenario-embed-title {
@@ -1135,6 +1174,326 @@
             border: none;
             border-radius: 20px;
             box-shadow: 0 22px 45px rgba(15, 118, 110, 0.15);
+        }
+
+        /* 隐藏 Virti 自带的查看简介按钮 */
+        .scenario-embed.fullscreen iframe {
+            pointer-events: auto;
+        }
+
+        /* 尝试隐藏 Virti iframe 内的查看简介按钮 - 通过覆盖层 */
+        .scenario-embed-virti-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 200px;
+            height: 80px;
+            background: transparent;
+            z-index: 10000;
+            display: none;
+            pointer-events: none;
+        }
+
+        .scenario-embed.fullscreen .scenario-embed-virti-overlay {
+            display: block;
+            pointer-events: auto;
+        }
+
+        /* 遮住按钮图层下方白色背景区块 - 以按钮为中心的遮罩（美观设计） */
+        .scenario-embed-button-mask {
+            position: fixed;
+            /* 按钮容器 top: 20px，按钮高度 50px
+               按钮垂直中心 = 20 + 25 = 45px
+               遮罩高度 70px，遮罩中心应该在 45px
+               遮罩 top = 45 - 35 = 10px */
+            top: 10px; /* 精确计算让按钮在遮罩中上下居中 */
+            /* 按钮容器从 left: 20px 开始，宽度约 174px (50*3 + 12*2)
+               按钮水平中心 = 20 + 87 = 107px
+               遮罩宽度 230px，遮罩中心应该在 107px
+               使用 transform 精确居中 */
+            left: 107px; /* 按钮中心位置 */
+            width: 230px; /* 足够大以完全覆盖白色背景区域 */
+            height: 70px; /* 足够高以覆盖按钮上下区域 */
+            transform: translateX(-50%); /* 以中心点为基准，向左偏移50%宽度实现居中 */
+            /* 美观的渐变背景 */
+            background: linear-gradient(135deg, 
+                rgba(0, 0, 0, 0.85) 0%, 
+                rgba(0, 0, 0, 0.9) 50%, 
+                rgba(0, 0, 0, 0.85) 100%);
+            backdrop-filter: blur(25px) saturate(180%);
+            -webkit-backdrop-filter: blur(25px) saturate(180%);
+            border-radius: 40px; /* 更圆润的圆角 */
+            border: 1px solid rgba(255, 255, 255, 0.08); /* 微妙的边框 */
+            z-index: 10000; /* 在按钮下方，但在Virti内容上方 */
+            display: none;
+            pointer-events: auto; /* 允许点击遮住Virti按钮 */
+            /* 多层阴影效果，增加深度感 */
+            box-shadow: 
+                0 4px 24px rgba(0, 0, 0, 0.5),
+                0 2px 8px rgba(0, 0, 0, 0.3),
+                inset 0 1px 0 rgba(255, 255, 255, 0.05); /* 内部高光 */
+            transition: all 0.3s ease; /* 平滑过渡 */
+        }
+
+        .scenario-embed.fullscreen .scenario-embed-button-mask {
+            display: block;
+        }
+
+        /* 确保按钮在遮罩上方 */
+        .scenario-embed-top-controls {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            display: none;
+            align-items: center;
+            gap: 12px; /* 统一的按钮间隔 */
+            z-index: 10002; /* 确保按钮在遮罩上方 */
+        }
+
+
+        /* 全屏模式下显示按钮容器 */
+        .scenario-embed.fullscreen .scenario-embed-top-controls {
+            display: flex;
+        }
+
+        /* 统一的按钮样式 - 三个按钮大小、颜色、字体完全一致 */
+        .scenario-embed-unified-btn {
+            width: 50px;
+            height: 50px;
+            min-width: 50px;
+            min-height: 50px;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            font-family: inherit;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            position: relative;
+            flex-shrink: 0;
+            box-sizing: border-box;
+            padding: 0;
+            margin: 0;
+        }
+
+        .scenario-embed-unified-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            border-color: rgba(255, 255, 255, 0.5);
+            transform: scale(1.1);
+        }
+
+        .scenario-embed-unified-btn::after {
+            content: attr(title);
+            position: absolute;
+            bottom: -35px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-family: inherit;
+            white-space: nowrap;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .scenario-embed-unified-btn:hover::after {
+            opacity: 1;
+        }
+
+        .scenario-embed-unified-btn i {
+            font-size: 18px;
+            color: white;
+        }
+
+        /* 情境简介模态窗口 */
+        .scenario-intro-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(5px);
+            z-index: 10003;
+            align-items: center;
+            justify-content: center;
+            padding: 15px; /* 减少外部padding */
+            overflow-y: auto;
+        }
+
+        .scenario-intro-modal.show {
+            display: flex;
+        }
+
+        .scenario-intro-modal-content {
+            background: white;
+            border-radius: 12px; /* 减少圆角 */
+            max-width: 750px; /* 减少最大宽度 */
+            width: 100%;
+            max-height: 85vh; /* 减少最大高度 */
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            position: relative;
+        }
+
+        .scenario-intro-modal-header {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            padding: 16px 20px; /* 减少padding */
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .scenario-intro-modal-header h2 {
+            display: none; /* 隐藏header中的标题，标题显示在左侧 */
+        }
+
+        .scenario-intro-modal-close {
+            background: none;
+            border: none;
+            font-size: 24px; /* 稍微减小 */
+            color: #6b7280;
+            cursor: pointer;
+            padding: 0;
+            width: 28px; /* 稍微减小 */
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+        }
+
+        .scenario-intro-modal-close:hover {
+            background: #f3f4f6;
+            color: #1f2937;
+        }
+
+        .scenario-intro-modal-body {
+            padding: 20px; /* 减少padding */
+            display: flex;
+            gap: 20px; /* 减少gap */
+        }
+
+        .scenario-intro-modal-left {
+            flex: 0 0 240px; /* 减少左侧宽度 */
+            display: flex;
+            flex-direction: column;
+            gap: 12px; /* 减少gap */
+        }
+
+        .scenario-intro-left-title {
+            font-size: 22px; /* 稍微减小 */
+            font-weight: 700;
+            color: #1f2937;
+            margin: 0 0 6px 0; /* 减少margin */
+        }
+
+        .scenario-intro-modal-avatar {
+            width: 100%;
+            aspect-ratio: 4/3;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 10px; /* 减少圆角 */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .scenario-intro-modal-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .scenario-intro-modal-time {
+            display: flex;
+            align-items: center;
+            gap: 6px; /* 减少gap */
+            padding: 10px 12px; /* 减少padding */
+            background: #f9fafb;
+            border-radius: 6px; /* 减少圆角 */
+            font-size: 13px; /* 稍微减小 */
+            color: #4b5563;
+        }
+
+        .scenario-intro-modal-time i {
+            color: #667eea;
+        }
+
+        .scenario-intro-modal-right {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .scenario-intro-description {
+            font-size: 15px;
+            line-height: 1.7; /* 稍微减少行高 */
+            color: #4b5563;
+            margin: 0;
+            white-space: pre-line;
+        }
+
+        @media (max-width: 768px) {
+            .scenario-intro-modal {
+                padding: 10px; /* 移动端减少padding */
+            }
+
+            .scenario-intro-modal-content {
+                max-width: 100%;
+                max-height: 90vh;
+            }
+
+            .scenario-intro-modal-body {
+                flex-direction: column;
+                padding: 16px; /* 减少padding */
+                gap: 16px; /* 减少gap */
+            }
+
+            .scenario-intro-modal-left {
+                flex: 1;
+            }
+
+            .scenario-intro-modal-avatar {
+                aspect-ratio: 16/9;
+            }
+
+            .scenario-intro-modal-header {
+                padding: 14px 16px; /* 减少padding */
+            }
+
+            .scenario-intro-modal-header h2 {
+                font-size: 20px;
+            }
+
+            .scenario-intro-left-title {
+                font-size: 20px;
+                margin: 0 0 4px 0;
+            }
+        }
+
+        /* 当全屏时隐藏侧边栏、顶部栏等 */
+        body.scenario-fullscreen .sidebar,
+        body.scenario-fullscreen .header,
+        body.scenario-fullscreen .marquee,
+        body.scenario-fullscreen .virtual-human-content .content-footer {
+            display: none !important;
+        }
+
+        body.scenario-fullscreen {
+            overflow: hidden;
         }
 
         .start-scenario-btn {
@@ -1188,29 +1547,80 @@
 
         .pbls-overlay-progress {
             position: absolute;
-            left: 60px;
-            right: 60px;
-            bottom: 36px;
-            max-width: calc(100% - 120px);
-            padding: 12px 18px;
-            border-radius: 16px;
-            background: rgba(12, 14, 24, 0.88);
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            box-shadow: 0 14px 32px rgba(0, 0, 0, 0.45);
-            pointer-events: auto;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            width: 100%;
+            pointer-events: none;
             z-index: 2;
+        }
+
+        .pbls-overlay-inner {
+            margin-left: 100px;
+            margin-right: 0;
+            padding: 12px 18px;
+            border-radius: 0;
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+            background: rgba(12, 14, 24, 0.92);
+            backdrop-filter: blur(12px);
+            box-shadow: 0 -4px 18px rgba(0, 0, 0, 0.35);
+            display: flex;
+            align-items: center;
+            gap: 18px;
+            box-sizing: border-box;
+            pointer-events: auto;
+        }
+
+        .pbls-progress-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .pbls-overlay-progress .pbls-step {
+            display: flex !important;
+            flex-direction: column;
+            align-items: center;
+            gap: 2px;
+            opacity: 0.6;
+            transition: transform 0.25s ease, opacity 0.25s ease;
+        }
+
+        .pbls-overlay-progress .pbls-step.is-active {
+            opacity: 1;
+            transform: translateY(-2px);
+        }
+
+        .pbls-overlay-progress .pbls-step-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 18px;
+            font-size: 18px;
+            background: rgba(255, 255, 255, 0.16);
+            color: #fff;
+        }
+
+        .pbls-overlay-progress .pbls-step-label {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.85);
+            white-space: nowrap;
+        }
+
+        .pbls-overlay-progress .pbls-connector {
+            width: 34px;
+            height: 4px;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.22);
         }
 
         .pbls-subtitle-header {
+            margin-left: auto;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 10px;
         }
 
         .pbls-subtitle-timer {
@@ -1220,28 +1630,8 @@
             color: #ffffff;
             padding: 4px 12px;
             border-radius: 999px;
-            background: rgba(255, 255, 255, 0.18);
+            background: rgba(255, 255, 255, 0.2);
             letter-spacing: 0.12em;
-        }
-
-        .pbls-subtitle-text {
-            font-size: 16px;
-            line-height: 1.6;
-            color: #f8fafc;
-            text-align: center;
-            min-height: 44px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 4px 12px;
-            min-width: 280px;
-        }
-
-        .pbls-progress-wrapper {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 12px;
         }
 
         .pbls-overlay-progress .pbls-progress-bar {
@@ -1509,6 +1899,62 @@
                 border-radius: 16px;
             }
 
+            /* 移动端全屏模式 */
+            .scenario-embed.fullscreen {
+                padding: 0;
+            }
+
+            .scenario-embed.fullscreen iframe {
+                min-height: 100vh;
+            }
+
+            /* 移动端控制按钮调整 */
+            .scenario-embed-virti-overlay {
+                width: 150px;
+                height: 70px;
+            }
+
+            .scenario-embed-top-controls {
+                top: 15px;
+                left: 15px;
+                gap: 10px; /* 移动端间隔稍小 */
+            }
+
+            /* 移动端按钮遮罩调整 */
+            .scenario-embed-top-controls {
+                top: 15px;
+                left: 15px;
+            }
+
+            .scenario-embed-button-mask {
+                /* 移动端按钮容器 top: 15px，按钮高度 44px
+                   按钮垂直中心 = 15 + 22 = 37px
+                   遮罩高度 65px，遮罩中心应该在 37px
+                   遮罩 top = 37 - 32.5 = 4.5px，约 5px */
+                top: 5px; /* 精确计算让按钮在遮罩中上下居中 */
+                /* 移动端按钮容器从 left: 15px 开始，宽度约 144px (44*3 + 10*2)
+                   按钮水平中心 = 15 + 72 = 87px */
+                left: 87px; /* 移动端按钮中心位置 */
+                width: 190px; /* 移动端按钮区域约 160px，增加余量 */
+                height: 65px; /* 足够高以覆盖按钮上下区域 */
+                transform: translateX(-50%); /* 居中 */
+                border-radius: 35px; /* 更圆润的圆角 */
+                border: 1px solid rgba(255, 255, 255, 0.08);
+                backdrop-filter: blur(20px) saturate(180%);
+            }
+
+            .scenario-embed-unified-btn {
+                width: 44px;
+                height: 44px;
+                min-width: 44px;
+                min-height: 44px;
+                font-size: 16px;
+            }
+
+            .scenario-embed-unified-btn i {
+                font-size: 16px;
+            }
+
             .virti-360-wrapper {
                 max-width: 100%;
             }
@@ -1522,25 +1968,21 @@
                 height: 22px;
             }
 
-            .pbls-overlay-progress {
-                left: 20px;
-                right: 20px;
-                transform: none;
-                bottom: 48px;
-                width: auto;
-                padding: 12px 14px;
+            .pbls-overlay-inner {
+                margin-left: 80px;
+                margin-right: 20px;
+                flex-direction: column;
+                align-items: stretch;
+                gap: 8px;
+                border-radius: 16px;
+            }
+
+            .pbls-progress-wrapper {
+                justify-content: center;
             }
 
             .pbls-subtitle-timer {
                 font-size: 15px;
-            }
-
-            .pbls-subtitle-text {
-                font-size: 15px;
-            }
-
-            .pbls-overlay-progress .pbls-step-label {
-                font-size: 10px;
             }
 
             .footer-actions {
@@ -1782,27 +2224,29 @@
                             </iframe>
                         <div class="virti-seek-blocker" aria-hidden="true"></div>
                         <div class="pbls-overlay-progress">
-                            <div class="pbls-subtitle-header">
-                                <div class="pbls-subtitle-timer" id="subtitleTimerDisplay">00:00</div>
-                            </div>
-                            <div class="pbls-subtitle-text" id="subtitleTextDisplay">點擊「開始」即可同步字幕</div>
-                            <div class="pbls-progress-wrapper">
-                                <div class="pbls-progress-bar">
-                                    <div class="pbls-step is-active" data-step="1" data-start="0">
-                                        <div class="pbls-step-icon" aria-hidden="true">📞</div>
-                                        <div class="pbls-step-label">接聽電話</div>
-                                    </div>
-                                    <div class="pbls-connector" aria-hidden="true"></div>
-                                    <div class="pbls-step" data-step="2" data-start="80">
-                                        <div class="pbls-step-icon" aria-hidden="true">🛏️</div>
-                                        <div class="pbls-step-label">患者轉送</div>
-                                    </div>
-                                    <div class="pbls-connector" aria-hidden="true"></div>
-                                    <div class="pbls-step" data-step="3" data-start="170">
-                                        <div class="pbls-step-icon" aria-hidden="true">🚨</div>
-                                        <div class="pbls-step-label">急救中</div>
+                            <div class="pbls-overlay-inner">
+                                <div class="pbls-progress-wrapper">
+                                    <div class="pbls-progress-bar">
+                                        <div class="pbls-step is-active" data-step="1" data-start="0">
+                                            <div class="pbls-step-icon" aria-hidden="true">📞</div>
+                                            <div class="pbls-step-label">接聽電話</div>
+                                        </div>
+                                        <div class="pbls-connector" aria-hidden="true"></div>
+                                        <div class="pbls-step" data-step="2" data-start="80">
+                                            <div class="pbls-step-icon" aria-hidden="true">🛏️</div>
+                                            <div class="pbls-step-label">患者轉送</div>
+                                        </div>
+                                        <div class="pbls-connector" aria-hidden="true"></div>
+                                        <div class="pbls-step" data-step="3" data-start="170">
+                                            <div class="pbls-step-icon" aria-hidden="true">🚨</div>
+                                            <div class="pbls-step-label">急救中</div>
+                                        </div>
                                     </div>
                                 </div>
+                                <div class="pbls-subtitle-header">
+                                    <div class="pbls-subtitle-timer" id="subtitleTimerDisplay">00:00</div>
+                                </div>
+                                <div class="pbls-subtitle-text" id="subtitleTextDisplay">點擊「開始」即可同步字幕</div>
                             </div>
                         </div>
                     </div>
@@ -1926,6 +2370,53 @@
                             allow="microphone; fullscreen; xr-spatial-tracking;"
                             src=""
                         ></iframe>
+                        <!-- 覆盖层用于遮挡 Virti 的查看简介按钮 -->
+                        <div class="scenario-embed-virti-overlay"></div>
+                        <!-- 遮住按钮下方白色区域的遮罩 -->
+                        <div class="scenario-embed-button-mask"></div>
+                        <!-- 左上角统一按钮容器 - 三个按钮格式完全一致 -->
+                        <div class="scenario-embed-top-controls">
+                            <!-- 查看简介按钮 -->
+                            <button class="scenario-embed-unified-btn" onclick="showScenarioIntro()" title="查看簡介">
+                                <i class="fas fa-user"></i>
+                            </button>
+                            <!-- 返回情境列表按钮 -->
+                            <button class="scenario-embed-unified-btn" onclick="returnToScenarioList()" title="返回情景列表">
+                                <i class="fas fa-list"></i>
+                            </button>
+                            <!-- 返回练习专区按钮 -->
+                            <button class="scenario-embed-unified-btn" onclick="returnToPracticeHomepage()" title="返回練習專區">
+                                <i class="fas fa-home"></i>
+                            </button>
+                        </div>
+                        <!-- 情境简介模态窗口 -->
+                        <div class="scenario-intro-modal" id="scenarioIntroModal">
+                            <div class="scenario-intro-modal-content">
+                                <div class="scenario-intro-modal-header">
+                                    <h2 id="scenarioIntroTitle">情境簡介</h2>
+                                    <button class="scenario-intro-modal-close" onclick="closeScenarioIntro()">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </div>
+                                <div class="scenario-intro-modal-body">
+                                    <div class="scenario-intro-modal-left">
+                                        <h2 class="scenario-intro-left-title" id="scenarioIntroLeftTitle">情境簡介</h2>
+                                        <div class="scenario-intro-modal-avatar" id="scenarioIntroAvatar">
+                                            <i class="fas fa-user-md" style="font-size: 80px; color: white; opacity: 0.7;"></i>
+                                        </div>
+                                        <div class="scenario-intro-modal-time">
+                                            <i class="fas fa-clock"></i>
+                                            <span id="scenarioIntroTime">15:00</span>
+                                        </div>
+                                    </div>
+                                    <div class="scenario-intro-modal-right">
+                                        <div class="scenario-intro-description" id="scenarioIntroDescription">
+                                            <!-- 完整描述内容将在这里显示 -->
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                     
                     <div class="content-footer">
@@ -2272,6 +2763,9 @@
             updateTimerDisplay();
             updateSubtitleForTime(0);
             updateStageByTime(0);
+            if (subtitleTextDisplayEl) {
+                subtitleTextDisplayEl.textContent = '點擊影片即可同步字幕';
+            }
         }
 
         function toggleTimerForInteraction() {
@@ -2288,6 +2782,24 @@
                 }
                 startSubtitleTimer();
             }
+        }
+
+        function triggerVirtiPlayPause() {
+            const iframe = document.getElementById('Virti360Player');
+            if (!iframe) return;
+            const rect = iframe.getBoundingClientRect();
+            const targetX = rect.left + 60;
+            const targetY = rect.bottom - 50;
+            ['pointerdown', 'pointerup', 'click'].forEach(type => {
+                const evt = new MouseEvent(type, {
+                    bubbles: true,
+                    cancelable: true,
+                    clientX: targetX,
+                    clientY: targetY,
+                    view: window
+                });
+                iframe.dispatchEvent(evt);
+            });
         }
 
         function handleVirtiMessage(event) {
@@ -2382,6 +2894,14 @@
                 resetSubtitleTimer();
             }
 
+            const playProxyBtn = document.getElementById('subtitlePlayBtn');
+            if (playProxyBtn) {
+                playProxyBtn.addEventListener('click', () => {
+                    toggleTimerForInteraction();
+                    triggerVirtiPlayPause();
+                });
+            }
+
             const virtiPlayer = document.getElementById('Virti360Player');
             if (virtiPlayer) {
                 let pointerDownInfo = null;
@@ -2399,7 +2919,13 @@
                     const dt = performance.now() - pointerDownInfo.time;
                     pointerDownInfo = null;
                     if (dx <= 6 && dy <= 6 && dt <= 600) {
-                        toggleTimerForInteraction();
+                        const rect = virtiPlayer.getBoundingClientRect();
+                        const relativeX = event.clientX - rect.left;
+                        const relativeY = rect.bottom - event.clientY;
+                        const isPlayControlArea = relativeX >= 0 && relativeX <= 160 && relativeY >= 0 && relativeY <= 140;
+                        if (isPlayControlArea) {
+                            toggleTimerForInteraction();
+                        }
                     }
                 });
             }
@@ -2416,7 +2942,13 @@
                 summary: '孩童在家突然倒地無反應，你需要在黃金時間內下達指令讓團隊展開救援。',
                 description: '傍晚18點30分，客廳忽然安靜下來，一位5歲、110公分、18公斤的男童倒地，毫無反應。現場做了急救措施，患者OHCA，家屬在外等待。你只需要說出「下一步要做什麼」處理方式，系統就會即時呈現團隊/旁人依你指令採取的處置與生理變化；你的目標，是把時間贏回來!',
                 embedUrl: 'https://app.virti.com/embed/my-virtual-humans/1205368c978ec0b4f87.81769899',
-                embedTitle: '心臟驟停情境虛擬人訓練'
+                embedTitle: '心臟驟停情境虛擬人訓練',
+                detailedInfo: {
+                    role: '你是一位急診醫療人員。',
+                    case: '有一名5歲男童(110公分,18公斤)在家中突然倒地,發生院外心臟驟停(OHCA)。目前已由家屬送至急診室,病人無呼吸、無脈搏。',
+                    equipment: '病人目前為院內急救情境,所有醫療器材齊全(Ambu、Monitor、除顫器、藥物)。',
+                    task: '你的任務是根據ABCDE評估流程與PBLS/PALS原則,逐步提出檢查與處置,並持續急救直到病人恢復自主循環(ROSC)。'
+                }
             },
             'poisoning': {
                 name: '食物中毒',
@@ -2425,7 +2957,13 @@
                 summary: '餐桌旁的孩子突然失去意識，觀察環境線索，判斷下一步的處置流程。',
                 description: '下午16點12分，5歲小孩（103公分／25公斤）在餐桌旁突然倒下，四周留有嘔吐物與食物殘渣。家人驚慌失措，患者OHCA，家屬在外等待。你只需要說出「下一步要做什麼」處理措施，系統就會即時呈現團隊/旁人依你指令採取的處置與生理變化；你的目標，是把時間贏回來!',
                 embedUrl: virtiPoisoningURL,
-                embedTitle: '食物中毒情境虛擬人訓練'
+                embedTitle: '食物中毒情境虛擬人訓練',
+                detailedInfo: {
+                    role: '你是一位急診醫療人員。',
+                    case: '有一名5歲男童(103公分,25公斤)在家中因食物中毒倒地,發生院外心臟驟停(OHCA)。目前已由家屬送至急診室,病人無呼吸、無脈搏。',
+                    equipment: '病人目前為院內急救情境,所有醫療器材齊全(Ambu、Monitor、除顫器、藥物)。',
+                    task: '你的任務是根據ABCDE評估流程與PBLS/PALS原則,逐步提出檢查與處置,並持續急救直到病人恢復自主循環(ROSC)。'
+                }
             },
             'drowning': {
                 name: '溺水',
@@ -2434,7 +2972,13 @@
                 summary: '泳池救援後的緊急處置，考驗你對呼吸循環監測與團隊分工的指揮能力。',
                 description: '下午3點20分的游泳池旁傳來呼喊——5歲小孩（105公分／20公斤）被拉上岸時已無反應。患者OHCA，家屬在外等待。你只需要說出「下一步要做什麼」的處理措施，系統就會即時呈現團隊/旁人依你指令採取的處置與生理變化；你的目標，是把時間贏回來!',
                 embedUrl: 'https://app.virti.com/embed/my-virtual-humans/1196868c3ab21200c38.72245762',
-                embedTitle: '溺水情境虛擬人訓練'
+                embedTitle: '溺水情境虛擬人訓練',
+                detailedInfo: {
+                    role: '你是一位急診醫療人員。',
+                    case: '有一名5歲男童(105公分,20公斤)下午3點20分時在游泳池溺水,現場被拉上岸時已無反應,發生院外心臟驟停(OHCA)。目前已由家屬送至急診室,現場護理師已經在持續CPR。病人目前無呼吸、無脈搏。',
+                    equipment: '病人目前為院內急救情境,所有醫療器材齊全(Ambu、Monitor、除顫器、藥物)。',
+                    task: '你的任務是根據ABCDE評估流程與PBLS/PALS原則,逐步提出檢查與處置,並持續急救直到病人恢復自主循環(ROSC)。'
+                }
             },
             'fire': {
                 name: '火災嗆傷',
@@ -2443,7 +2987,13 @@
                 summary: '濃煙救出的兒童氧合不佳，掌握嗆傷病人處置重點，安定團隊與家屬。',
                 description: '文化三路住宅區發生一起火災，現場一位8歲兒童（125公分／27公斤）被推進急診，患者OHCA。你只需要說出「下一步要做什麼」的處理措施，系統就會即時呈現團隊/旁人依你指令採取的處置與生理變化；你的目標，是把時間贏回來!',
                 embedUrl: 'https://app.virti.com/embed/my-virtual-humans/1186668bc5a4082d3f0.92972546',
-                embedTitle: '火災嗆傷情境虛擬人訓練'
+                embedTitle: '火災嗆傷情境虛擬人訓練',
+                detailedInfo: {
+                    role: '你是一位急診醫療人員。',
+                    case: '有一名8歲兒童(125公分,27公斤)於火災中吸入大量濃煙並陷入昏迷,發生院外心臟驟停(OHCA)。目前已由家屬送至急診室,病人無呼吸、無脈搏。',
+                    equipment: '病人目前為院內急救情境,所有醫療器材齊全(Ambu、Monitor、除顫器、藥物)。',
+                    task: '你的任務是根據ABCDE評估流程與PBLS/PALS原則,逐步提出檢查與處置,並持續急救直到病人恢復自主循環(ROSC)。包括氣道清理、呼吸監測、靜脈輸液、燒傷處理、CPR與AED操作,以及藥品劑量判斷。'
+                }
             },
             'trauma': {
                 name: '外傷',
@@ -2452,7 +3002,13 @@
                 summary: '事故造成的大量出血，檢查生命徵象並指示止血、評估與後續處置步驟。',
                 description: '下午16點12分，一位6歲男童（100公分／22公斤）因打碎玻璃造成明顯撕裂傷，血迅速滲透衣物；他意識模糊、哭喊聲微弱、四肢冰冷，經家人發現後急救並送往醫院。患者OHCA。你只需要說出「下一步要做什麼」處理措施，系統就會即時呈現團隊/旁人依你指令採取的處置與生理變化；你的目標，是把時間贏回來!',
                 embedUrl: 'https://app.virti.com/embed/my-virtual-humans/1196768c3a4802d6862.95088487',
-                embedTitle: '外傷情境虛擬人訓練'
+                embedTitle: '外傷情境虛擬人訓練',
+                detailedInfo: {
+                    role: '你是一位急診醫療人員。',
+                    case: '有一名6歲男童(100公分,22公斤)因打碎玻璃造成明顯外傷,伴隨嚴重出血,發生院外心臟驟停(OHCA)。目前已由家屬送至急診室,病人無呼吸、無脈搏。',
+                    equipment: '病人目前為院內急救情境,所有醫療器材齊全(Ambu、Monitor、除顫器、藥物)。',
+                    task: '你的任務是根據ABCDE評估流程與PBLS/PALS原則,逐步提出檢查與處置,並持續急救直到病人恢復自主循環(ROSC)。'
+                }
             }
         };
 
@@ -2588,16 +3144,34 @@
                 iframe.src = url;
             }
 
+            // 启用全屏模式
+            scenarioEmbed.classList.add('fullscreen');
+            document.body.classList.add('scenario-fullscreen');
+            
+            // 尝试通过 postMessage 隐藏 Virti 的查看简介按钮（如果 Virti 支持）
+            try {
+                iframe.contentWindow.postMessage({
+                    type: 'hideProfileButton',
+                    hide: true
+                }, '*');
+            } catch (e) {
+                console.log('无法与 Virti iframe 通信:', e);
+            }
+            
             scenarioEmbed.style.display = 'flex';
-            scenarioEmbed.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
 
         function hideScenarioEmbed(resetSrc = false) {
             const scenarioEmbed = document.getElementById('scenarioEmbed');
             const iframe = document.getElementById('scenarioEmbedFrame');
+            
+            // 退出全屏模式
             if (scenarioEmbed) {
+                scenarioEmbed.classList.remove('fullscreen');
                 scenarioEmbed.style.display = 'none';
             }
+            document.body.classList.remove('scenario-fullscreen');
+            
             if (resetSrc && iframe) {
                 iframe.src = '';
             }
@@ -2611,6 +3185,113 @@
                 scenarioDetail.scrollIntoView({ behavior: 'smooth', block: 'start' });
             }
         }
+
+        // 返回情景列表
+        function returnToScenarioList() {
+            hideScenarioEmbed(true);
+            showScenarioBoard();
+        }
+
+        // 返回练习专区
+        function returnToPracticeHomepage() {
+            hideScenarioEmbed(true);
+            goBackToHomepage();
+        }
+
+        // 显示情境简介模态窗口
+        function showScenarioIntro() {
+            if (!currentScenarioType) {
+                alert('請先選擇情境模擬。');
+                return;
+            }
+
+            const scenario = scenarioData[currentScenarioType];
+            if (!scenario) {
+                alert('找不到情境資料。');
+                return;
+            }
+
+            const modal = document.getElementById('scenarioIntroModal');
+            if (!modal) {
+                return;
+            }
+
+            // 更新模态窗口标题（header中的标题可以隐藏或保留）
+            const titleEl = document.getElementById('scenarioIntroTitle');
+            if (titleEl) {
+                titleEl.textContent = scenario.name;
+            }
+
+            // 更新左侧标题
+            const leftTitleEl = document.getElementById('scenarioIntroLeftTitle');
+            if (leftTitleEl) {
+                leftTitleEl.textContent = scenario.name;
+            }
+
+            // 更新头像区域（如果有图片）
+            const avatarEl = document.getElementById('scenarioIntroAvatar');
+            if (avatarEl && scenario.image) {
+                avatarEl.innerHTML = `<img src="${scenario.image}" alt="${scenario.name}">`;
+            }
+
+            // 更新时间显示（可以根据实际情况调整）
+            const timeEl = document.getElementById('scenarioIntroTime');
+            if (timeEl) {
+                const now = new Date();
+                const hours = String(now.getHours()).padStart(2, '0');
+                const minutes = String(now.getMinutes()).padStart(2, '0');
+                timeEl.textContent = `${hours}:${minutes}`;
+            }
+
+            // 更新详细内容 - 组合成完整描述文本
+            const descriptionEl = document.getElementById('scenarioIntroDescription');
+            if (descriptionEl) {
+                if (scenario.detailedInfo) {
+                    // 组合所有信息为一个完整段落
+                    const fullDescription = [
+                        scenario.detailedInfo.role,
+                        scenario.detailedInfo.case,
+                        scenario.detailedInfo.equipment,
+                        scenario.detailedInfo.task
+                    ].filter(text => text).join(' ');
+                    descriptionEl.textContent = fullDescription;
+                } else {
+                    // 如果没有详细内容，使用基本描述
+                    const defaultDescription = `您是一位急診醫療人員，需要處理緊急醫療情況。${scenario.description || ''}所有需要的醫療設備都已準備好（Ambu、Monitor、Defibrillator、Medications）。請您根據ABCDE評估與PBLS/PALS原則進行檢查與處置，以達到ROSC（Return of Spontaneous Circulation，自主循環恢復）。`;
+                    descriptionEl.textContent = defaultDescription;
+                }
+            }
+
+            // 显示模态窗口
+            modal.classList.add('show');
+            
+            // 点击背景关闭（使用事件委托，避免重复添加）
+            const modalClickHandler = function(e) {
+                if (e.target === modal) {
+                    closeScenarioIntro();
+                    modal.removeEventListener('click', modalClickHandler);
+                }
+            };
+            modal.addEventListener('click', modalClickHandler);
+
+            // ESC 键关闭
+            const escHandler = function(e) {
+                if (e.key === 'Escape' && modal.classList.contains('show')) {
+                    closeScenarioIntro();
+                    document.removeEventListener('keydown', escHandler);
+                }
+            };
+            document.addEventListener('keydown', escHandler);
+        }
+
+        // 关闭情境简介模态窗口
+        function closeScenarioIntro() {
+            const modal = document.getElementById('scenarioIntroModal');
+            if (modal) {
+                modal.classList.remove('show');
+            }
+        }
+
 
         // 用戶頭像功能
         function showUserProfile() {
