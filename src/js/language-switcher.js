@@ -28,8 +28,8 @@ class LanguageSwitcher {
           },
           // 資訊頁面專用內容
           hero: {
-            title: '小兒基本生命支持（PBLS）',
-            description: '小兒基本生命支持（PBLS）是專為兒童與嬰幼兒設計的重要急救流程，協助第一時間正確判斷並處理呼吸或心跳驟停的狀況。本平台提供完整的學習資源，涵蓋標準理論基礎、系統化流程操作與多情境模擬，透過圖解說明與互動式演練，幫助學員快速理解並熟練應變步驟，最終目標是讓每位學習者在關鍵時刻都能正確反應，提升急救成功率，守護孩子的生命安全',
+            title: '小兒基本救命術（PBLS）',
+            description: '小兒基本救命術（PBLS）是專為兒童與嬰幼兒設計的重要急救流程，協助第一時間正確判斷並處理呼吸或心跳驟停的狀況。本平台提供完整的學習資源，涵蓋標準理論基礎、系統化流程操作與多情境模擬，透過圖解說明與互動式演練，幫助學員快速理解並熟練應變步驟，最終目標是讓每位學習者在關鍵時刻都能正確反應，提升急救成功率，守護孩子的生命安全',
             learnMoreButton: '了解更多'
           },
           flowchart: {
@@ -66,48 +66,51 @@ class LanguageSwitcher {
               title: '心臟驟停處理措施',
               steps: [
                 '立即進行CPR（心肺復甦術）',
-                '使用AED進行電擊（50J）',
-                '給予腎上腺素',
-                '漸進式電擊治療',
-                '轉送加護病房'
+                '使用AED進行電擊（第一次電擊2J/kg，第二次電擊4J/kg）',
+                '給予腎上腺素(Epinephrine)',
+                '轉送PICU'
               ]
             },
             poisoning: {
               title: '食物中毒處理措施',
               steps: [
                 '清理呼吸道，確保氣道暢通',
-                '使用袋瓣罩進行人工呼吸',
-                '進行心肺復甦術',
-                '使用AED進行電擊（80J）',
-                '給予胺碘酮'
+                '使用bag-mask進行通氣',
+                '進行CPR(心肺復甦術)',
+                '進行電擊(第一次電擊2J/kg，第二次電擊4J/kg)',
+                '給予胺碘酮(Amiodarone)',
+                '轉送PICU'
               ]
             },
             drowning: {
               title: '溺水處理措施',
               steps: [
                 '抽吸呼吸道中的水分',
-                '使用袋瓣罩進行人工呼吸',
-                '進行心肺復甦術',
-                '使用AED進行電擊（60J）',
-                '給予胺碘酮'
+                '使用bag-mask進行通氣',
+                '進行CPR(心肺復甦術)',
+                '使用AED進行電擊（第一次電擊2J/kg，第二次電擊4J/kg）',
+                '給予胺碘酮(Amiodarone)',
+                '轉送PICU'
               ]
             },
             fire: {
               title: '火災嗆傷處理措施',
               steps: [
                 '進行氣管插管並給予氧氣',
-                '進行心肺復甦術',
-                '使用AED進行電擊（80-100J）',
-                '給予腎上腺素'
+                '進行CPR(心肺復甦術)',
+                '使用AED進行電擊（第一次電擊2J/kg，第二次電擊4J/kg）',
+                '給予腎上腺素(Epinephrine)',
+                '轉送PICU'
               ]
             },
             trauma: {
               title: '外傷處理措施',
               steps: [
                 '進行止血並建立靜脈輸液',
-                '進行心肺復甦術',
-                '使用AED進行電擊（70J）',
-                '給予腎上腺素'
+                '進行CPR(心肺復甦術)',
+                '使用AED進行電擊（第一次電擊2J/kg，第二次電擊4J/kg）',
+                '給予腎上腺素(Epinephrine)',
+                '轉送PICU'
               ]
             }
           },
@@ -197,7 +200,7 @@ class LanguageSwitcher {
           // 資訊頁面專用內容
           hero: {
             title: 'Pediatric Basic Life Support (PBLS)',
-            description: 'Pediatric Basic Life Support (PBLS) is the essential guideline for rescuing infants and children in cardiac or respiratory arrest. This platform provides systematic training combining theory, process flow, and scenario simulations.',
+            description: 'Pediatric Basic Life Support (PBLS) is an important first aid procedure designed for children and infants, helping to correctly assess and handle respiratory or cardiac arrest situations in the first instance. This platform provides comprehensive learning resources covering standard theoretical foundations, systematic process operations, and multi-scenario simulations. Through illustrated explanations and interactive exercises, it helps learners quickly understand and master response procedures. The ultimate goal is to enable every learner to respond correctly at critical moments, improve first aid success rates, and protect children\'s lives.',
             learnMoreButton: 'Learn More'
           },
           flowchart: {
@@ -234,48 +237,51 @@ class LanguageSwitcher {
               title: 'Cardiac Arrest Treatment Measures',
               steps: [
                 'Immediately perform CPR (Cardiopulmonary Resuscitation)',
-                'Use AED for defibrillation (50J)',
+                'Use AED for defibrillation (First shock: 2J/kg, Second shock: 4J/kg)',
                 'Administer Epinephrine',
-                'Progressive defibrillation treatment',
-                'Transfer to ICU'
+                'Transfer to PICU'
               ]
             },
             poisoning: {
               title: 'Food Poisoning Treatment Measures',
               steps: [
                 'Clear airway to ensure patency',
-                'Use bag-mask for artificial ventilation',
-                'Perform CPR',
-                'Use AED for defibrillation (80J)',
-                'Administer Amiodarone'
+                'Use bag-mask for ventilation',
+                'Perform CPR (Cardiopulmonary Resuscitation)',
+                'Perform defibrillation (First shock: 2J/kg, Second shock: 4J/kg)',
+                'Administer Amiodarone',
+                'Transfer to PICU'
               ]
             },
             drowning: {
               title: 'Drowning Treatment Measures',
               steps: [
                 'Suction water from airway',
-                'Use bag-mask for artificial ventilation',
-                'Perform CPR',
-                'Use AED for defibrillation (60J)',
-                'Administer Amiodarone'
+                'Use bag-mask for ventilation',
+                'Perform CPR (Cardiopulmonary Resuscitation)',
+                'Use AED for defibrillation (First shock: 2J/kg, Second shock: 4J/kg)',
+                'Administer Amiodarone',
+                'Transfer to PICU'
               ]
             },
             fire: {
               title: 'Fire Inhalation Injury Treatment Measures',
               steps: [
                 'Perform endotracheal intubation and provide oxygen',
-                'Perform CPR',
-                'Use AED for defibrillation (80-100J)',
-                'Administer Epinephrine'
+                'Perform CPR (Cardiopulmonary Resuscitation)',
+                'Use AED for defibrillation (First shock: 2J/kg, Second shock: 4J/kg)',
+                'Administer Epinephrine',
+                'Transfer to PICU'
               ]
             },
             trauma: {
               title: 'Trauma Treatment Measures',
               steps: [
                 'Perform hemostasis and establish IV access',
-                'Perform CPR',
-                'Use AED for defibrillation (70J)',
-                'Administer Epinephrine'
+                'Perform CPR (Cardiopulmonary Resuscitation)',
+                'Use AED for defibrillation (First shock: 2J/kg, Second shock: 4J/kg)',
+                'Administer Epinephrine',
+                'Transfer to PICU'
               ]
             }
           },

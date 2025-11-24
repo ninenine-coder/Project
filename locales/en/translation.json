@@ -14,17 +14,17 @@
     },
     "marquee": {
       "item1": "🎯 Welcome to PBLS VR Learning Platform!",
-      "item2": "📚 360° Immersive Teaching Videos for Realistic Learning",
-      "item3": "🤖 Virtual Human Interaction to Improve Communication Skills",
-      "item4": "🎮 VR Practical Operations Simulating Real Emergency Situations",
+      "item2": "📚 360° Immersive Teaching Videos for Realistic Learning Experience",
+      "item3": "🤖 Scenario Simulation Dialogue to Improve First Aid Communication Skills",
+      "item4": "🎮 VR Operation Test Simulating Real Emergency Situations",
       "item5": "📊 Real-time Score Tracking to Monitor Learning Progress",
       "item6": "💡 Problem-Based Learning to Enhance First Aid Skills"
     },
     "menu": {
       "info": "Information",
-      "practice": "Practice",
-      "exam": "Exam",
-      "history": "History",
+      "practice": "Practice Area",
+      "exam": "Exam Area",
+      "history": "History Results",
       "team": "Team"
     },
     "language": {
@@ -34,11 +34,14 @@
   "info": {
     "hero": {
       "title": "Pediatric Basic Life Support (PBLS)",
-      "description": "Pediatric Basic Life Support (PBLS) is the essential guideline for rescuing infants and children in cardiac or respiratory arrest. This platform provides systematic training combining theory, process flow, and scenario simulations.",
+      "description": "Pediatric Basic Life Support (PBLS) is an important first aid procedure designed for children and infants, helping to correctly assess and handle respiratory or cardiac arrest situations in the first instance. This platform provides comprehensive learning resources covering standard theoretical foundations, systematic process operations, and multi-scenario simulations. Through illustrated explanations and interactive exercises, it helps learners quickly understand and master response procedures. The ultimate goal is to enable every learner to respond correctly at critical moments, improve first aid success rates, and protect children's lives.",
       "learnMoreButton": "Learn More"
     },
     "flowchart": {
       "title": "PBLS Flowchart"
+    },
+    "knowledge": {
+      "title": "PBLS Concept Clarification"
     },
     "scenarios": {
       "title": "Scenario Simulation Cases",
@@ -71,48 +74,51 @@
         "title": "Cardiac Arrest Treatment Measures",
         "steps": [
           "Immediately perform CPR (Cardiopulmonary Resuscitation)",
-          "Use AED for defibrillation (50J)",
+          "Use AED for defibrillation (First shock: 2J/kg, Second shock: 4J/kg)",
           "Administer Epinephrine",
-          "Progressive defibrillation treatment",
-          "Transfer to ICU"
+          "Transfer to PICU"
         ]
       },
       "poisoning": {
         "title": "Food Poisoning Treatment Measures",
         "steps": [
           "Clear airway to ensure patency",
-          "Use bag-mask for artificial ventilation",
-          "Perform CPR",
-          "Use AED for defibrillation (80J)",
-          "Administer Amiodarone"
+          "Use bag-mask for ventilation",
+          "Perform CPR (Cardiopulmonary Resuscitation)",
+          "Perform defibrillation (First shock: 2J/kg, Second shock: 4J/kg)",
+          "Administer Amiodarone",
+          "Transfer to PICU"
         ]
       },
       "drowning": {
         "title": "Drowning Treatment Measures",
         "steps": [
           "Suction water from airway",
-          "Use bag-mask for artificial ventilation",
-          "Perform CPR",
-          "Use AED for defibrillation (60J)",
-          "Administer Amiodarone"
+          "Use bag-mask for ventilation",
+          "Perform CPR (Cardiopulmonary Resuscitation)",
+          "Use AED for defibrillation (First shock: 2J/kg, Second shock: 4J/kg)",
+          "Administer Amiodarone",
+          "Transfer to PICU"
         ]
       },
       "fire": {
         "title": "Fire Inhalation Injury Treatment Measures",
         "steps": [
           "Perform endotracheal intubation and provide oxygen",
-          "Perform CPR",
-          "Use AED for defibrillation (80-100J)",
-          "Administer Epinephrine"
+          "Perform CPR (Cardiopulmonary Resuscitation)",
+          "Use AED for defibrillation (First shock: 2J/kg, Second shock: 4J/kg)",
+          "Administer Epinephrine",
+          "Transfer to PICU"
         ]
       },
       "trauma": {
         "title": "Trauma Treatment Measures",
         "steps": [
           "Perform hemostasis and establish IV access",
-          "Perform CPR",
-          "Use AED for defibrillation (70J)",
-          "Administer Epinephrine"
+          "Perform CPR (Cardiopulmonary Resuscitation)",
+          "Use AED for defibrillation (First shock: 2J/kg, Second shock: 4J/kg)",
+          "Administer Epinephrine",
+          "Transfer to PICU"
         ]
       }
     },
@@ -123,14 +129,14 @@
   },
   "practice": {
     "title": "Practice Area",
-    "description": "Here we provide 360° immersive teaching videos and virtual human interaction learning.",
+    "description": "Here we provide 360° immersive teaching videos and scenario simulation dialogue learning.",
     "videoSection": {
       "title": "360° Immersive Teaching Videos",
-      "description": "Watch high-quality 360-degree videos and experience immersive first aid scenarios"
+      "description": "Present real scenarios through immersive videos, experience on-site pressure, and strengthen memory with interactive prompts"
     },
     "virtualHumanSection": {
-      "title": "Virtual Human Interaction",
-      "description": "Practice dialogue with AI-driven virtual patients to improve communication skills"
+      "title": "Scenario Simulation Dialogue",
+      "description": "Virtual medical assistants will describe scenario simulations. Please make correct response measures according to the simulation situation"
     }
   },
   "quiz": {

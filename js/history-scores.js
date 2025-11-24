@@ -50,7 +50,7 @@ function renderScores(items) {
         Math.round(r.timeSpentMs / 60000) + "分" + Math.round((r.timeSpentMs % 60000) / 1000) + "秒") : 
       "未知";
     
-    const examType = r.examType || "筆試測驗";
+    const examType = r.examType === 'virti' ? '虛擬人訓練' : (r.examType || "筆試測驗");
     const scoreDisplay = r.score ? `${r.score}分` : "未知";
     const correctInfo = r.correctCount && r.questionCount ? 
       ` (${r.correctCount}/${r.questionCount})` : "";

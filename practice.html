@@ -1518,20 +1518,87 @@
             margin-right: 10px;
         }
 
+        /* 360影片全屏模式样式 */
+        .vr-video-content {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 10000;
+            background: url("./assets/背景.png") center calc(50% + 58px) / cover no-repeat;
+            overflow-y: auto;
+            padding: 0;
+            margin: 0;
+        }
+
+        .vr-video-content .content-header {
+            display: none; /* 隐藏标题 */
+        }
+
+        /* 360影片控制按钮 */
+        .vr-video-controls {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 10001;
+            display: flex;
+            gap: 12px;
+            flex-direction: column;
+        }
+
+        .vr-control-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 20px;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 25px;
+            color: #fff;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .vr-control-btn:hover {
+            background: rgba(0, 0, 0, 0.95);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+
+        .vr-control-btn i {
+            font-size: 16px;
+        }
+
         /* Virti 360° 完整影片嵌入 */
         .virti-360-wrapper {
             position: relative;
             width: 100%;
-            max-width: 1200px;
-            margin: 0 auto;
+            max-width: 100%;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .virti-360-frame {
             width: 100%;
-            min-height: 600px;
+            max-width: 1140px;
+            height: 642px;
             border: none;
             border-radius: 12px;
             box-shadow: 0 18px 38px rgba(79, 70, 229, 0.15);
+            margin: 0 auto;
+            display: block;
         }
 
         .virti-seek-blocker {
@@ -1713,6 +1780,18 @@
             display: none;
         }
 
+        /* 360影片全屏模式下的讨论区样式 */
+        .vr-video-content .discussion-section {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            padding: 60px 20px;
+            margin-top: 40px;
+            min-height: 100vh;
+        }
+
+        .vr-video-content .content-footer {
+            display: none; /* 隐藏原有的返回按钮，使用右上角的按钮 */
+        }
+
         /* 討論區樣式 */
         .discussion-section {
             max-width: 1000px;
@@ -1725,9 +1804,32 @@
             border: 1px solid rgba(255, 255, 255, 0.2);
         }
 
+        /* 360影片全屏模式下的讨论区容器 */
+        .vr-video-content .discussion-container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(20px);
+            border-radius: 24px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
         .discussion-container {
             max-width: 800px;
             margin: 0 auto;
+        }
+
+        /* 留言卡片悬停效果 */
+        .vr-video-content .cmt {
+            transition: all 0.3s ease;
+        }
+
+        .vr-video-content .cmt:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1) !important;
+            border-color: rgba(102, 126, 234, 0.3) !important;
         }
 
         .card-icon {
@@ -2041,6 +2143,7 @@
             }
         }, true);
         
+        
         // VR 360 實境教學影片錯誤處理
         window.addEventListener('error', function(e) {
             if (e.target && e.target.tagName === 'IFRAME') {
@@ -2205,71 +2308,64 @@
 
                 <!-- 360°實境教學影片內容 -->
                 <div class="vr-video-content content-container" id="vrVideoContent" style="display: none;">
-                    <div class="content-header">
-                        <h2><i class="fas fa-play-circle"></i> 360°實境教學影片</h2>
-                        <p>以實境影片呈現實境場景，感受現場壓力，搭配互動提示強化記憶</p>
+                    <!-- 360影片全屏模式控制按钮 -->
+                    <div class="vr-video-controls">
+                        <button class="vr-control-btn" onclick="scrollToDiscussion()" title="到討論區">
+                            <i class="fas fa-comments"></i>
+                            <span>到討論區</span>
+                        </button>
+                        <button class="vr-control-btn" onclick="goBackToHomepage()" title="返回練習專區">
+                            <i class="fas fa-home"></i>
+                            <span>返回練習專區</span>
+                        </button>
                     </div>
                     
                     <div class="virti-360-wrapper">
-                            <iframe
-                            title="Virti-360"
+                        <!-- Virti 360度视频播放器 -->
+                        <iframe
+                            title="Virti-Player"
                             id="Virti360Player"
                             class="virti-360-frame"
-                            width="100%"
-                            height="600"
+                            src="https://app.virti.com/embed/my-simulations/35981690f54168db201.29010440"
+                            width="1140"
+                            height="642"
                             allow="fullscreen; xr-spatial-tracking;"
-                            src=""
-                                loading="lazy"
-                                referrerpolicy="origin-when-cross-origin">
-                            </iframe>
+                            loading="lazy"
+                            referrerpolicy="origin-when-cross-origin">
+                        </iframe>
                         <div class="virti-seek-blocker" aria-hidden="true"></div>
-                        <div class="pbls-overlay-progress">
-                            <div class="pbls-overlay-inner">
-                                <div class="pbls-progress-wrapper">
-                                    <div class="pbls-progress-bar">
-                                        <div class="pbls-step is-active" data-step="1" data-start="0">
-                                            <div class="pbls-step-icon" aria-hidden="true">📞</div>
-                                            <div class="pbls-step-label">接聽電話</div>
-                                        </div>
-                                        <div class="pbls-connector" aria-hidden="true"></div>
-                                        <div class="pbls-step" data-step="2" data-start="80">
-                                            <div class="pbls-step-icon" aria-hidden="true">🛏️</div>
-                                            <div class="pbls-step-label">患者轉送</div>
-                                        </div>
-                                        <div class="pbls-connector" aria-hidden="true"></div>
-                                        <div class="pbls-step" data-step="3" data-start="170">
-                                            <div class="pbls-step-icon" aria-hidden="true">🚨</div>
-                                            <div class="pbls-step-label">急救中</div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="pbls-subtitle-header">
-                                    <div class="pbls-subtitle-timer" id="subtitleTimerDisplay">00:00</div>
-                                </div>
-                                <div class="pbls-subtitle-text" id="subtitleTextDisplay">點擊「開始」即可同步字幕</div>
-                            </div>
-                        </div>
                     </div>
 
                     <!-- 討論區 -->
                     <div class="discussion-section">
                         <div class="discussion-container">
-                            <h2 style="margin:0 0 20px;color:#2c3e50;font-size:24px;font-weight:600;text-align:center;">討論區</h2>
+                            <div style="text-align: center; margin-bottom: 40px;">
+                                <h2 style="margin:0 0 10px;color:#1e293b;font-size:32px;font-weight:800;background:linear-gradient(135deg, #667eea 0%, #764ba2 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">討論區</h2>
+                                <p style="color:#64748b;font-size:16px;margin:0;">分享您的想法，與其他學員交流學習心得</p>
+                            </div>
 
                             <!-- 發文 -->
-                            <div style="background:#fff;padding:20px;border-radius:15px;margin-bottom:20px;border:1px solid #e9ecef;box-shadow:0 2px 8px rgba(0,0,0,0.1);">
-                                <textarea id="newComment" rows="3" placeholder="留下想法或提問（Shift+Enter 換行，Enter 送出）"
-                                    style="width:100%;background:#fff;color:#333;border:1px solid #ddd;border-radius:8px;padding:12px;font-size:14px;resize:vertical;font-family:inherit;"></textarea>
-                                <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:12px;">
-                                    <button id="postBtn" style="padding:10px 20px;border:1px solid #26a69a;color:#26a69a;background:transparent;border-radius:8px;font-size:14px;cursor:pointer;transition:all 0.3s;">
-                                        發佈
+                            <div style="background:linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);padding:28px;border-radius:20px;margin-bottom:30px;border:1px solid rgba(102, 126, 234, 0.2);box-shadow:0 8px 24px rgba(102, 126, 234, 0.1);">
+                                <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;">
+                                    <div style="width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg, #667eea 0%, #764ba2 100%);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:600;">
+                                        <i class="fas fa-user"></i>
+                                    </div>
+                                    <div>
+                                        <div id="whoami" style="font-size:14px;color:#1e293b;font-weight:600;"></div>
+                                        <div style="font-size:12px;color:#64748b;">留下您的想法或提問</div>
+                                    </div>
+                                </div>
+                                <textarea id="newComment" rows="4" placeholder="留下想法或提問（Shift+Enter 換行，Enter 送出）"
+                                    style="width:100%;background:#fff;color:#1e293b;border:2px solid #e2e8f0;border-radius:12px;padding:16px;font-size:15px;resize:vertical;font-family:inherit;transition:all 0.3s;min-height:100px;"></textarea>
+                                <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:16px;">
+                                    <button id="postBtn" style="padding:12px 28px;border:none;color:#fff;background:linear-gradient(135deg, #667eea 0%, #764ba2 100%);border-radius:12px;font-size:15px;font-weight:600;cursor:pointer;transition:all 0.3s;box-shadow:0 4px 12px rgba(102, 126, 234, 0.3);">
+                                        <i class="fas fa-paper-plane" style="margin-right:6px;"></i>發佈
                                     </button>
                                 </div>
-                                <div id="whoami" style="font-size:12px;color:#6c757d;margin-top:8px;"></div>
                             </div>
 
                             <!-- 留言列表 -->
-                            <div id="commentList" style="display:flex;flex-direction:column;gap:16px;background:#fff;padding:20px;border-radius:15px;border:1px solid #e9ecef;box-shadow:0 2px 8px rgba(0,0,0,0.1);"></div>
+                            <div id="commentList" style="display:flex;flex-direction:column;gap:20px;background:transparent;padding:0;"></div>
                         </div>
                     </div>
                     
@@ -2456,8 +2552,8 @@
                 // 更新 Virti360Player 的 URL
                 const virti360Player = document.getElementById('Virti360Player');
                 if (virti360Player) {
-                    // 如果src为空或未设置，使用基础URL
-                    const baseUrl = virti360Player.src || 'https://app.virti.com/embed/my-simulations/35981690f54168db201.29010440';
+                    // 使用正确的360影片URL
+                    const baseUrl = 'https://app.virti.com/embed/my-simulations/35981690f54168db201.29010440';
                     const urlWithUserId = addExternalUserIDToVirtiUrl(baseUrl);
                     virti360Player.src = urlWithUserId;
                     console.log('✅ Virti360Player URL已更新，添加external_user_id:', urlWithUserId);
@@ -2593,6 +2689,9 @@
             const homepage = document.getElementById('practiceHomepage');
             const vrVideoContent = document.getElementById('vrVideoContent');
             const virtualHumanContent = document.getElementById('virtualHumanContent');
+            const sidebar = document.querySelector('.sidebar');
+            const header = document.querySelector('.header');
+            const marquee = document.querySelector('.marquee');
             
             // 隱藏首頁
             homepage.style.display = 'none';
@@ -2602,10 +2701,22 @@
                 setMarqueeVisibility(false);
                 vrVideoContent.style.display = 'block';
                 resetSubtitleTimer();
+                
+                // 隐藏侧边栏和顶部栏（全屏模式）
+                if (sidebar) sidebar.style.display = 'none';
+                if (header) header.style.display = 'none';
+                if (marquee) marquee.style.display = 'none';
+                
+                // 滚动到顶部
+                window.scrollTo(0, 0);
             } else if (practiceType === 'virtual-human') {
                 setMarqueeVisibility(false);
                 virtualHumanContent.style.display = 'block';
                 resetScenarioSelection();
+                
+                // 显示侧边栏和顶部栏
+                if (sidebar) sidebar.style.display = '';
+                if (header) header.style.display = '';
             }
         }
 
@@ -2614,6 +2725,10 @@
             const homepage = document.getElementById('practiceHomepage');
             const vrVideoContent = document.getElementById('vrVideoContent');
             const virtualHumanContent = document.getElementById('virtualHumanContent');
+            const sidebar = document.querySelector('.sidebar');
+            const header = document.querySelector('.header');
+            const marquee = document.querySelector('.marquee');
+            
             hideScenarioEmbed(true);
             
             // 隱藏所有內容頁面
@@ -2622,9 +2737,26 @@
             
             // 顯示首頁
             homepage.style.display = 'block';
+            
+            // 恢复显示侧边栏和顶部栏
+            if (sidebar) sidebar.style.display = '';
+            if (header) header.style.display = '';
+            if (marquee) marquee.style.display = '';
+            
             setMarqueeVisibility(true);
             resetScenarioSelection();
             resetSubtitleTimer();
+            
+            // 滚动到顶部
+            window.scrollTo(0, 0);
+        }
+
+        // 滚动到讨论区
+        function scrollToDiscussion() {
+            const discussionSection = document.querySelector('.discussion-section');
+            if (discussionSection) {
+                discussionSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
         }
 
         const virtiPoisoningURL = "https://app.virti.com/embed/my-virtual-humans/1208968ca5abf489df0.28003731";
@@ -2800,6 +2932,7 @@
             }
         }
 
+
         function triggerVirtiPlayPause() {
             const iframe = document.getElementById('Virti360Player');
             if (!iframe) return;
@@ -2818,12 +2951,301 @@
             });
         }
 
+        // 情境ID映射：从Virti embedUrl到情境ID
+        const scenarioIdMap = {
+            '1205368c978ec0b4f87.81769899': 'cardiac',  // 心臟驟停
+            '1208968ca5abf489df0.28003731': 'poisoning', // 食物中毒
+            '1196868c3ab21200c38.72245762': 'drowning',  // 溺水
+            '1186668bc5a4082d3f0.92972546': 'fire',      // 火災嗆傷
+            '1196768c3a4802d6862.95088487': 'trauma'     // 外傷
+        };
+
+        // 从URL中提取Virti情境ID
+        function extractVirtiScenarioId(url) {
+            if (!url) return null;
+            const match = url.match(/my-virtual-humans\/([a-f0-9]+\.[0-9]+)/);
+            if (match && match[1]) {
+                return match[1];
+            }
+            return null;
+        }
+
+        // 获取当前情境的ID
+        function getCurrentScenarioId() {
+            // 优先使用当前选择的情境类型
+            if (currentScenarioType && scenarioData[currentScenarioType]) {
+                return currentScenarioType;
+            }
+            
+            // 如果当前有显示的情境iframe，从URL中提取
+            const iframe = document.getElementById('scenarioEmbedFrame');
+            if (iframe && iframe.src) {
+                const virtiId = extractVirtiScenarioId(iframe.src);
+                if (virtiId && scenarioIdMap[virtiId]) {
+                    return scenarioIdMap[virtiId];
+                }
+            }
+            
+            return null;
+        }
+
+        // 获取用户名
+        function getUserName() {
+            try {
+                // 优先从 localStorage 获取
+                const savedUser = localStorage.getItem('pbls_user');
+                if (savedUser) {
+                    const userData = JSON.parse(savedUser);
+                    return userData.name || userData.displayName || userData.account || '未命名使用者';
+                }
+                
+                const profile = JSON.parse(localStorage.getItem('pbls_user_profile') || 'null');
+                if (profile?.name) return profile.name;
+                if (profile?.学号) return profile.学号;
+                if (profile?.工号) return profile.工号;
+                
+                return '未命名使用者';
+            } catch (error) {
+                console.error('获取用户名失败:', error);
+                return '未命名使用者';
+            }
+        }
+
+        // 保存Virti成绩到Firestore（保存到scores集合，与历史成绩页面兼容）
+        async function saveVirtiScoreToFirestore(userId, scenarioId, score, actionType = 'score', originalData = null) {
+            try {
+                // 更新会话数据中的成绩（即使 score 是 0 也更新，可能是真实的 0 分）
+                // 但如果新分数更高，则更新为更高的分数
+                if (typeof score === 'number' && score >= 0) {
+                    if (score > (virtiSessionData.score || 0) || virtiSessionData.score === undefined || virtiSessionData.score === null) {
+                        virtiSessionData.score = score;
+                        console.log('💾 在保存函数中更新成绩:', score);
+                    }
+                }
+                
+                // 检查是否是 setScore 消息且包含 saveAndQuit，如果是则立即保存
+                const shouldSaveImmediately = (actionType === 'setScore' && originalData && originalData.saveAndQuit === true);
+                
+                // 只在 setCompleted 或 setScore (saveAndQuit=true) 时保存到 scores 集合（避免重复保存）
+                if (actionType !== 'setCompleted' && !shouldSaveImmediately) {
+                    console.log('📊 收到成绩更新（暂不保存，等待完成）:', { 
+                        actionType, 
+                        score, 
+                        scenarioId,
+                        currentScore: virtiSessionData.score
+                    });
+                    return true; // 只记录，不保存
+                }
+                
+                // 如果是 setCompleted，添加延迟等待可能的 setScore 消息到达
+                // 如果是 setScore (saveAndQuit=true)，立即保存（不需要延迟）
+                if (actionType === 'setCompleted' && !shouldSaveImmediately) {
+                    console.log('⏳ 等待可能的 setScore 消息（延迟 800ms）...');
+                    await new Promise(resolve => setTimeout(resolve, 800));
+                } else if (shouldSaveImmediately) {
+                    console.log('💾 检测到 setScore (saveAndQuit=true)，立即保存成绩');
+                }
+
+                // 计算测验时长（如果还没有从消息中获取）
+                // 重要：确保时长被正确计算并保存到 virtiSessionData
+                if (!virtiSessionData.duration || virtiSessionData.duration === 0) {
+                    if (virtiStartTime) {
+                        const calculatedDuration = Date.now() - virtiStartTime;
+                        virtiSessionData.duration = calculatedDuration;
+                        console.log('⏱️ 计算测验时长:', Math.round(virtiSessionData.duration / 1000) + '秒');
+                    } else {
+                        console.warn('⚠️ 无法计算测验时长，virtiStartTime 未设置');
+                        virtiSessionData.duration = 0;
+                    }
+                } else {
+                    console.log('✅ 使用已有的时长:', Math.round(virtiSessionData.duration / 1000) + '秒');
+                }
+
+                // 动态导入Firebase模块
+                const { initializeApp, getApps, getApp } = await import('https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js');
+                const { getFirestore, collection, addDoc, serverTimestamp } = await import('https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore.js');
+
+                // Firebase配置
+                const firebaseConfig = {
+                    apiKey: "AIzaSyBuWO8hFVjjTUe2tqJDrqdbeGTrp4PoT5Q",
+                    authDomain: "progect-115a5.firebaseapp.com",
+                    projectId: "progect-115a5"
+                };
+
+                // 初始化Firebase
+                const app = getApps().length ? getApp() : initializeApp(firebaseConfig);
+                const db = getFirestore(app);
+
+                // 获取情境名称
+                const scenarioName = scenarioData[scenarioId]?.name || scenarioId;
+                
+                // 获取用户名
+                const userName = getUserName();
+
+                // 测验开始时间（几月几号几点几分）
+                const testDateTime = virtiSessionData.startTime || new Date();
+                const testDate = testDateTime.toLocaleDateString('zh-TW', { 
+                    year: 'numeric', 
+                    month: '2-digit', 
+                    day: '2-digit' 
+                });
+                const testTime = testDateTime.toLocaleTimeString('zh-TW', { 
+                    hour: '2-digit', 
+                    minute: '2-digit',
+                    hour12: false 
+                });
+
+                // 同时获取 Firebase Auth UID（作为备用，确保兼容性）
+                let firebaseAuthUID = null;
+                try {
+                    const { getAuth, authReady } = await import('https://www.gstatic.com/firebasejs/10.13.1/firebase-auth.js');
+                    await authReady;
+                    const authInstance = getAuth(app);
+                    if (authInstance.currentUser) {
+                        firebaseAuthUID = authInstance.currentUser.uid;
+                    }
+                } catch (e) {
+                    console.warn('⚠️ 无法获取 Firebase Auth UID:', e);
+                }
+
+                // 确保使用会话数据中的最新值
+                // 优先使用会话数据中的 score（这是最新更新的值），如果没有则使用传入的 score
+                // 这是因为 setScore 可能在 setCompleted 之后才到达，我们需要使用最新的值
+                const finalScore = (virtiSessionData.score !== undefined && virtiSessionData.score !== null) 
+                    ? virtiSessionData.score 
+                    : ((typeof score === 'number' && score !== undefined && score !== null) ? score : 0);
+                
+                // 时长：优先使用会话数据中的 duration，如果没有则计算
+                let finalDuration = virtiSessionData.duration || 0;
+                if (finalDuration === 0 && virtiStartTime) {
+                    finalDuration = Date.now() - virtiStartTime;
+                    // 更新会话数据中的时长，确保后续使用
+                    virtiSessionData.duration = finalDuration;
+                    console.log('⏱️ 使用计算得出的时长:', Math.round(finalDuration / 1000) + '秒');
+                }
+                
+                // 目标点：不保存（Virti 不提供此数据）
+                const finalObjectives = [];
+                
+                console.log('🔍 最终数据检查:', {
+                    finalScore,
+                    finalDuration: Math.round(finalDuration / 1000) + '秒',
+                    finalObjectivesCount: 0
+                });
+                
+                console.log('💾 准备保存的数据:', {
+                    finalScore,
+                    finalDuration: Math.round(finalDuration / 1000) + '秒',
+                    finalObjectivesCount: finalObjectives.length,
+                    testDate,
+                    testTime,
+                    scenarioName
+                });
+
+                // 保存到 scores 集合，格式与历史成绩页面兼容
+                const scoreData = {
+                    uid: userId,                    // 用户ID（使用统一的UID，这是主要查询字段）
+                    userName: userName || '未命名使用者',             // 用户名
+                    score: Math.round(finalScore),  // 分数（四舍五入）
+                    examType: 'virti',              // 测验类型：virti
+                    scenarioId: scenarioId,         // 情境ID（方便查询）
+                    scenarioName: scenarioName,     // 情境名称（方便显示）
+                    // 测验时间（几月几号几点几分）
+                    testDate: testDate,             // 测验日期（几月几号）
+                    testTime: testTime,             // 测验时间（几点几分）
+                    startedAt: virtiSessionData.startTimestamp || Date.now(),  // 开始时间戳（用于排序）
+                    submittedAt: serverTimestamp(), // 提交时间（使用服务器时间戳）
+                    // 测验时长（总游玩时长，使用 virtiStartTime 计算）
+                    timeSpentMs: finalDuration,     // 耗时（毫秒）
+                    // 完成目标点：不保存（Virti 不提供此数据）
+                    completedObjectives: [],  // 完成的目标点数组（空）
+                    completedObjectivesCount: 0,  // 完成目标点数量（0）
+                    // 其他字段（兼容历史成绩页面）
+                    correctCount: null,             // 正确数量（Virti未提供）
+                    questionCount: null,            // 题目总数（Virti未提供）
+                    // 如果 Firebase Auth UID 与统一 UID 不同，也保存一份（兼容性）
+                    ...(firebaseAuthUID && firebaseAuthUID !== userId ? { firebaseAuthUID: firebaseAuthUID } : {}),
+                    clientInfo: {                   // 客户端信息
+                        appVersion: 'virti-integration v1.0.0',
+                        ua: navigator.userAgent,
+                        timestamp: Date.now(),
+                        source: 'virti',
+                        actionType: actionType
+                    }
+                };
+
+                // 使用連號服務建立成績文件（virti1, virti2, virti3...）
+                try {
+                    const { createSequentialScore } = await import('./src/services/scoreSeqService.js');
+                    const docId = await createSequentialScore(scoreData);
+                    
+                    console.log('✅ Virti成绩已保存到scores集合（使用連號）:', {
+                        docId: docId,
+                        userId,
+                        scenarioId,
+                        scenarioName,
+                        score: scoreData.score,
+                        examType: scoreData.examType,
+                        testDate: testDate,
+                        testTime: testTime,
+                        duration: Math.round(scoreData.timeSpentMs / 1000) + '秒',
+                        completedObjectives: scoreData.completedObjectivesCount
+                    });
+                    
+                    return true;
+                } catch (seqError) {
+                    // 如果連號服務失敗，回退到使用 addDoc
+                    console.warn('⚠️ 連號服務失敗，使用 addDoc 作為備用:', seqError);
+                    const docRef = await addDoc(collection(db, 'scores'), scoreData);
+                    
+                    console.log('✅ Virti成绩已保存到scores集合（備用方案）:', {
+                        docId: docRef.id,
+                        userId,
+                        scenarioId,
+                        scenarioName,
+                        score: scoreData.score
+                    });
+                    
+                    return true;
+                }
+            } catch (error) {
+                console.error('❌ 保存Virti成绩到Firestore失败:', error);
+                console.error('❌ 错误详情:', {
+                    code: error.code,
+                    message: error.message,
+                    stack: error.stack
+                });
+                return false;
+            }
+        }
+
         function handleVirtiMessage(event) {
             if (!event || typeof event.data === 'undefined') return;
+            
+            // 安全检查：只接受来自 Virti 的消息
+            // if (event.origin !== 'https://app.virti.com') return;
+            
             const data = event.data;
             const messageType = typeof data === 'string'
                 ? data
                 : data.type || data.event || data.action || data.state;
+            
+            // 记录所有可能包含成绩信息的消息（用于调试）
+            const scoreRelatedTypes = ['setScore', 'setCompleted', 'score', 'completed', 'finish', 'end', 'result', 'summary'];
+            const isScoreRelated = scoreRelatedTypes.some(type => 
+                messageType === type || 
+                data.action === type || 
+                data.type === type ||
+                (typeof data === 'object' && (data.score !== undefined || data.completedObjectives !== undefined || data.duration !== undefined))
+            );
+            
+            if (isScoreRelated) {
+                console.log('📊 收到可能包含成绩信息的Virti消息:');
+                console.log('📊 消息类型:', messageType);
+                console.log('📊 消息完整内容:', JSON.stringify(data, null, 2));
+                console.log('📊 消息来源:', event.origin);
+            }
+            
             switch (messageType) {
                 case 'virti:play':
                 case 'player:play':
@@ -2848,8 +3270,124 @@
                         updateStageByTime(subtitleElapsedSeconds);
                     }
                     break;
-                default:
+                case 'setScore':
+                case 'setCompleted':
+                case 'score':
+                case 'completed':
+                case 'finish':
+                case 'end':
+                case 'result':
+                case 'summary':
+                    // 处理成绩数据
+                    handleVirtiScore(data, messageType);
                     break;
+                default:
+                    // 检查是否有action字段（可能Virti使用action而不是type）
+                    if (data.action === 'setScore' || data.action === 'setCompleted' || 
+                        data.action === 'score' || data.action === 'completed' ||
+                        data.action === 'finish' || data.action === 'end' ||
+                        data.action === 'result' || data.action === 'summary') {
+                        handleVirtiScore(data, data.action);
+                    } else if (typeof data === 'object' && data !== null) {
+                        // 如果消息对象中包含成绩相关字段，也尝试处理
+                        if (data.score !== undefined || data.completedObjectives !== undefined || 
+                            data.duration !== undefined || data.timeSpent !== undefined ||
+                            data.completedObjectivesCount !== undefined) {
+                            console.log('📊 检测到消息中包含成绩相关字段，尝试处理');
+                            handleVirtiScore(data, 'setCompleted');
+                        }
+                    }
+                    break;
+            }
+        }
+
+        // 处理Virti成绩数据
+        async function handleVirtiScore(data, actionType) {
+            try {
+                console.log('🔍 处理Virti成绩数据，完整消息:', JSON.stringify(data, null, 2));
+                
+                // 获取当前用户ID（使用统一的方式）
+                let userId = getExternalUserID();
+                
+                // 如果 getExternalUserID 返回 null，尝试从 Firebase Auth 获取
+                if (!userId) {
+                    try {
+                        const { auth, authReady } = await import('./js/firebase.js');
+                        await authReady;
+                        if (auth.currentUser) {
+                            userId = auth.currentUser.uid;
+                            console.log('⚠️ 使用 Firebase Auth UID 作为备用:', userId);
+                        }
+                    } catch (e) {
+                        console.error('❌ 无法获取用户ID:', e);
+                        console.warn('⚠️ 无法获取用户ID，无法保存成绩');
+                        return;
+                    }
+                }
+                
+                if (!userId) {
+                    console.warn('⚠️ 无法获取用户ID，无法保存成绩');
+                    return;
+                }
+
+                // 获取当前情境ID
+                const scenarioId = getCurrentScenarioId();
+                if (!scenarioId) {
+                    console.warn('⚠️ 无法确定当前情境ID，无法保存成绩');
+                    return;
+                }
+
+                // 获取成绩（尝试多种可能的字段名）
+                let score = 0;
+                if (typeof data.score === 'number') {
+                    score = data.score;
+                } else if (typeof data.value === 'number') {
+                    score = data.value;
+                } else if (typeof data.finalScore === 'number') {
+                    score = data.finalScore;
+                } else if (typeof data.totalScore === 'number') {
+                    score = data.totalScore;
+                } else if (typeof data.percentage === 'number') {
+                    // 如果是百分比（0-100），转换为分数
+                    score = data.percentage;
+                } else if (data.score !== undefined && data.score !== null) {
+                    score = Number(data.score) || 0;
+                }
+                
+                // 更新会话数据中的成绩（即使 score 是 0 也更新，因为可能是真实的 0 分）
+                // 重要：如果新的 score 比现有的大，或者现有的是 0，则更新
+                // 这样可以确保保存时使用最高的分数
+                if (typeof score === 'number') {
+                    // 如果新分数大于现有分数，或者现有分数是 0，则更新
+                    if (score > (virtiSessionData.score || 0) || virtiSessionData.score === undefined || virtiSessionData.score === null) {
+                        virtiSessionData.score = score;
+                        console.log('📊 更新成绩:', score, '(原有:', virtiSessionData.score, ')');
+                    } else {
+                        console.log('📊 保留更高成绩:', virtiSessionData.score, '(新收到:', score, ')');
+                    }
+                }
+
+                // 不尝试从 Virti 消息中提取目标点和时长
+                // 目标点：Virti 不提供此数据，保持为空数组
+                // 时长：使用 virtiStartTime 计算（在保存函数中处理）
+
+                console.log('📊 提取的数据:', {
+                    score,
+                    actionType
+                });
+
+                // 保存到Firestore（传递原始数据，以便在保存函数中检查 saveAndQuit）
+                const success = await saveVirtiScoreToFirestore(userId, scenarioId, score, actionType, data);
+                if (success) {
+                    console.log(`✅ ${actionType === 'setScore' ? '成绩' : '完成记录'}已保存:`, {
+                        userId,
+                        scenarioId,
+                        score: virtiSessionData.score || score,
+                        duration: virtiSessionData.duration ? Math.round(virtiSessionData.duration / 1000) + '秒' : '0秒'
+                    });
+                }
+            } catch (error) {
+                console.error('❌ 处理Virti成绩时发生错误:', error);
             }
         }
 
@@ -2918,24 +3456,24 @@
                 });
             }
 
-            const virtiPlayer = document.getElementById('Virti360Player');
-            if (virtiPlayer) {
+            const iframe = document.getElementById('Virti360Player');
+            if (iframe) {
                 let pointerDownInfo = null;
-                virtiPlayer.addEventListener('pointerdown', (event) => {
+                iframe.addEventListener('pointerdown', (event) => {
                     pointerDownInfo = {
                         x: event.clientX,
                         y: event.clientY,
                         time: performance.now()
                     };
                 });
-                virtiPlayer.addEventListener('pointerup', (event) => {
+                iframe.addEventListener('pointerup', (event) => {
                     if (!pointerDownInfo) return;
                     const dx = Math.abs(event.clientX - pointerDownInfo.x);
                     const dy = Math.abs(event.clientY - pointerDownInfo.y);
                     const dt = performance.now() - pointerDownInfo.time;
                     pointerDownInfo = null;
                     if (dx <= 6 && dy <= 6 && dt <= 600) {
-                        const rect = virtiPlayer.getBoundingClientRect();
+                        const rect = iframe.getBoundingClientRect();
                         const relativeX = event.clientX - rect.left;
                         const relativeY = rect.bottom - event.clientY;
                         const isPlayControlArea = relativeX >= 0 && relativeX <= 160 && relativeY >= 0 && relativeY <= 140;
@@ -2945,6 +3483,7 @@
                     }
                 });
             }
+
 
             window.addEventListener('message', handleVirtiMessage, false);
         }
@@ -3070,6 +3609,14 @@
         };
 
         let currentScenarioType = '';
+        let virtiStartTime = null;  // Virti 测验开始时间
+        let virtiSessionData = {
+            startTime: null,
+            startTimestamp: null,
+            duration: 0,
+            completedObjectives: [],  // 完成的目标点
+            score: 0
+        };
 
         function resetScenarioSelection() {
             const scenarioDetail = document.getElementById('scenarioDetail');
@@ -3200,6 +3747,29 @@
             // 为URL添加external_user_id参数
             const urlWithUserId = addExternalUserIDToVirtiUrl(url);
             
+            // 尝试从URL中识别情境类型（如果currentScenarioType未设置）
+            if (!currentScenarioType) {
+                const virtiId = extractVirtiScenarioId(url);
+                if (virtiId && scenarioIdMap[virtiId]) {
+                    currentScenarioType = scenarioIdMap[virtiId];
+                    console.log('📌 从URL识别情境类型:', currentScenarioType);
+                }
+            }
+            
+            // 记录测验开始时间（只在首次加载或URL改变时重置）
+            if (iframe.src !== urlWithUserId || iframe.src === '') {
+                // 重置会话数据
+                virtiStartTime = Date.now();
+                virtiSessionData = {
+                    startTime: new Date(),
+                    startTimestamp: virtiStartTime,
+                    duration: 0,
+                    completedObjectives: [],
+                    score: 0
+                };
+                console.log('📊 Virti测验开始，开始时间:', new Date(virtiStartTime).toLocaleString('zh-TW'));
+            }
+            
             if (iframe.src !== urlWithUserId) {
                 iframe.src = urlWithUserId;
             }
@@ -3217,7 +3787,7 @@
             } catch (e) {
                 console.log('无法与 Virti iframe 通信:', e);
             }
-            
+
             scenarioEmbed.style.display = 'flex';
         }
 
@@ -3537,30 +4107,30 @@
                     const avatar = msg.authorName ? msg.authorName.charAt(0).toUpperCase() : 'U';
                     
                     return `
-                        <div class="cmt" data-id="${msg.id}" style="display:flex;gap:12px;margin-bottom:16px;padding:8px 0;">
+                        <div class="cmt" data-id="${msg.id}" style="display:flex;gap:16px;margin-bottom:20px;padding:20px;background:linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);border-radius:16px;border:1px solid rgba(102, 126, 234, 0.1);box-shadow:0 4px 12px rgba(0, 0, 0, 0.05);transition:all 0.3s ease;">
                             <!-- 頭像 -->
-                            <div style="width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);display:flex;align-items:center;justify-content:center;color:white;font-weight:bold;font-size:16px;flex-shrink:0;">
+                            <div style="width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);display:flex;align-items:center;justify-content:center;color:white;font-weight:bold;font-size:18px;flex-shrink:0;box-shadow:0 4px 8px rgba(102, 126, 234, 0.3);">
                                 ${avatar}
                             </div>
                             
                             <!-- 留言內容 -->
                             <div style="flex:1;min-width:0;">
                                 <!-- 用戶名和時間 -->
-                                    <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
-                                        <span style="font-weight:600;color:#0f0f0f;font-size:14px;">${esc(msg.authorName)}${msg.authorDept ? `｜${esc(msg.authorDept)}` : ''}</span>
-                                        <span style="color:#606060;font-size:12px;">${timeStr}</span>
+                                    <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+                                        <span style="font-weight:700;color:#1e293b;font-size:15px;">${esc(msg.authorName)}${msg.authorDept ? ` <span style="color:#64748b;font-weight:400;font-size:13px;">｜${esc(msg.authorDept)}</span>` : ''}</span>
+                                        <span style="color:#94a3b8;font-size:12px;">${timeStr}</span>
                                     </div>
                                 
                                 <!-- 留言文字 -->
-                                <div style="color:#0f0f0f;line-height:1.4;margin-bottom:8px;white-space:pre-wrap;word-break:break-word;">${esc(msg.text)}</div>
+                                <div style="color:#334155;line-height:1.6;margin-bottom:12px;white-space:pre-wrap;word-break:break-word;font-size:15px;">${esc(msg.text)}</div>
                                 
                                 <!-- 互動按鈕 -->
-                                <div style="display:flex;align-items:center;gap:16px;margin-bottom:8px;">
-                                    <button class="replyBtn" data-id="${msg.id}" style="background:none;border:none;color:#065fd4;font-size:14px;font-weight:500;cursor:pointer;padding:4px 0;">
-                                        <i class="fas fa-reply" style="margin-right:4px;"></i>回覆
+                                <div style="display:flex;align-items:center;gap:20px;margin-bottom:8px;">
+                                    <button class="replyBtn" data-id="${msg.id}" style="background:none;border:none;color:#667eea;font-size:14px;font-weight:600;cursor:pointer;padding:6px 12px;border-radius:8px;transition:all 0.2s;" onmouseover="this.style.backgroundColor='rgba(102, 126, 234, 0.1)'" onmouseout="this.style.backgroundColor='transparent'">
+                                        <i class="fas fa-reply" style="margin-right:6px;"></i>回覆
                                     </button>
-                                    <button class="likeBtn" data-id="${msg.id}" data-liked="${msg.likedBy && msg.likedBy.includes(auth.currentUser?.uid) ? 'true' : 'false'}" style="background:none;border:none;color:${msg.likedBy && msg.likedBy.includes(auth.currentUser?.uid) ? '#065fd4' : '#606060'};font-size:14px;cursor:pointer;padding:4px 0;">
-                                        <i class="fas fa-thumbs-up" style="margin-right:4px;"></i>讚 ${msg.likeCount || 0}
+                                    <button class="likeBtn" data-id="${msg.id}" data-liked="${msg.likedBy && msg.likedBy.includes(auth.currentUser?.uid) ? 'true' : 'false'}" style="background:none;border:none;color:${msg.likedBy && msg.likedBy.includes(auth.currentUser?.uid) ? '#667eea' : '#64748b'};font-size:14px;font-weight:600;cursor:pointer;padding:6px 12px;border-radius:8px;transition:all 0.2s;" onmouseover="this.style.backgroundColor='rgba(102, 126, 234, 0.1)'" onmouseout="this.style.backgroundColor='transparent'">
+                                        <i class="fas fa-thumbs-up" style="margin-right:6px;"></i>讚 ${msg.likeCount || 0}
                                     </button>
                                     <div style="position:relative;margin-left:auto;">
                                         <button class="moreBtn" data-id="${msg.id}" style="background:none;border:none;color:#606060;cursor:pointer;padding:4px 8px;border-radius:50%;transition:background-color 0.2s;" onmouseover="this.style.backgroundColor='rgba(0,0,0,0.1)'" onmouseout="this.style.backgroundColor='transparent'">
@@ -3582,31 +4152,31 @@
                                 
                                 <!-- 回覆數量 -->
                                 ${replies.length > 0 ? `
-                                    <div style="color:#065fd4;font-size:14px;font-weight:500;cursor:pointer;margin-bottom:8px;" onclick="toggleReplies('${msg.id}')">
-                                        <i class="fas fa-sort-down" style="margin-right:4px;"></i>${replies.length} 則回覆
+                                    <div style="color:#667eea;font-size:14px;font-weight:600;cursor:pointer;margin-bottom:12px;padding:8px 12px;background:rgba(102, 126, 234, 0.05);border-radius:8px;display:inline-block;transition:all 0.2s;" onclick="toggleReplies('${msg.id}')" onmouseover="this.style.background='rgba(102, 126, 234, 0.1)'" onmouseout="this.style.background='rgba(102, 126, 234, 0.05)'">
+                                        <i class="fas fa-sort-down" style="margin-right:6px;"></i>${replies.length} 則回覆
                                     </div>
                                 ` : ''}
                                 
                                 <!-- 回覆區域 -->
-                                <div class="replies" id="replies-${msg.id}" style="display:none;margin-left:0;padding-left:0;">
+                                <div class="replies" id="replies-${msg.id}" style="display:none;margin-left:0;padding-left:0;margin-top:12px;">
                                     ${replies.map(r=>{
                                         const rt = r.createdAt?.toDate ? r.createdAt.toDate() : new Date();
                                         const replyTimeStr = formatTimeAgo(rt);
                                         const replyAvatar = r.authorName ? r.authorName.charAt(0).toUpperCase() : 'U';
                                         
                                         return `
-                                            <div class="reply" data-id="${r.id}" style="display:flex;gap:12px;margin-bottom:12px;padding-left:8px;">
-                                                <div style="width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);display:flex;align-items:center;justify-content:center;color:white;font-weight:bold;font-size:14px;flex-shrink:0;">
+                                            <div class="reply" data-id="${r.id}" style="display:flex;gap:12px;margin-bottom:16px;padding:16px;background:rgba(248, 250, 252, 0.8);border-radius:12px;border-left:3px solid #667eea;">
+                                                <div style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);display:flex;align-items:center;justify-content:center;color:white;font-weight:bold;font-size:14px;flex-shrink:0;box-shadow:0 2px 6px rgba(102, 126, 234, 0.2);">
                                                     ${replyAvatar}
                                                 </div>
                                                 <div style="flex:1;min-width:0;">
-                                                    <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
-                                                        <span style="font-weight:600;color:#0f0f0f;font-size:14px;">${esc(r.authorName)}${r.authorDept ? `｜${esc(r.authorDept)}` : ''}</span>
-                                                        <span style="color:#606060;font-size:12px;">${replyTimeStr}</span>
+                                                    <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+                                                        <span style="font-weight:700;color:#1e293b;font-size:14px;">${esc(r.authorName)}${r.authorDept ? ` <span style="color:#64748b;font-weight:400;font-size:12px;">｜${esc(r.authorDept)}</span>` : ''}</span>
+                                                        <span style="color:#94a3b8;font-size:12px;">${replyTimeStr}</span>
                                                     </div>
-                                                    <div style="color:#0f0f0f;line-height:1.4;margin-bottom:6px;white-space:pre-wrap;word-break:break-word;">${esc(r.text)}</div>
+                                                    <div style="color:#334155;line-height:1.6;margin-bottom:8px;white-space:pre-wrap;word-break:break-word;font-size:14px;">${esc(r.text)}</div>
                                                     <div style="display:flex;align-items:center;gap:16px;">
-                                                        <button class="likeBtn" data-id="${r.id}" data-liked="${r.likedBy && r.likedBy.includes(auth.currentUser?.uid) ? 'true' : 'false'}" style="background:none;border:none;color:${r.likedBy && r.likedBy.includes(auth.currentUser?.uid) ? '#065fd4' : '#606060'};font-size:14px;cursor:pointer;padding:4px 0;">
+                                                        <button class="likeBtn" data-id="${r.id}" data-liked="${r.likedBy && r.likedBy.includes(auth.currentUser?.uid) ? 'true' : 'false'}" style="background:none;border:none;color:${r.likedBy && r.likedBy.includes(auth.currentUser?.uid) ? '#667eea' : '#64748b'};font-size:13px;font-weight:600;cursor:pointer;padding:4px 10px;border-radius:6px;transition:all 0.2s;" onmouseover="this.style.backgroundColor='rgba(102, 126, 234, 0.1)'" onmouseout="this.style.backgroundColor='transparent'">
                                                             <i class="fas fa-thumbs-up" style="margin-right:4px;"></i>讚 ${r.likeCount || 0}
                                                         </button>
                                                         <div style="position:relative;margin-left:auto;">
@@ -3633,18 +4203,18 @@
                                 </div>
                                 
                                 <!-- 回覆輸入框 -->
-                                <div class="replyBox" style="display:none;margin-top:12px;">
+                                <div class="replyBox" style="display:none;margin-top:16px;padding:16px;background:rgba(248, 250, 252, 0.8);border-radius:12px;border:1px solid rgba(102, 126, 234, 0.2);">
                                     <div style="display:flex;gap:12px;align-items:flex-start;">
-                                        <div style="width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);display:flex;align-items:center;justify-content:center;color:white;font-weight:bold;font-size:14px;flex-shrink:0;">
+                                        <div style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);display:flex;align-items:center;justify-content:center;color:white;font-weight:bold;font-size:14px;flex-shrink:0;box-shadow:0 2px 6px rgba(102, 126, 234, 0.2);">
                                             ${auth.currentUser?.displayName ? auth.currentUser.displayName.charAt(0).toUpperCase() : 'U'}
                                         </div>
                                         <div style="flex:1;">
-                                            <textarea rows="1" class="replyText" placeholder="新增回覆…" style="width:100%;background:#fff;color:#333;border:1px solid #ddd;border-radius:20px;padding:12px 16px;font-size:14px;resize:none;outline:none;min-height:20px;" oninput="this.style.height='auto';this.style.height=this.scrollHeight+'px'"></textarea>
-                                            <div style="display:flex;gap:8px;margin-top:8px;">
-                                                <button class="sendReplyBtn" data-parent="${msg.id}" style="background:#065fd4;color:white;border:none;padding:8px 16px;border-radius:18px;font-size:14px;font-weight:500;cursor:pointer;">
+                                            <textarea rows="1" class="replyText" placeholder="新增回覆…" style="width:100%;background:#fff;color:#334155;border:2px solid #e2e8f0;border-radius:12px;padding:12px 16px;font-size:14px;resize:none;outline:none;min-height:20px;transition:all 0.2s;" oninput="this.style.height='auto';this.style.height=this.scrollHeight+'px'" onfocus="this.style.borderColor='#667eea'" onblur="this.style.borderColor='#e2e8f0'"></textarea>
+                                            <div style="display:flex;gap:10px;margin-top:12px;">
+                                                <button class="sendReplyBtn" data-parent="${msg.id}" style="background:linear-gradient(135deg, #667eea 0%, #764ba2 100%);color:white;border:none;padding:10px 20px;border-radius:12px;font-size:14px;font-weight:600;cursor:pointer;box-shadow:0 4px 12px rgba(102, 126, 234, 0.3);transition:all 0.2s;" onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 6px 16px rgba(102, 126, 234, 0.4)'" onmouseout="this.style.transform='translateY(0)';this.style.boxShadow='0 4px 12px rgba(102, 126, 234, 0.3)'">
                                                     回覆
                                                 </button>
-                                                <button class="cancelReplyBtn" data-parent="${msg.id}" style="background:none;color:#606060;border:none;padding:8px 16px;font-size:14px;cursor:pointer;">
+                                                <button class="cancelReplyBtn" data-parent="${msg.id}" style="background:none;color:#64748b;border:none;padding:10px 20px;font-size:14px;font-weight:500;cursor:pointer;border-radius:12px;transition:all 0.2s;" onmouseover="this.style.backgroundColor='rgba(148, 163, 184, 0.1)'" onmouseout="this.style.backgroundColor='transparent'">
                                                     取消
                                                 </button>
                                             </div>

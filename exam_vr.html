@@ -2141,6 +2141,8 @@
                     submittedAt: new Date().toISOString(),
                     createdAt: new Date().toISOString(),
                     timestamp: Date.now(),
+                    // 確保使用 serverTimestamp 而不是字符串（與歷史成績頁面兼容）
+                    // 注意：需要在使用連號服務時，submittedAt 會被連號服務設置為 serverTimestamp()
                     // 選填欄位數據
                     optionalAnswers: optionalData
                 };
@@ -2174,12 +2176,32 @@
                 // 等待Firebase初始化
                 await window.__FB__.authReady;
                 
-                // 使用正確的Firebase導入
-                const { collection, addDoc } = await import("https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore.js");
-                
-                const docRef = await addDoc(collection(window.__FB__.db, 'scores'), data);
-                console.log('學習紀錄已儲存到scores集合，ID:', docRef.id);
-                return docRef.id;
+                // 使用連號服務建立成績文件（VR1, VR2, VR3...）
+                try {
+                    // 暫時將 window.__FB__ 設置為模組導出的格式，以兼容連號服務
+                    const originalDb = window.__FB__.db;
+                    const originalAuth = window.__FB__.auth;
+                    
+                    // 動態導入連號服務
+                    const { createSequentialScore } = await import('./src/services/scoreSeqService.js');
+                    
+                    // 連號服務需要從 js/firebase.js 導入 db 和 auth，但 exam_vr.html 使用的是 window.__FB__
+                    // 創建一個臨時的兼容層
+                    const { db, auth } = await import('./js/firebase.js');
+                    
+                    // 使用連號服務創建文檔
+                    const docId = await createSequentialScore(data);
+                    console.log('學習紀錄已儲存到scores集合（使用連號），ID:', docId);
+                    return docId;
+                } catch (seqError) {
+                    // 如果連號服務失敗，回退到使用 addDoc
+                    console.warn('⚠️ 連號服務失敗，使用 addDoc 作為備用:', seqError);
+                    const { collection, addDoc } = await import("https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore.js");
+                    
+                    const docRef = await addDoc(collection(window.__FB__.db, 'scores'), data);
+                    console.log('學習紀錄已儲存到scores集合（備用方案），ID:', docRef.id);
+                    return docRef.id;
+                }
             } catch (error) {
                 console.error('Firebase儲存錯誤:', error);
                 throw error;

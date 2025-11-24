@@ -1557,12 +1557,32 @@
                 document.getElementById('detailModalTitle').textContent = '';
                 
                 // 顯示基本資訊
-                document.getElementById('detailExamType').textContent = scoreData.examType || '筆試測驗';
+                document.getElementById('detailExamType').textContent = scoreData.examType === 'virti' ? 
+                    `模擬對話情境${scoreData.scenarioName ? ' - ' + scoreData.scenarioName : ''}` : 
+                    (scoreData.examType || '筆試測驗');
                 
                 // 處理測驗時間 - 顯示日期和時間
                 let testDateTime = '未知';
                 try {
-                    if (scoreData.examType === 'VR操作測驗') {
+                    if (scoreData.examType === 'virti') {
+                        // Virti 使用 testDate 和 testTime（几月几号几点几分）
+                        if (scoreData.testDate && scoreData.testTime) {
+                            testDateTime = `${scoreData.testDate} ${scoreData.testTime}`;
+                        } else if (scoreData.submittedAt) {
+                            // 如果testDate/testTime不存在，使用submittedAt
+                            let date;
+                            if (scoreData.submittedAt && typeof scoreData.submittedAt.toDate === 'function') {
+                                date = scoreData.submittedAt.toDate().toLocaleString('zh-TW');
+                            } else if (scoreData.submittedAt && scoreData.submittedAt.seconds) {
+                                date = new Date(scoreData.submittedAt.seconds * 1000).toLocaleString('zh-TW');
+                            } else if (scoreData.submittedAt) {
+                                date = new Date(scoreData.submittedAt).toLocaleString('zh-TW');
+                            } else {
+                                date = '未知日期';
+                            }
+                            testDateTime = date;
+                        }
+                    } else if (scoreData.examType === 'VR操作測驗') {
                         // VR操作測驗使用testDate和testTime
                         if (scoreData.testDate && scoreData.testTime) {
                             testDateTime = `${scoreData.testDate} ${scoreData.testTime}`;
@@ -1606,15 +1626,18 @@
                 }
                 document.getElementById('detailTestDate').textContent = testDateTime;
                 
-                // 處理測驗時長
+                // 處理測驗時長（总游玩时长）
                 const timeSpentMs = scoreData.timeSpentMs || 0;
                 const minutes = Math.floor(timeSpentMs / 60000);
                 const seconds = Math.floor((timeSpentMs % 60000) / 1000);
-                const timeSpent = minutes > 0 ? `${minutes}分${seconds}秒` : `${seconds}秒`;
+                const timeSpent = minutes > 0 ? `${minutes}分${seconds}秒` : (seconds > 0 ? `${seconds}秒` : '0秒');
                 document.getElementById('detailTestDuration').textContent = timeSpent;
                 
-                // 顯示完成進度
-                if (scoreData.examType === 'VR操作測驗') {
+                // 顯示完成進度（Virti 不显示目标点）
+                if (scoreData.examType === 'virti') {
+                    // Virti 成绩不显示目标点（Virti 不提供此数据）
+                    document.getElementById('detailProgress').textContent = '';
+                } else if (scoreData.examType === 'VR操作測驗') {
                     document.getElementById('detailProgress').textContent = scoreData.completionProgress || '未知';
                 } else {
                     document.getElementById('detailProgress').textContent = `${scoreData.correctCount || 0}/${scoreData.questionCount || 0} 題`;
@@ -1725,6 +1748,10 @@
             if (filterValue !== 'all') {
                 filteredScores = historyScores.filter(score => {
                     const examType = score.examType || '筆試測驗';
+                    // "模擬對話情境" 对应 virti 类型
+                    if (filterValue === '模擬對話情境') {
+                        return examType === 'virti';
+                    }
                     return examType === filterValue;
                 });
             }
@@ -1752,31 +1779,89 @@
                     return;
                 }
                 
-                // 查詢成績
-                const { collection, query, where, getDocs, orderBy, limit } = await import('https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore.js');
-                
-                let snap;
+                // 獲取統一的 UID 和 Firebase Auth UID（同時查詢兩種，以兼容所有記錄）
+                const firebaseAuthUID = auth.currentUser.uid;
+                let unifiedUID = null;
                 try {
-                    // 嘗試使用 orderBy 查詢
-                    const q1 = query(
-            collection(db, 'scores'),
-                        where('uid', '==', auth.currentUser.uid),
-            orderBy('submittedAt', 'desc'),
-                        limit(50)
-                    );
-                    snap = await getDocs(q1);
-        } catch (e) {
-                    // submittedAt 若是字串會在 orderBy 報錯，退回不排序
-                    console.log('⚠️ orderBy 失敗，使用基本查詢:', e.message);
-                    const q2 = query(
-            collection(db, 'scores'),
-                        where('uid', '==', auth.currentUser.uid),
-                        limit(50)
-                    );
-                    snap = await getDocs(q2);
+                    const { getUnifiedUID } = await import('./js/unifiedAuthService.js');
+                    unifiedUID = await getUnifiedUID();
+                    if (unifiedUID) {
+                        console.log('✅ 獲取到統一 UID:', unifiedUID);
+                    }
+                } catch (e) {
+                    console.warn('⚠️ 獲取統一 UID 失敗:', e);
                 }
                 
-                historyScores = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+                console.log('📊 Firebase Auth UID:', firebaseAuthUID);
+                console.log('📊 統一 UID:', unifiedUID);
+                
+                // 查詢成績（同時查詢統一 UID 和 Firebase Auth UID，以兼容所有記錄）
+                const { collection, query, where, getDocs, orderBy, limit, or } = await import('https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore.js');
+                
+                let allScores = new Map(); // 使用 Map 來去重（基於文檔 ID）
+                
+                // 查詢統一 UID 的記錄（如果存在）
+                if (unifiedUID && unifiedUID !== firebaseAuthUID) {
+                    try {
+                        let snap1;
+                        try {
+                            const q1 = query(
+                                collection(db, 'scores'),
+                                where('uid', '==', unifiedUID),
+                                orderBy('submittedAt', 'desc'),
+                                limit(50)
+                            );
+                            snap1 = await getDocs(q1);
+                        } catch (e) {
+                            console.log('⚠️ 統一 UID orderBy 失敗，使用基本查詢:', e.message);
+                            const q2 = query(
+                                collection(db, 'scores'),
+                                where('uid', '==', unifiedUID),
+                                limit(50)
+                            );
+                            snap1 = await getDocs(q2);
+                        }
+                        
+                        snap1.docs.forEach(doc => {
+                            allScores.set(doc.id, { id: doc.id, ...doc.data() });
+                        });
+                        console.log(`✅ 從統一 UID 查詢到 ${snap1.docs.length} 筆記錄`);
+                    } catch (e) {
+                        console.error('❌ 查詢統一 UID 記錄失敗:', e);
+                    }
+                }
+                
+                // 查詢 Firebase Auth UID 的記錄
+                try {
+                    let snap2;
+                    try {
+                        const q3 = query(
+                            collection(db, 'scores'),
+                            where('uid', '==', firebaseAuthUID),
+                            orderBy('submittedAt', 'desc'),
+                            limit(50)
+                        );
+                        snap2 = await getDocs(q3);
+                    } catch (e) {
+                        console.log('⚠️ Firebase Auth UID orderBy 失敗，使用基本查詢:', e.message);
+                        const q4 = query(
+                            collection(db, 'scores'),
+                            where('uid', '==', firebaseAuthUID),
+                            limit(50)
+                        );
+                        snap2 = await getDocs(q4);
+                    }
+                    
+                    snap2.docs.forEach(doc => {
+                        allScores.set(doc.id, { id: doc.id, ...doc.data() });
+                    });
+                    console.log(`✅ 從 Firebase Auth UID 查詢到 ${snap2.docs.length} 筆記錄`);
+                } catch (e) {
+                    console.error('❌ 查詢 Firebase Auth UID 記錄失敗:', e);
+                }
+                
+                // 將 Map 轉換為數組
+                historyScores = Array.from(allScores.values());
                 
                 // 客戶端排序（處理不同時間格式）
                 historyScores.sort((a, b) => {
@@ -1849,7 +1934,25 @@
                 // 正確處理時間顯示
                 let date;
                 try {
-                    if (score.examType === 'VR操作測驗') {
+                    if (score.examType === 'virti') {
+                        // Virti 使用 testDate 和 testTime（几月几号几点几分）
+                        if (score.testDate && score.testTime) {
+                            date = `${score.testDate} ${score.testTime}`;
+                        } else if (score.submittedAt) {
+                            // 如果testDate/testTime不存在，使用submittedAt
+                            if (score.submittedAt && typeof score.submittedAt.toDate === 'function') {
+                                date = score.submittedAt.toDate().toLocaleString('zh-TW');
+                            } else if (score.submittedAt && score.submittedAt.seconds) {
+                                date = new Date(score.submittedAt.seconds * 1000).toLocaleString('zh-TW');
+                            } else if (score.submittedAt) {
+                                date = new Date(score.submittedAt).toLocaleString('zh-TW');
+                            } else {
+                                date = '未知日期';
+                            }
+                        } else {
+                            date = '未知日期';
+                        }
+                    } else if (score.examType === 'VR操作測驗') {
                         // VR操作測驗優先使用testDate和testTime
                         if (score.testDate && score.testTime) {
                             const userFilledDateTimeString = `${score.testDate} ${score.testTime}`;
@@ -1912,13 +2015,19 @@
                 return `
                     <div class="history-item clickable-score" onclick="showScoreDetail('${JSON.stringify(score).replace(/"/g, '&quot;')}')">
                         <div class="history-info">
-                            <h4>${score.examType || '筆試測驗'} ${localBadge}</h4>
+                            <h4>${score.examType === 'virti' ? 
+                                `模擬對話情境${score.scenarioName ? ' - ' + score.scenarioName : ''}` : 
+                                (score.examType || '筆試測驗')} ${localBadge}</h4>
                             <div class="history-details">
                                 <span><i class="fas fa-calendar"></i> ${date}</span>
                                 <span><i class="fas fa-clock"></i> ${timeSpent}</span>
-                                <span><i class="fas fa-check-circle"></i> ${score.examType === 'VR操作測驗' ? 
-                                    (score.progressPercentage !== undefined ? `${score.progressPercentage}%` : '未知%') : 
-                                    `${score.correctCount || 0}/${score.questionCount || 0} 題`}</span>
+                                <span><i class="fas fa-check-circle"></i> ${
+                                    score.examType === 'virti' ? 
+                                        '' : // Virti 不显示目标点
+                                    score.examType === 'VR操作測驗' ? 
+                                        (score.progressPercentage !== undefined ? `${score.progressPercentage}%` : '未知%') : 
+                                    `${score.correctCount || 0}/${score.questionCount || 0} 題`
+                                }</span>
                             </div>
                         </div>
                         <div class="history-score">
@@ -2055,9 +2164,15 @@
                     const minutes = Math.floor(timeSpentMs / 60000);
                     const seconds = Math.floor((timeSpentMs % 60000) / 1000);
                     const timeSpent = minutes > 0 ? `${minutes}分${seconds}秒` : `${seconds}秒`;
-                    return `${date},${score.userName || '未知'},${score.score},${score.examType === 'VR操作測驗' ? 
+                    const progressInfo = score.examType === 'virti' ? 
+                        '' : // Virti 不显示目标点
+                        score.examType === 'VR操作測驗' ? 
                         (score.progressPercentage !== undefined ? `${score.progressPercentage}%` : '未知%') : 
-                        `${score.correctCount || 0}/${score.questionCount || 0} 題`},${timeSpent},${score.examType || '筆試測驗'}`;
+                        `${score.correctCount || 0}/${score.questionCount || 0} 題`;
+                    const examTypeDisplay = score.examType === 'virti' ? 
+                        `模擬對話情境${score.scenarioName ? ' - ' + score.scenarioName : ''}` : 
+                        (score.examType || '筆試測驗');
+                    return `${date},${score.userName || '未知'},${score.score},${progressInfo},${timeSpent},${examTypeDisplay}`;
                 })
             ].join('\n');
             

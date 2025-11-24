@@ -1038,12 +1038,12 @@
             <!-- Hero Section -->
             <div class="hero-section" id="heroSection">
                 <div class="hero-content">
-                    <h1 class="hero-title">Pediatric Basic Life Support</h1>
+                    <h1 class="hero-title">小兒基本救命術（PBLS）</h1>
                     <p class="hero-description">
-                        Pediatric Basic Life Support (PBLS) is the essential guideline for rescuing infants and children in cardiac or respiratory arrest. This platform provides systematic training combining theory, process flow, and scenario simulations.
+                        小兒基本救命術（PBLS）是專為兒童與嬰幼兒設計的重要急救流程，協助第一時間正確判斷並處理呼吸或心跳驟停的狀況。本平台提供完整的學習資源，涵蓋標準理論基礎、系統化流程操作與多情境模擬，透過圖解說明與互動式演練，幫助學員快速理解並熟練應變步驟，最終目標是讓每位學習者在關鍵時刻都能正確反應，提升急救成功率，守護孩子的生命安全。
                     </p>
                     <button class="learn-more-btn" onclick="scrollToFlowchart()">
-                        Learn More
+                        了解更多
                     </button>
                 </div>
             </div>
@@ -1312,66 +1312,102 @@
         }
 
 
-        // 處理措施資料
-        const treatmentData = {
-            cardiac: {
-                title: '心臟驟停處理措施',
-                steps: [
-                    '立即進行CPR（心肺復甦術）',
-                    '進行電擊',
-                    '給予Epinephrine',
-                    '轉送ICU'
-                ]
-            },
-            poisoning: {
-                title: '食物中毒處理措施',
-                steps: [
-                    '清理呼吸道，確保氣道暢通',
-                    '使用ambu-bag進行人工呼吸',
-                    '進行CPR(心肺復甦術)',
-                    '進行電擊',
-                    '給予Amiodarone'
-                ]
-            },
-            drowning: {
-                title: '溺水處理措施',
-                steps: [
-                    '抽吸呼吸道中的水分',
-                    '使用Bag-Mask進行人工呼吸',
-                    '進行CPR心肺復甦術',
-                    '使用AED電擊除顫（60J）',
-                    '給予Amiodarone（胺碘酮）'
-                ]
-            },
-            fire: {
-                title: '火災嗆傷處理措施',
-                steps: [
-                    '進行氣管插管並給予氧氣',
-                    '進行CPR心肺復甦術',
-                    '使用AED電擊除顫（80-100J）',
-                    '給予Epinephrine（腎上腺素）'
-                ]
-            },
-            trauma: {
-                title: '外傷處理措施',
-                steps: [
-                    '進行止血並建立靜脈輸液',
-                    '進行CPR心肺復甦術',
-                    '使用AED電擊除顫（70J）',
-                    '給予Epinephrine（腎上腺素）'
-                ]
+        // 處理措施資料 - 從翻譯文件載入
+        let treatmentData = {};
+        
+        // 從翻譯文件載入處理措施資料
+        async function loadTreatmentData() {
+            try {
+                const currentLang = localStorage.getItem('pbls_language') || 'zh';
+                const langFile = currentLang === 'en' ? 'en' : 'zh-TW';
+                const response = await fetch(`locales/${langFile}/translation.json`);
+                const translations = await response.json();
+                
+                if (translations.info && translations.info.treatmentData) {
+                    treatmentData = {
+                        cardiac: translations.info.treatmentData.cardiac,
+                        poisoning: translations.info.treatmentData.poisoning,
+                        drowning: translations.info.treatmentData.drowning,
+                        fire: translations.info.treatmentData.fire,
+                        trauma: translations.info.treatmentData.trauma
+                    };
+                }
+            } catch (error) {
+                console.error('載入翻譯資料失敗，使用預設資料:', error);
+                // 如果載入失敗，使用預設的中文資料
+                treatmentData = {
+                    cardiac: {
+                        title: '心臟驟停處理措施',
+                        steps: [
+                            '立即進行CPR（心肺復甦術）',
+                            '使用AED進行電擊（第一次電擊2J/kg，第二次電擊4J/kg）',
+                            '給予腎上腺素(Epinephrine)',
+                            '轉送PICU'
+                        ]
+                    },
+                    poisoning: {
+                        title: '食物中毒處理措施',
+                        steps: [
+                            '清理呼吸道，確保氣道暢通',
+                            '使用bag-mask進行通氣',
+                            '進行CPR(心肺復甦術)',
+                            '進行電擊(第一次電擊2J/kg，第二次電擊4J/kg)',
+                            '給予胺碘酮(Amiodarone)',
+                            '轉送PICU'
+                        ]
+                    },
+                    drowning: {
+                        title: '溺水處理措施',
+                        steps: [
+                            '抽吸呼吸道中的水分',
+                            '使用bag-mask進行通氣',
+                            '進行CPR(心肺復甦術)',
+                            '使用AED進行電擊（第一次電擊2J/kg，第二次電擊4J/kg）',
+                            '給予胺碘酮(Amiodarone)',
+                            '轉送PICU'
+                        ]
+                    },
+                    fire: {
+                        title: '火災嗆傷處理措施',
+                        steps: [
+                            '進行氣管插管並給予氧氣',
+                            '進行CPR(心肺復甦術)',
+                            '使用AED進行電擊（第一次電擊2J/kg，第二次電擊4J/kg）',
+                            '給予腎上腺素(Epinephrine)',
+                            '轉送PICU'
+                        ]
+                    },
+                    trauma: {
+                        title: '外傷處理措施',
+                        steps: [
+                            '進行止血並建立靜脈輸液',
+                            '進行CPR(心肺復甦術)',
+                            '使用AED進行電擊（第一次電擊2J/kg，第二次電擊4J/kg）',
+                            '給予腎上腺素(Epinephrine)',
+                            '轉送PICU'
+                        ]
+                    }
+                };
             }
-        };
+        }
 
         // 顯示處理措施彈出視窗
-        function showTreatmentModal(scenarioType) {
+        async function showTreatmentModal(scenarioType) {
             const modal = document.getElementById('treatmentModal');
             const title = document.getElementById('modalTitle');
             const body = document.getElementById('modalBody');
             
-            // 使用全局翻譯數據或本地數據
-            const data = window.treatmentData ? window.treatmentData[scenarioType] : treatmentData[scenarioType];
-            if (!data) return;
+            // 確保資料已載入
+            if (Object.keys(treatmentData).length === 0) {
+                await loadTreatmentData();
+            }
+            
+            // 使用翻譯數據
+            const data = treatmentData[scenarioType];
+            if (!data) {
+                console.error('找不到情境資料:', scenarioType);
+                return;
+            }
             
             title.textContent = data.title;
             
@@ -1424,6 +1460,9 @@
             
             // 初始化背景輪播
             initHeroBackground();
+            
+            // 載入處理措施資料
+            loadTreatmentData();
             
             // 檢查用戶登入狀態
             checkUserAuth();
